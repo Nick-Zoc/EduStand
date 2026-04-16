@@ -2,24 +2,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 :root {
-    /* Colors from Stitch Design */
-    --primary: #0078d4;
-    --primary-container: #cce4f7;
+    /* Core theme tokens for EduStand */
+    --primary: #007FFF;
+    /* Azure Blue */
+    --primary-container: #d9f0ff;
     --on-primary: #ffffff;
-    --surface: #f3f2f1;
+    --surface: #F8F9FA;
+    /* Very light gray background */
     --surface-container-lowest: #ffffff;
-    --surface-container-low: #faf9f8;
-    --surface-container: #edebe9;
-    --surface-container-high: #e1dfdd;
-    --surface-container-highest: #d2d0ce;
-    --on-surface: #201f1e;
-    --on-surface-variant: #605e5c;
-    --outline: #8a8886;
-    --outline-variant: #c8c6c4;
+    --surface-container-low: #F6F7F8;
+    --surface-container: #eef3f7;
+    --surface-container-high: #e6eef8;
+    --surface-container-highest: #dce7f2;
+    --on-surface: #111827;
+    --on-surface-variant: #6b7280;
+    --outline: #9ca3af;
+    --outline-variant: #e5e7eb;
     --error: #d13438;
-    
+    --panel-gradient: linear-gradient(160deg, #eef5ff 0%, #eaf3ff 55%, #edf6ff 100%);
+
     /* Layout */
-    --roundness: 8px; /* Used for xl shapes */
+    --roundness: 8px;
     --roundness-md: 4px;
 }
 
@@ -29,11 +32,13 @@ body {
 }
 
 body {
-    background: var(--surface);
+    background: var(--panel-gradient);
     color: var(--on-surface);
     font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    overflow-x: hidden;
 }
 
 .brand-headline {
@@ -41,7 +46,7 @@ body {
 }
 
 .bg-surface {
-    background-color: var(--surface);
+    background: var(--panel-gradient);
 }
 
 .bg-surface-container-lowest {
@@ -108,7 +113,7 @@ body {
 
 /* Base Shadows and Elements */
 .editorial-shadow {
-    box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+    box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
 }
 
 .pattern-bg {
@@ -122,6 +127,14 @@ body {
 .main-panel {
     border-radius: 12px;
     overflow: hidden;
+    border: 1px solid #D1D5DB;
+    position: relative;
+    z-index: 1;
+}
+
+.main-panel.card-sleek {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #D1D5DB;
 }
 
 .card-curator {
@@ -148,6 +161,7 @@ a.text-primary-link {
     color: var(--primary);
     text-decoration: none;
 }
+
 a.text-primary-link:hover {
     text-decoration: underline;
 }
@@ -156,15 +170,193 @@ a.text-primary-link:hover {
 .icon-btn:hover {
     background-color: var(--surface-container);
 }
+
 .icon-btn:hover i {
     transform: translateY(-2px);
     transition: transform .18s ease-in-out;
 }
 
+/* EduStand specific button variant */
+.btn-primary-edu {
+    background: var(--primary) !important;
+    color: var(--on-primary) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 127, 255, 0.18);
+    transition: all 0.2s ease;
+}
+
+.btn-primary-edu:hover {
+    background: #006fe0 !important;
+    border-color: #006fe0 !important;
+    box-shadow: 0 6px 16px rgba(0, 127, 255, 0.18);
+    transform: translateY(-1px);
+}
+
+.btn-primary-edu:active {
+    transform: scale(0.98);
+}
+
+.btn-primary-edu:focus-visible {
+    box-shadow: 0 0 0 0.2rem rgba(0, 127, 255, 0.24);
+}
+
+/* Sleek card styling used on dashboard small grid cards */
+.card-sleek {
+    background: #FFFFFF;
+    /* pure white */
+    border: 1px solid #F3F4F6;
+    /* barely visible gray border */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    /* subtle ambient shadow */
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    will-change: transform, box-shadow, border-color;
+}
+
+.card-sleek:hover {
+    border: 1px solid var(--primary);
+    /* Azure Blue border on hover */
+    box-shadow: 0 6px 16px rgba(0, 127, 255, 0.12);
+    /* soft azure glow */
+    transform: translateY(-3px);
+}
+
+/* Small card inner layout */
+.card-sleek .card-body {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem;
+}
+
+.card-sleek .card-body .fa {
+    font-size: 1.25rem;
+    color: var(--on-surface-variant);
+}
+
+.card-sleek .card-title {
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--on-surface);
+}
+
+.card-sleek .card-actions {
+    margin-left: auto;
+}
+
+/* Login page visual panel accents (non-particle, static) */
+.login-visual-panel {
+    background: var(--panel-gradient);
+}
+
+.login-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 127, 255, 0.12);
+    z-index: 0;
+}
+
+.login-bg-orb.orb-1 {
+    width: 7rem;
+    height: 7rem;
+    top: 1.5rem;
+    left: 1.75rem;
+}
+
+.login-bg-orb.orb-2 {
+    width: 5rem;
+    height: 5rem;
+    bottom: 3rem;
+    right: 2rem;
+}
+
+.login-bg-icon {
+    position: absolute;
+    left: 2.2rem;
+    bottom: 2.2rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 127, 255, 0.14);
+    background: #ffffff;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 0;
+}
+
+/* Input group + floating label treatment */
+.input-group-float {
+    border: 1px solid #d8dee7;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.input-group-float:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.18rem rgba(0, 127, 255, 0.16);
+}
+
+.input-group-float .input-group-text,
+.input-group-float .form-control {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent;
+}
+
+.input-group-float .input-icon-addon {
+    color: #7b8797;
+    width: 2.45rem;
+    justify-content: center;
+}
+
+.input-group-float:focus-within .input-icon-addon {
+    color: var(--primary);
+}
+
+.input-group-float .form-floating>.form-control {
+    height: calc(3rem + 2px);
+    line-height: 1.25;
+    font-size: 0.95rem;
+    padding-left: 0.35rem;
+}
+
+.input-group-float .form-floating>label {
+    padding-left: 0.35rem;
+    color: var(--on-surface-variant);
+}
+
+.forgot-link-inline {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+}
+
+.forgot-link-inline:hover {
+    background: rgba(0, 127, 255, 0.08);
+    text-decoration: none;
+}
+
 /* Glassmorphic boxes */
 .glass-panel {
-    background-color: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.glass-card {
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(0, 127, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    border-color: rgba(0, 127, 255, 0.34);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12), 0 6px 16px rgba(0, 127, 255, 0.12);
+    transform: translateY(-3px);
 }

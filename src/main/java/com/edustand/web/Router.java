@@ -38,13 +38,13 @@ public class Router extends HttpServlet {
 				target = "/WEB-INF/pages/login.jsp";
 				break;
 			case "/AdminDashboard":
-				target = "/WEB-INF/pages/AdminDashboard.jsp";
+				target = "/WEB-INF/pages/admin/adminDashboard.jsp";
 				break;
 			case "/TeacherDashboard":
-				target = "/WEB-INF/pages/TeacherDashboard.jsp";
+				target = "/WEB-INF/pages/teacher/teacherDashboard.jsp";
 				break;
 			case "/StudentDashboard":
-				target = "/WEB-INF/pages/StudentDashboard.jsp";
+				target = "/WEB-INF/pages/student/studentDashboard.jsp";
 				break;
 			case "/forgot-password":
 				target = "/WEB-INF/pages/forgot-password.jsp";

@@ -1,1 +1,170 @@
 @charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    /* Colors from Stitch Design */
+    --primary: #0078d4;
+    --primary-container: #cce4f7;
+    --on-primary: #ffffff;
+    --surface: #f3f2f1;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #faf9f8;
+    --surface-container: #edebe9;
+    --surface-container-high: #e1dfdd;
+    --surface-container-highest: #d2d0ce;
+    --on-surface: #201f1e;
+    --on-surface-variant: #605e5c;
+    --outline: #8a8886;
+    --outline-variant: #c8c6c4;
+    --error: #d13438;
+    
+    /* Layout */
+    --roundness: 8px; /* Used for xl shapes */
+    --roundness-md: 4px;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background: var(--surface);
+    color: var(--on-surface);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.brand-headline {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+.bg-surface {
+    background-color: var(--surface);
+}
+
+.bg-surface-container-lowest {
+    background-color: var(--surface-container-lowest);
+}
+
+.bg-surface-container-low {
+    background-color: var(--surface-container-low);
+}
+
+.bg-surface-container-high {
+    background-color: var(--surface-container-high);
+}
+
+.text-on-surface {
+    color: var(--on-surface);
+}
+
+.text-on-surface-variant {
+    color: var(--on-surface-variant);
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.text-on-primary {
+    color: var(--on-primary);
+}
+
+.border-outline-variant {
+    border-color: var(--outline-variant);
+}
+
+/* Custom Input Styling */
+.form-control.input-ghost {
+    background-color: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--roundness);
+    padding-left: 2.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.form-control.input-ghost:focus {
+    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+    border-color: var(--primary);
+    background-color: #fff;
+}
+
+.input-icon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: var(--on-surface-variant);
+    z-index: 4;
+}
+
+/* Base Shadows and Elements */
+.editorial-shadow {
+    box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+}
+
+.pattern-bg {
+    background-color: #f3f2f1;
+    background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px), radial-gradient(var(--primary) 0.5px, #f3f2f1 0.5px);
+    background-size: 24px 24px;
+    background-position: 0 0, 12px 12px;
+    opacity: 0.05;
+}
+
+.main-panel {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card-curator {
+    background: var(--surface-container-lowest);
+    border: none;
+    border-radius: var(--roundness);
+    box-shadow: 0 12px 32px rgba(25, 28, 29, 0.04);
+}
+
+.btn-primary-curator {
+    background: var(--primary);
+    color: var(--on-primary);
+    border: none;
+    border-radius: var(--roundness);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary-curator:hover {
+    filter: brightness(1.1);
+    transform: scale(0.99);
+}
+
+a.text-primary-link {
+    color: var(--primary);
+    text-decoration: none;
+}
+a.text-primary-link:hover {
+    text-decoration: underline;
+}
+
+/* Icon hover effects for bootstrap buttons */
+.icon-btn:hover {
+    background-color: var(--surface-container);
+}
+.icon-btn:hover i {
+    transform: translateY(-2px);
+    transition: transform .18s ease-in-out;
+}
+
+/* Glassmorphic boxes */
+.glass-panel {
+    background-color: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}

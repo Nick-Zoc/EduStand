@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,70 +72,20 @@
         }
     </style>
 </head>
-<body class="bg-surface text-on-surface d-flex min-vh-100">
+<c:set var="activeSidebar" value="dashboard" scope="request" />
+<c:set var="userName" value="Prof. Miller" scope="request" />
+<c:set var="userRole" value="Teacher" scope="request" />
+<c:set var="userInitials" value="PM" scope="request" />
+<c:set var="searchPlaceholder" value="Search resources..." scope="request" />
 
-    <!-- Sidebar -->
-    <aside class="sidebar d-none d-md-flex flex-column position-fixed top-0 start-0">
-        <div class="px-4 py-4 mt-2 mb-2 d-flex align-items-center gap-2">
-            <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                <i class="fa-solid fa-graduation-cap fs-6"></i>
-            </div>
-            <div>
-                <h1 class="fs-5 fw-bold text-primary brand-headline m-0">EduStand</h1>
-                <p class="small fw-semibold m-0" style="color: var(--on-surface-variant); font-size: 11px;">Resource Portal</p>
-            </div>
-        </div>
+<body class="dashboard-shell bg-surface text-on-surface">
 
-        <nav class="flex-grow-1 d-flex flex-column px-3 gap-1">
-            <a href="#" class="nav-link-custom active d-flex align-items-center gap-3 px-3 py-3 text-decoration-none">
-                <i class="fa-solid fa-chart-line fs-6 icon-w"></i>
-                <span class="brand-headline small">Dashboard</span>
-            </a>
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-3 text-decoration-none">
-                <i class="fa-solid fa-book-open fs-6 icon-w"></i>
-                <span class="brand-headline small">Curriculum</span>
-            </a>
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-3 text-decoration-none">
-                <i class="fa-solid fa-folder-tree fs-6 icon-w"></i>
-                <span class="brand-headline small">Resources</span>
-            </a>
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-3 text-decoration-none">
-                <i class="fa-solid fa-chart-pie fs-6 icon-w"></i>
-                <span class="brand-headline small">Analytics</span>
-            </a>
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-3 text-decoration-none">
-                <i class="fa-solid fa-gear fs-6 icon-w"></i>
-                <span class="brand-headline small">Settings</span>
-            </a>
-        </nav>
-
-        <div class="p-3 mt-auto">
-            <button class="btn btn-light bg-surface-container-low text-decoration-none text-on-surface-variant d-flex align-items-center justify-content-center w-100 gap-2 small border-0 py-2 rounded-3" onclick="document.querySelector('.sidebar').classList.toggle('show'); document.querySelector('.sidebar').classList.add('d-none');">
-                <i class="fa-solid fa-chevron-left icon-w"></i>
-                <span class="brand-headline fw-bold" style="font-size: 12px; text-transform: uppercase;">Collapse</span>
-            </button>
-        </div>
-    </aside>
+    <jsp:include page="/WEB-INF/components/teacherSidebar.jsp" />
 
     <!-- Main Canvas -->
-    <main class="main-content d-flex flex-column min-vh-100">
-        <!-- Topbar -->
-        <header class="d-flex justify-content-between align-items-center w-100 px-4 py-3 bg-white sticky-top border-bottom border-outline-variant shadow-sm" style="z-index: 1030;">
-            <div class="d-flex align-items-center flex-grow-1" style="max-width: 400px;">
-                <button class="btn btn-light d-md-none border-0 bg-transparent text-on-surface me-2 p-1" id="sidebarToggle" onclick="document.querySelector('.sidebar').classList.toggle('show'); document.querySelector('.sidebar').classList.remove('d-none');">
-                    <i class="fa-solid fa-bars fs-5"></i>
-                </button>
-                <div class="position-relative w-100">
-                    <i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y text-on-surface-variant small" style="left: 1rem;"></i>
-                    <input class="form-control form-control-sm bg-surface-container border-0 rounded-pill py-2 ps-5" placeholder="Search resources..." type="text"/>
-                </div>
-            </div>
-            
-            <div class="d-flex align-items-center gap-3">
-                <span class="small fw-semibold text-on-surface">Prof. Miller</span>
-                <i class="fa-solid fa-circle-user fs-2 text-primary"></i>
-            </div>
-        </header>
+    <main class="app-main d-flex flex-column min-vh-100">
+
+        <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
         <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 2.5rem;">
             <!-- Hero Section: Editorial Premium Style -->
@@ -299,9 +250,7 @@
             </section>
         </div>
 
-        <footer class="mt-auto py-4 w-100 border-top bg-white d-flex justify-content-center">
-            <p class="small fw-semibold text-on-surface-variant m-0" style="font-size: 12px;">© 2026 EduStand - Resource Portal</p>
-        </footer>
+        <jsp:include page="/WEB-INF/components/footer.jsp" />
     </main>
 
 </body>

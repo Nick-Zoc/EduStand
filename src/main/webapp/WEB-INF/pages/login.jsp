@@ -37,13 +37,17 @@
                     <h1 class="brand-headline fs-4 fw-bold text-on-surface mb-1">Sign in to EduStand</h1>
                     <p class="text-on-surface-variant small mb-0">Please enter your university email and password to continue.</p>
                 </div>
-
+				<c:if test="${not empty error}">
+				    <div class="alert alert-danger text-center py-2" role="alert">
+				        ${error}
+				    </div>
+				</c:if>
                 <form action="${pageContext.request.contextPath}/login" method="post" class="vstack gap-3">
                     <div class="input-group input-group-float">
                         <span class="input-group-text input-icon-addon"><i class="fa-solid fa-envelope"></i></span>
                         <div class="form-floating flex-grow-1">
-                            <input type="email" class="form-control input-with-addon" id="email" name="username" placeholder="Email ID" required autofocus>
-                            <label for="email">Email ID</label>
+                            <input type="email" class="form-control input-with-addon" id="email" name="email" placeholder="Email" value="${rememberedEmail}" required autofocus>
+                            <label for="email">Email Address</label>
                         </div>
                     </div>
 
@@ -56,7 +60,7 @@
                     </div>
 
                     <div class="form-check py-1">
-                        <input class="form-check-input border-outline-variant" type="checkbox" id="remember" name="remember" value="true">
+                        <input class="form-check-input border-outline-variant" type="checkbox" id="remember" name="rememberMe" value="true" ${rememberChecked ? 'checked' : ''}>
                         <label class="form-check-label text-on-surface-variant mt-1" style="font-size: 0.75rem;" for="remember">Keep me signed in for 30 days</label>
                     </div>
 

@@ -1,6 +1,7 @@
 package com.edustand.controllers;
 
 import java.io.IOException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -10,8 +11,8 @@ import jakarta.servlet.http.HttpSession;
 
 import com.edustand.model.UserModel;
 
-@WebServlet(asyncSupported = true, urlPatterns = { "/StudentDashboard" })
-public class StudentDashboardController extends HttpServlet {
+@WebServlet(asyncSupported = true, urlPatterns = { "/" })
+public class HomeController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -24,23 +25,13 @@ public class StudentDashboardController extends HttpServlet {
             return;
         }
 
-        if (!"STUDENT".equalsIgnoreCase(loggedInUser.getRole())) {
-            resp.sendRedirect(req.getContextPath() + resolveDashboardByRole(loggedInUser.getRole()));
-            return;
-        }
-
-        req.setAttribute("userName", loggedInUser.getFullName());
-        req.setAttribute("userRole", loggedInUser.getRole());
-        req.getRequestDispatcher("/WEB-INF/pages/student/studentDashboard.jsp").forward(req, resp);
-    }
-
-    private String resolveDashboardByRole(String role) {
+        String role = loggedInUser.getRole();
         if ("ADMIN".equalsIgnoreCase(role)) {
-            return "/AdminDashboard";
+            resp.sendRedirect(req.getContextPath() + "/AdminDashboard");
+        } else if ("TEACHER".equalsIgnoreCase(role)) {
+            resp.sendRedirect(req.getContextPath() + "/TeacherDashboard");
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/StudentDashboard");
         }
-        if ("TEACHER".equalsIgnoreCase(role)) {
-            return "/TeacherDashboard";
-        }
-        return "/StudentDashboard";
     }
 }

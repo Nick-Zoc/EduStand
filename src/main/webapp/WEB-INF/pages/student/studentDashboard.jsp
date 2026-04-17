@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,86 +60,20 @@
         }
     </style>
 </head>
-<body class="bg-surface text-on-surface d-flex min-vh-100">
+<c:set var="activeSidebar" value="dashboard" scope="request" />
+<c:set var="userName" value="Alex Thompson" scope="request" />
+<c:set var="userRole" value="Student" scope="request" />
+<c:set var="userInitials" value="AT" scope="request" />
+<c:set var="searchPlaceholder" value="Search for courses or resources..." scope="request" />
 
-    <!-- Sidebar -->
-    <aside class="sidebar d-none d-md-flex flex-column position-fixed top-0 start-0 py-4 px-3">
-        
-        <!-- Logo Area -->
-        <div class="d-flex align-items-center gap-3 mb-5 px-2">
-            <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                <i class="fa-solid fa-graduation-cap fs-6"></i>
-            </div>
-            <div>
-                <h1 class="fs-5 fw-bold text-primary brand-headline m-0">EduStand</h1>
-                <p class="small fw-bold text-outline-variant m-0" style="font-size: 10px; letter-spacing: 0.1em; color: var(--outline);">THE DIGITAL CURATOR</p>
-            </div>
-        </div>
+<body class="dashboard-shell bg-surface text-on-surface">
 
-        <!-- Navigation -->
-        <nav class="flex-grow-1 d-flex flex-column gap-2">
-            <a href="#" class="nav-link-custom active d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-                <i class="fa-solid fa-table-columns fs-6 icon-w"></i>
-                <span class="brand-headline small">Dashboard</span>
-            </a>
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-                <i class="fa-solid fa-book-open fs-6 icon-w"></i>
-                <span class="brand-headline small">Courses</span>
-            </a>
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-                <i class="fa-solid fa-clipboard-list fs-6 icon-w"></i>
-                <span class="brand-headline small">Assignments</span>
-            </a>
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-                <i class="fa-solid fa-users fs-6 icon-w"></i>
-                <span class="brand-headline small">Community</span>
-            </a>
-        </nav>
-
-        <div class="mt-auto pt-4 border-top border-outline-variant d-flex flex-column gap-2">
-            <a href="#" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-                <i class="fa-solid fa-gear fs-6 icon-w"></i>
-                <span class="brand-headline small">Settings</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/logout" class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 text-decoration-none text-danger">
-                <i class="fa-solid fa-right-from-bracket fs-6 icon-w"></i>
-                <span class="brand-headline small">Logout</span>
-            </a>
-            <button class="btn btn-light d-flex align-items-center gap-2 justify-content-center w-100 mt-2 text-outline bg-surface-container-low rounded border-0" id="collapseSidebarBtn" onclick="document.querySelector('.sidebar').classList.toggle('show'); document.querySelector('.sidebar').classList.add('d-none');">
-                <i class="fa-solid fa-chevron-left"></i>
-                <span style="font-size: 12px; font-weight: 700; text-transform: uppercase;">Collapse</span>
-            </button>
-        </div>
-    </aside>
+    <jsp:include page="/WEB-INF/components/studentSidebar.jsp" />
 
     <!-- Main Content -->
-    <main class="main-content d-flex flex-column min-vh-100">
-        <!-- Topbar -->
-        <header class="d-flex justify-content-between align-items-center w-100 px-4 py-3 bg-white border-bottom border-outline-variant sticky-top shadow-sm" style="z-index: 1030;">
-            <div class="d-flex align-items-center flex-grow-1" style="max-width: 600px;">
-                <button class="btn btn-light d-md-none border-0 bg-transparent text-on-surface me-2 p-1" id="sidebarToggle" onclick="document.querySelector('.sidebar').classList.toggle('show'); document.querySelector('.sidebar').classList.remove('d-none');">
-                    <i class="fa-solid fa-bars fs-5"></i>
-                </button>
-                <div class="position-relative w-100">
-                    <i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y text-on-surface-variant small" style="left: 1rem;"></i>
-                    <input class="form-control bg-surface-container border-0 rounded-pill py-2 small w-100" style="padding-left: 2.5rem;" placeholder="Search for courses or resources..." type="text"/>
-                </div>
-            </div>
-            
-            <div class="d-flex align-items-center gap-4 ms-4">
-                <div class="position-relative cursor-pointer text-on-surface-variant">
-                    <i class="fa-regular fa-bell fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="d-none d-sm-block text-end me-1">
-                        <p class="brand-headline fw-semibold m-0 text-on-surface" style="font-size: 0.9rem;">Alex Thompson</p>
-                        <p class="text-on-surface-variant m-0" style="font-size: 0.75rem;">Student</p>
-                    </div>
-                    <img src="https://ui-avatars.com/api/?name=Alex+Thompson&background=007FFF&color=fff" alt="Profile" class="rounded-circle" width="36" height="36">
-                </div>
-            </div>
-        </header>
+    <main class="app-main d-flex flex-column min-vh-100">
+
+        <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
         <!-- Container -->
         <div class="p-4 p-md-5 mx-auto w-100" style="max-width: 1280px; gap: 2.5rem; display: flex; flex-direction: column;">
@@ -327,9 +262,7 @@
             </section>
         </div>
 
-        <footer class="mt-auto py-3 w-100 border-top bg-surface border-outline-variant d-flex justify-content-center">
-            <p class="small fw-semibold text-uppercase text-on-surface-variant m-0" style="font-size: 11px; letter-spacing: 0.05em;">© 2026 EduStand | Created with ❤️ by nepalsolutionhub</p>
-        </footer>
+        <jsp:include page="/WEB-INF/components/footer.jsp" />
     </main>
 
 </body>

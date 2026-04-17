@@ -42,11 +42,18 @@
                     <p class="text-on-surface-variant small mb-0">Send your details and we will review your access request.</p>
                 </div>
 
-                <form action="#" method="post" class="vstack gap-3">
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success text-center py-2" role="alert">${success}</div>
+                </c:if>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger text-center py-2" role="alert">${error}</div>
+                </c:if>
+
+                <form action="${pageContext.request.contextPath}/request-access" method="post" class="vstack gap-3">
                     <div class="input-group input-group-float">
                         <span class="input-group-text input-icon-addon"><i class="fa-solid fa-user"></i></span>
                         <div class="form-floating flex-grow-1">
-                            <input type="text" class="form-control input-with-addon" id="fullName" name="fullName" placeholder="Full Name" required>
+                            <input type="text" class="form-control input-with-addon" id="fullName" name="fullName" placeholder="Full Name" value="<c:out value='${formFullName}' />" required>
                             <label for="fullName">Full Name</label>
                         </div>
                     </div>
@@ -54,7 +61,7 @@
                     <div class="input-group input-group-float">
                         <span class="input-group-text input-icon-addon"><i class="fa-solid fa-envelope"></i></span>
                         <div class="form-floating flex-grow-1">
-                            <input type="email" class="form-control input-with-addon" id="requestEmail" name="email" placeholder="University Email" required>
+                            <input type="email" class="form-control input-with-addon" id="requestEmail" name="email" placeholder="University Email" value="<c:out value='${formEmail}' />" required>
                             <label for="requestEmail">University Email</label>
                         </div>
                     </div>
@@ -63,17 +70,16 @@
                         <span class="input-group-text input-icon-addon"><i class="fa-solid fa-user-graduate"></i></span>
                         <div class="form-floating flex-grow-1">
                             <select class="form-select" id="role" name="role" required>
-                                <option value="" selected disabled>Select Role</option>
-                                <option value="student">Student</option>
-                                <option value="teacher">Teacher</option>
-                                <option value="admin">Administrator</option>
+                                <option value="" ${empty formRole ? 'selected' : ''} disabled>Select Role</option>
+                                <option value="STUDENT" ${formRole eq 'STUDENT' ? 'selected' : ''}>Student</option>
+                                <option value="TEACHER" ${formRole eq 'TEACHER' ? 'selected' : ''}>Teacher</option>
                             </select>
                             <label for="role">Role</label>
                         </div>
                     </div>
 
                     <div class="form-floating">
-                        <textarea class="form-control request-textarea" id="reason" name="reason" placeholder="Reason" required></textarea>
+                        <textarea class="form-control request-textarea" id="reason" name="reason" placeholder="Reason" required><c:out value="${formReason}" /></textarea>
                         <label for="reason">Reason for Access</label>
                     </div>
 

@@ -8,10 +8,10 @@ import java.sql.Timestamp;
  */
 
 /**
- * Default empty constructor 
+ * Default empty constructor
  */
 public class UserModel {
-    
+
     // Private variables mapping exactly to the database schema
     private int userId;
     private String fullName;
@@ -19,8 +19,9 @@ public class UserModel {
     private String passwordHash;
     private String role; // 'ADMIN', 'TEACHER', 'STUDENT'
     private String status; // 'ACTIVE', 'INACTIVE'
+    private String requestReason;
     private Timestamp createdAt;
-    
+
     /**
      * Default empty constructor (Required for JavaBean standard)
      */
@@ -28,7 +29,8 @@ public class UserModel {
     }
 
     /**
-     * Parameterized constructor for registering a new user (does not inclide ID and createdAt 
+     * Parameterized constructor for registering a new user (does not inclide ID and
+     * createdAt
      * since the database auto-generates those).
      */
     public UserModel(String fullName, String email, String passwordHash, String role, String status) {
@@ -87,6 +89,14 @@ public class UserModel {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRequestReason() {
+        return requestReason;
+    }
+
+    public void setRequestReason(String requestReason) {
+        this.requestReason = requestReason;
     }
 
     public Timestamp getCreatedAt() {

@@ -330,6 +330,33 @@ a.text-primary-link:hover {
     color: var(--on-surface-variant);
 }
 
+.input-group-float .form-floating>.form-select {
+    height: calc(3rem + 2px);
+    border: 0;
+    box-shadow: none;
+    background-color: transparent;
+    padding-left: 0.35rem;
+    font-size: 0.95rem;
+}
+
+.otp-input-row .otp-digit {
+    width: 3rem;
+    height: 3rem;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: 1px solid #d8dee7;
+    border-radius: 10px;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.otp-input-row .otp-digit:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.16rem rgba(0, 127, 255, 0.16);
+    outline: none;
+}
+
 .forgot-link-inline {
     display: inline-block;
     padding: 0.25rem 0.5rem;
@@ -359,4 +386,18 @@ a.text-primary-link:hover {
     border-color: rgba(0, 127, 255, 0.34);
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12), 0 6px 16px rgba(0, 127, 255, 0.12);
     transform: translateY(-3px);
+}
+
+/* Keep main shell static: no hover glow/lift on page container */
+.main-panel.card-sleek:hover {
+    border: 1px solid #D1D5DB;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: none;
+}
+
+/* OTP entry card should remain static (no hover animation) */
+.otp-static-card:hover {
+    border: 1px solid #F3F4F6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transform: none;
 }

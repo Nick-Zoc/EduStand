@@ -23,15 +23,15 @@
         <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 1.75rem;">
             <section class="page-header-sleek p-4 p-md-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-                    <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">Access Review</div>
-                    <h2 class="fs-2 fw-bold mb-2 brand-headline text-on-surface">Pending requests</h2>
+                    <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">Manage Requests</div>
+                    <h2 class="fs-1 fw-bold mb-2 brand-headline text-on-surface">Pending Requests</h2>
                     <p class="text-on-surface-variant mb-0" style="max-width: 42rem; line-height: 1.6;">Review new user requests and approve or reject access in a clean, focused workflow.</p>
                 </div>
                 <span class="edu-badge edu-badge-pending" id="pendingSummaryCount">${pendingCount} Pending</span>
             </section>
 
-            <section class="card-curator overflow-hidden">
-                <div class="px-4 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-bottom border-outline-variant bg-surface gap-3">
+            <section class="users-table-wrap">
+                <div class="users-toolbar px-3 px-md-4 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-bottom border-outline-variant bg-surface gap-3">
                     <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">Review Queue</h2>
                     <span class="small text-on-surface-variant">Newest requests appear first</span>
                 </div>
@@ -39,20 +39,20 @@
                 <div id="requestAlertContainer" aria-live="polite"></div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 m-0 table-index">
+                    <table class="table table-hover align-middle mb-0 table-index users-flat-table">
                         <thead class="bg-surface">
                             <tr>
-                                <th class="border-0 px-4 py-3">Applicant</th>
-                                <th class="border-0 px-4 py-3">Email</th>
-                                <th class="border-0 px-4 py-3">Requested Role</th>
-                                <th class="border-0 px-4 py-3">Status</th>
-                                <th class="border-0 px-4 py-3 text-end">Actions</th>
+                                <th class="px-3 px-md-4 py-3">APPLICANT</th>
+                                <th class="px-3 px-md-4 py-3">EMAIL</th>
+                                <th class="px-3 px-md-4 py-3">REQUESTED ROLE</th>
+                                <th class="px-3 px-md-4 py-3">STATUS</th>
+                                <th class="px-3 px-md-4 py-3 text-end">ACTIONS</th>
                             </tr>
                         </thead>
-                        <tbody class="border-top-0" style="font-family: 'Inter', sans-serif;" id="requestsTableBody">
+                        <tbody id="requestsTableBody">
                             <c:forEach items="${pendingUsers}" var="user">
                                 <tr>
-                                    <td class="px-4 py-3">
+                                    <td class="px-3 px-md-4 py-3">
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 36px; height: 36px; font-size: 12px;">${empty user.fullName ? 'U' : fn:toUpperCase(fn:substring(user.fullName, 0, 1))}</div>
                                             <div>
@@ -61,10 +61,10 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 small text-on-surface-variant"><c:out value="${user.email}" /></td>
-                                    <td class="px-4 py-3"><span class="edu-badge ${user.role eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'} text-uppercase"><c:out value="${user.role}" /></span></td>
-                                    <td class="px-4 py-3"><span class="edu-badge edu-badge-pending text-uppercase">PENDING</span></td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-3 px-md-4 py-3 small text-on-surface-variant"><c:out value="${user.email}" /></td>
+                                    <td class="px-3 px-md-4 py-3"><span class="edu-badge ${user.role eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'} text-uppercase"><c:out value="${user.role}" /></span></td>
+                                    <td class="px-3 px-md-4 py-3"><span class="edu-badge edu-badge-status edu-badge-status-pending">PENDING</span></td>
+                                    <td class="px-3 px-md-4 py-3 text-end">
                                         <div class="d-flex justify-content-end gap-2">
                                             <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-open-review" data-user-id="${user.userId}" data-full-name="<c:out value='${user.fullName}'/>" data-email="<c:out value='${user.email}'/>" data-role="${user.role}" data-reason="<c:out value='${user.requestReason}'/>" type="button"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>
                                             <button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-request-action" data-action="reject_request" data-user-id="${user.userId}" type="button"><i class="fa-solid fa-xmark"></i><span>Decline</span></button>
@@ -74,7 +74,7 @@
                             </c:forEach>
                             <c:if test="${empty pendingUsers}">
                                 <tr>
-                                    <td colspan="5" class="py-5 text-center text-on-surface-variant">
+                                    <td colspan="5" class="py-5 text-center text-on-surface-variant px-3 px-md-4">
                                         <div class="d-flex flex-column align-items-center gap-2">
                                             <i class="fa-regular fa-circle-check fs-3 text-primary"></i>
                                             <strong class="text-on-surface">No pending requests</strong>
@@ -208,13 +208,13 @@
 
             function renderRequests(users) {
                 if (!users.length) {
-                    requestsTableBody.innerHTML = '<tr><td colspan="5" class="py-5 text-center text-on-surface-variant"><div class="d-flex flex-column align-items-center gap-2"><i class="fa-regular fa-circle-check fs-3 text-primary"></i><strong class="text-on-surface">No pending requests</strong><span class="small">New requests will appear here automatically.</span></div></td></tr>';
+                    requestsTableBody.innerHTML = '<tr><td colspan="5" class="py-5 px-3 px-md-4 text-center text-on-surface-variant"><div class="d-flex flex-column align-items-center gap-2"><i class="fa-regular fa-circle-check fs-3 text-primary"></i><strong class="text-on-surface">No pending requests</strong><span class="small">New requests will appear here automatically.</span></div></td></tr>';
                     return;
                 }
 
                 requestsTableBody.innerHTML = users.map((user) => {
                     return '<tr>'
-                        + '<td class="px-4 py-3">'
+                        + '<td class="px-3 px-md-4 py-3">'
                         + '<div class="d-flex align-items-center gap-3">'
                         + '<div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 36px; height: 36px; font-size: 12px;">' + escapeHtml(getInitial(user.fullName)) + '</div>'
                         + '<div>'
@@ -223,10 +223,10 @@
                         + '</div>'
                         + '</div>'
                         + '</td>'
-                        + '<td class="px-4 py-3 small text-on-surface-variant">' + escapeHtml(user.email) + '</td>'
-                        + '<td class="px-4 py-3"><span class="edu-badge ' + (user.role === 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students') + ' text-uppercase fw-bold">' + escapeHtml(user.role) + '</span></td>'
-                        + '<td class="px-4 py-3"><span class="edu-badge edu-badge-pending text-uppercase fw-bold">PENDING</span></td>'
-                        + '<td class="px-4 py-3 text-end">'
+                        + '<td class="px-3 px-md-4 py-3 small text-on-surface-variant">' + escapeHtml(user.email) + '</td>'
+                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge ' + (user.role === 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students') + ' text-uppercase fw-bold">' + escapeHtml(user.role) + '</span></td>'
+                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge edu-badge-status edu-badge-status-pending">PENDING</span></td>'
+                        + '<td class="px-3 px-md-4 py-3 text-end">'
                         + '<div class="d-flex justify-content-end gap-2">'
                         + '<button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-open-review" data-user-id="' + user.userId + '" data-full-name="' + escapeAttribute(user.fullName) + '" data-email="' + escapeAttribute(user.email) + '" data-role="' + escapeAttribute(user.role) + '" data-reason="' + escapeAttribute(user.requestReason) + '" type="button"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>'
                         + '<button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-request-action" data-action="reject_request" data-user-id="' + user.userId + '" type="button"><i class="fa-solid fa-xmark"></i><span>Decline</span></button>'

@@ -58,12 +58,45 @@
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-3">
-            <div class="text-end d-none d-md-block">
-                <p class="m-0 fw-bold brand-headline text-on-surface" style="font-size: 14px; line-height: 1;">${resolvedName}</p>
-                <p class="m-0 text-uppercase fw-bold mt-1 text-on-surface-variant" style="font-size: 10px; letter-spacing: 0.05em;">${resolvedRole}</p>
+        <div class="dropdown">
+            <button class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-3 profile-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Open profile menu">
+                <div class="text-end d-none d-md-block">
+                    <p class="m-0 fw-bold brand-headline text-on-surface" style="font-size: 14px; line-height: 1;">${resolvedName}</p>
+                    <p class="m-0 text-uppercase fw-bold mt-1 text-on-surface-variant" style="font-size: 10px; letter-spacing: 0.05em;">${resolvedRole}</p>
+                </div>
+                <div class="profile-avatar">${resolvedInitials}</div>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end profile-dropdown p-0 border-0 shadow-lg overflow-hidden">
+                <div class="p-3 border-bottom border-outline-variant d-flex align-items-center gap-3">
+                    <div class="profile-avatar-lg d-flex align-items-center justify-content-center fw-bold" style="width: 54px; height: 54px; font-size: 18px; background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: #fff;">
+                        ${resolvedInitials}
+                    </div>
+                    <div class="min-w-0 flex-grow-1">
+                        <div class="fw-bold brand-headline text-on-surface text-truncate">${resolvedName}</div>
+                        <div class="mt-1">
+                            <span class="edu-badge ${resolvedRole eq 'ADMIN' ? 'bg-danger' : resolvedRole eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'} text-uppercase text-white">
+                                ${resolvedRole}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-2">
+                    <a href="${pageContext.request.contextPath}/profile" class="dropdown-item rounded-3 py-2 px-3 d-flex align-items-center gap-3">
+                        <i class="fa-regular fa-user text-primary"></i>
+                        <span>View Profile</span>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/settings" class="dropdown-item rounded-3 py-2 px-3 d-flex align-items-center gap-3">
+                        <i class="fa-solid fa-gear text-on-surface-variant"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+                <div class="p-2 border-top border-outline-variant">
+                    <a href="${pageContext.request.contextPath}/logout" class="dropdown-item rounded-3 py-2 px-3 d-flex align-items-center gap-3 text-danger">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
             </div>
-            <div class="profile-avatar">${resolvedInitials}</div>
         </div>
     </div>
 </header>

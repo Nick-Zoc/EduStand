@@ -201,6 +201,172 @@ a.text-primary-link:hover {
     box-shadow: 0 0 0 0.2rem rgba(0, 127, 255, 0.24);
 }
 
+.users-page-intro {
+    padding-bottom: 0.25rem;
+}
+
+.users-title {
+    letter-spacing: -0.03em;
+}
+
+.users-subtitle {
+    margin-top: 0.5rem;
+}
+
+.users-table-wrap {
+    background: #fff;
+    border: 1px solid var(--outline-variant);
+    border-radius: 20px;
+    overflow: hidden;
+
+}
+
+.users-toolbar {
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.users-search-wrap {
+    min-width: 0;
+    flex: 1 1 420px;
+}
+
+.users-search-field {
+    min-height: 48px;
+    border-radius: 14px;
+    border-color: #d7deea;
+    color: var(--on-surface);
+}
+
+.users-search-field::placeholder {
+    color: #94a3b8;
+}
+
+.users-search-field:focus {
+    color: var(--on-surface);
+    border-color: #8ab4ff;
+    box-shadow: 0 0 0 0.18rem rgba(0, 127, 255, 0.10);
+}
+
+.users-select-filter {
+    min-width: 150px;
+    max-width: 160px;
+}
+
+.users-compact-filter {
+    min-height: 40px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+}
+
+.users-delete-icon-btn {
+    width: 42px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+}
+
+.edu-badge-role,
+.edu-badge-status {
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.32rem 0.72rem;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+}
+
+.edu-badge-role-admin {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fda4af;
+}
+
+.edu-badge-role-teacher {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #93c5fd;
+}
+
+.edu-badge-role-student {
+    background: #ecfeff;
+    color: #0f766e;
+    border-color: #67e8f9;
+}
+
+.edu-badge-status-active {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #86efac;
+}
+
+.edu-badge-status-pending {
+    background: #fffbeb;
+    color: #b45309;
+    border-color: #fcd34d;
+}
+
+.edu-badge-status-inactive {
+    background: #f8fafc;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+.edu-badge-teachers,
+.edu-badge-students {
+    background: #fff;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.edu-badge-teachers {
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+.edu-badge-students {
+    border-color: #67e8f9;
+    color: #0f766e;
+}
+
+.profile-dropdown .edu-badge-teachers,
+.profile-dropdown .edu-badge-students {
+    background: transparent;
+}
+
+.users-flat-table thead th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    font-weight: 700;
+    border-bottom-color: #e5e7eb;
+}
+
+.users-flat-table tbody tr {
+    transition: background-color 0.18s ease;
+}
+
+.users-flat-table tbody tr:hover {
+    background: #fafcff;
+}
+
+.users-flat-table tbody td {
+    border-top-color: #edf2f7;
+}
+
+.users-th-checkbox {
+    width: 48px;
+}
+
+@media (max-width: 992px) {
+    .users-select-filter {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
 /* EduStand badge utility classes (use instead of inline styles) */
 .edu-badge {
     font-size: 11px;
@@ -587,6 +753,69 @@ a.text-primary-link:hover {
     margin-top: 0.85rem;
 }
 
+.profile-dropdown {
+    width: 320px;
+    max-width: min(92vw, 320px);
+    border: 1px solid var(--outline-variant) !important;
+    border-radius: 14px;
+    margin-top: 0.85rem;
+}
+
+.profile-trigger {
+    color: inherit;
+}
+
+.profile-trigger:hover {
+    color: inherit;
+}
+
+.users-flat-shell {
+    max-width: none;
+}
+
+.users-table-wrap {
+    background: #fff;
+    border: 1px solid var(--outline-variant);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.users-search-wrap {
+    min-width: 280px;
+}
+
+.users-select-filter {
+    min-width: 150px;
+    max-width: 170px;
+}
+
+.users-delete-icon-btn {
+    width: 42px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.users-flat-table tbody tr td {
+    border-color: var(--outline-variant);
+}
+
+.users-flat-table tbody tr:hover {
+    background: #f9fbff;
+}
+
+.users-th-checkbox {
+    width: 48px;
+}
+
+@media (max-width: 992px) {
+    .users-select-filter {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
 .notification-item {
     border: 1px solid #eef2f7;
     border-radius: 12px;
@@ -653,4 +882,51 @@ body.sidebar-collapsed .sidebar-nav-link .sidebar-icon {
     border: 1px solid #F3F4F6;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     transform: none;
+}
+
+.contact-info-card,
+.contact-main-card,
+.about-hero,
+.about-stat-card,
+.about-content-card,
+.about-point {
+    background: #ffffff;
+    border: 1px solid var(--outline-variant);
+    border-radius: 14px;
+}
+
+.contact-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--primary-container);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.contact-gradient-panel {
+    border-radius: 14px;
+    background: linear-gradient(165deg, #007fff 0%, #0ea5e9 100%);
+}
+
+.contact-mini-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.16);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.about-stat-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.25rem, 2vw, 1.9rem);
+    color: var(--primary);
+    line-height: 1.1;
+    margin-bottom: 0.35rem;
 }

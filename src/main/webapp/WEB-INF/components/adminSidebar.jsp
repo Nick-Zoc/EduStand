@@ -3,7 +3,7 @@
 <aside class="app-sidebar d-none d-md-flex flex-column position-fixed top-0 start-0 py-4 px-3">
     <div class="d-flex align-items-center gap-3 mb-5 px-2 sidebar-brand-copy">
         <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-            <i class="fa-solid fa-shield-halved fs-6"></i>
+            <i class="fa-solid fa-graduation-cap fs-6"></i>
         </div>
         <div>
             <h1 class="fs-5 fw-bold text-primary brand-headline m-0 sidebar-brand-text">EduStand</h1>
@@ -23,6 +23,18 @@
         <a href="<c:url value='/AdminAccessRequests'/>" class="sidebar-nav-link ${activeSidebar eq 'accessRequests' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
             <i class="fa-solid fa-file-circle-check fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Access Requests</span>
+        </a>
+        <a href="<c:url value='/AdminContactRequests'/>" class="sidebar-nav-link ${activeSidebar eq 'contactRequests' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-envelope-open-text fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">Contact Requests</span>
+        </a>
+        <a href="<c:url value='/PanelContact'/>" class="sidebar-nav-link ${activeSidebar eq 'contact' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-address-book fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">Contact</span>
+        </a>
+        <a href="<c:url value='/PanelAbout'/>" class="sidebar-nav-link ${activeSidebar eq 'about' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-circle-info fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">About</span>
         </a>
     </nav>
 

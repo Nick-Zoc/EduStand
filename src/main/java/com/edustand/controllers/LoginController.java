@@ -11,8 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.edustand.model.UserModel;
 import com.edustand.service.LoginService;
+import com.edustand.service.RememberMeService;
 import com.edustand.util.CookieUtil;
 import com.edustand.util.SessionUtil;
+import com.edustand.util.RememberMeUtil;
 
 @WebServlet(asyncSupported = true, urlPatterns = { "/login" })
 public class LoginController extends HttpServlet {
@@ -55,11 +57,17 @@ public class LoginController extends HttpServlet {
             SessionUtil.setAttribute(req, "loggedInUser", loggedInUser);
             SessionUtil.setAttribute(req, "userRole", loggedInUser.getRole());
 
-            // 4. Handle "Remember Me" (Cookie lasts for 30 days)
+            // 4. Handle "Remember Me" (Token valid for 30 days)
             if (isRememberMeSelected(rememberMe)) {
+                RememberMeService rmService = new RememberMeService();
+                String token = rmService.createToken(loggedInUser.getUserId());
+                if (token != null) {
+                    CookieUtil.addCookie(resp, "rememberMeToken", token, 60 * 60 * 24 * 30);
+                }
                 CookieUtil.addCookie(resp, "rememberedEmail", email, 60 * 60 * 24 * 30);
             } else {
                 CookieUtil.deleteCookie(resp, "rememberedEmail");
+                CookieUtil.deleteCookie(resp, "rememberMeToken");
             }
 
             // 5. Role-based routing: Send them to the correct dashboard

@@ -34,7 +34,7 @@
                 <div class="mb-4">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-                            <i class="fa-solid fa-user-plus fs-5"></i>
+                            <i class="fa-solid fa-graduation-cap fs-5"></i>
                         </div>
                         <span class="brand-headline fs-5 fw-bold text-primary">EduStand</span>
                     </div>

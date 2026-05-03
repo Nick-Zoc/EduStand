@@ -60,3 +60,31 @@ CREATE TABLE IF NOT EXISTS Resource_Downloads (
 -- Insert a default admin for testing (Password is: admin123)
 INSERT INTO Users (full_name, email, password_hash, role) 
 VALUES ('System Admin', 'admin@edustand.edu', 'admin123', 'ADMIN');
+
+CREATE TABLE IF NOT EXISTS RememberMeTokens (
+    token_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token_hash VARCHAR(255) UNIQUE NOT NULL,
+    token_expiry DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    INDEX idx_user_token (user_id, token_expiry)
+);
+
+CREATE TABLE IF NOT EXISTS ContactRequests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    subject VARCHAR(180) NOT NULL,
+    message TEXT NOT NULL,
+    read_status ENUM('UNREAD', 'READ') NOT NULL DEFAULT 'UNREAD',
+    request_status ENUM('PENDING', 'FIXED') NOT NULL DEFAULT 'PENDING',
+    admin_response TEXT DEFAULT NULL,
+    email_notified TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL,
+    INDEX idx_contact_created (created_at),
+    INDEX idx_contact_status (read_status, request_status)
+);

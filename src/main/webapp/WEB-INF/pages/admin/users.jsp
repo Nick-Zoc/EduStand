@@ -12,7 +12,7 @@
     <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">
 </head>
 <c:set var="activeSidebar" value="users" scope="request" />
-<c:set var="searchPlaceholder" value="Search users, roles, or status..." scope="request" />
+<c:set var="searchPlaceholder" value="Search users..." scope="request" />
 
 <body class="dashboard-shell bg-surface text-on-surface">
     <jsp:include page="/WEB-INF/components/adminSidebar.jsp" />
@@ -20,77 +20,91 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 1.75rem;">
-            <section class="page-header-sleek p-4 p-md-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell">
+            <div class="users-page-intro d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-3">
                 <div>
-                    <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">System Users</div>
-                    <h2 class="fs-2 fw-bold mb-2 brand-headline text-on-surface">Admin Users</h2>
-                    <p class="text-on-surface-variant mb-0" style="max-width: 40rem; line-height: 1.6;">Manage website admins who can log in and control the platform from one clean panel.</p>
+                    <div class="users-kicker small text-uppercase fw-semibold text-primary mb-1" style="letter-spacing: 0.08em;">Manage Users</div>
+                    <h2 class="users-title fs-1 fw-bold m-0 brand-headline text-on-surface">All Users</h2>
+                    <p class="users-subtitle text-on-surface-variant mb-0" style="max-width: 46rem; line-height: 1.6;">Review accounts, update roles and status, and remove users from a clean, premium table layout.</p>
                 </div>
-                <button class="btn btn-primary-edu d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2 fw-semibold text-white border-0" type="button" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <button class="btn btn-primary-edu d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold text-white border-0" type="button" data-bs-toggle="modal" data-bs-target="#addUserModal">
                     <i class="fa-solid fa-user-plus"></i>
-                    Add Admin User
+                    Add User
                 </button>
-            </section>
+            </div>
 
-            <section class="card-curator overflow-hidden">
-                <div class="px-4 pt-4 pb-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
-                    <div>
-                        <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">User Directory</h2>
-                        <p class="small text-on-surface-variant mb-0 mt-1" id="usersSummaryText">Showing ${totalUsers} users</p>
+            <div id="usersAlertContainer">
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success border-0 rounded-0 m-0" role="alert">${success}</div>
+                </c:if>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger border-0 rounded-0 m-0" role="alert">${error}</div>
+                </c:if>
+            </div>
+
+            <section class="users-table-wrap">
+                <div class="users-toolbar px-3 px-md-4 py-3 d-flex flex-column flex-xl-row align-items-xl-center gap-2 gap-xl-3 border-bottom border-outline-variant">
+                    <div class="position-relative flex-grow-1 users-search-wrap">
+                        <i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y text-on-surface-variant small" style="left: 0.85rem;"></i>
+                        <input id="usersSearchInput" class="form-control ps-5 users-search-field" type="text" placeholder="Search users" />
                     </div>
-                    <div class="text-end small text-on-surface-variant">Updated live from the database</div>
+                    <select id="roleFilter" class="form-select users-select-filter users-compact-filter" aria-label="Filter by role">
+                        <option value="ALL">All roles</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="TEACHER">Teacher</option>
+                        <option value="STUDENT">Student</option>
+                    </select>
+                    <select id="statusFilter" class="form-select users-select-filter users-compact-filter" aria-label="Filter by status">
+                        <option value="ALL">All status</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="INACTIVE">Inactive</option>
+                    </select>
+                    <select id="rowsPerPage" class="form-select users-select-filter users-compact-filter" aria-label="Rows per page">
+                        <option value="10">10 rows</option>
+                        <option value="15">15 rows</option>
+                        <option value="20" selected>20 rows</option>
+                        <option value="25">25 rows</option>
+                    </select>
+                    <button id="bulkDeleteIconBtn" class="btn btn-outline-danger users-delete-icon-btn" type="button" title="Delete selected users" aria-label="Delete selected users">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 </div>
 
-                <div id="usersAlertContainer">
-                    <c:if test="${not empty success}">
-                        <div class="alert alert-success border-0 rounded-0 m-0" role="alert">${success}</div>
-                    </c:if>
-                    <c:if test="${not empty error}">
-                        <div class="alert alert-danger border-0 rounded-0 m-0" role="alert">${error}</div>
-                    </c:if>
-                </div>
-
-                <div class="table-responsive border-top border-outline-variant">
-                    <table class="table table-hover align-middle mb-0 m-0 table-index">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 table-index users-flat-table">
                         <thead class="bg-surface">
                             <tr>
-                                <th class="border-0 px-4 py-3"><input type="checkbox" id="selectAllUsers" aria-label="Select all users"></th>
-                                <th class="border-0 px-4 py-3">Name</th>
-                                <th class="border-0 px-4 py-3">User ID</th>
-                                <th class="border-0 px-4 py-3">Role</th>
-                                <th class="border-0 px-4 py-3">Status</th>
-                                <th class="border-0 px-4 py-3 text-end">Actions</th>
+                                <th class="px-3 px-md-4 py-3 users-th-checkbox"><input type="checkbox" id="selectAllUsers" aria-label="Select all users on this page"></th>
+                                <th class="px-3 px-md-4 py-3">SN</th>
+                                <th class="px-3 px-md-4 py-3">USER</th>
+                                <th class="px-3 px-md-4 py-3">ROLE</th>
+                                <th class="px-3 px-md-4 py-3">STATUS</th>
+                                <th class="px-3 px-md-4 py-3">EMAIL</th>
+                                <th class="px-3 px-md-4 py-3 text-end">ACTIONS</th>
                             </tr>
                         </thead>
-                        <tbody class="border-top-0" style="font-family: 'Inter', sans-serif;" id="usersTableBody">
-                            <c:forEach items="${users}" var="user">
-                                <tr class="transition">
-                                    <td class="px-4 py-3">
-                                        <input type="checkbox" class="user-select" value="${user.userId}" aria-label="Select user ${user.fullName}">
-                                    </td>
-                                    <td class="px-4 py-3">
+                        <tbody id="usersTableBody" class="border-top-0">
+                            <c:forEach items="${users}" var="user" varStatus="loop">
+                                <tr>
+                                    <td class="px-3 px-md-4 py-3"><input type="checkbox" class="user-select" value="${user.userId}"></td>
+                                    <td class="px-3 px-md-4 py-3 text-on-surface-variant">${loop.count}</td>
+                                    <td class="px-3 px-md-4 py-3">
                                         <div class="d-flex align-items-center gap-3">
-                                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 36px; height: 36px; font-size: 12px;">${empty user.fullName ? 'U' : fn:toUpperCase(fn:substring(user.fullName, 0, 1))}</div>
-                                            <div>
-                                                <p class="m-0 fw-semibold text-on-surface" style="font-size: 14px;"><c:out value="${user.fullName}" /></p>
-                                                <p class="m-0 text-on-surface-variant" style="font-size: 12px;"><c:out value="${user.email}" /></p>
-                                            </div>
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 34px; height: 34px; font-size: 12px;">${empty user.fullName ? 'U' : fn:toUpperCase(fn:substring(user.fullName, 0, 1))}</div>
+                                            <span class="fw-semibold text-on-surface"><c:out value="${user.fullName}" /></span>
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 small text-on-surface-variant" style="font-family: monospace;">#EDU-${user.userId}</td>
-                                    <td class="px-4 py-3">
-                                        <span class="edu-badge ${user.role eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'}"><c:out value="${user.role}" /></span>
+                                    <td class="px-3 px-md-4 py-3">
+                                        <span class="edu-badge edu-badge-role ${user.role eq 'ADMIN' ? 'edu-badge-role-admin' : user.role eq 'TEACHER' ? 'edu-badge-role-teacher' : 'edu-badge-role-student'}"><c:out value="${user.role}" /></span>
                                     </td>
-                                    <td class="px-4 py-3">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="status-dot ${user.status eq 'ACTIVE' ? 'status-active' : (user.status eq 'PENDING' ? 'status-pending' : 'status-inactive')}"></span>
-                                            <span class="fw-medium text-on-surface" style="font-size: 13px;"><c:out value="${user.status}" /></span>
-                                        </div>
+                                    <td class="px-3 px-md-4 py-3">
+                                        <span class="edu-badge edu-badge-status ${user.status eq 'ACTIVE' ? 'edu-badge-status-active' : (user.status eq 'PENDING' ? 'edu-badge-status-pending' : 'edu-badge-status-inactive')}"><c:out value="${user.status}" /></span>
                                     </td>
-                                    <td class="px-4 py-3 text-end">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <button class="btn btn-sm btn-light p-2 d-flex align-items-center justify-content-center border-0 text-on-surface-variant rounded-3 js-edit-user"
+                                    <td class="px-3 px-md-4 py-3 text-on-surface-variant"><c:out value="${user.email}" /></td>
+                                    <td class="px-3 px-md-4 py-3 text-end">
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <button class="btn btn-sm btn-light border-0 text-on-surface-variant js-edit-user"
                                                 data-user-id="${user.userId}"
                                                 data-full-name="<c:out value='${user.fullName}'/>"
                                                 data-email="<c:out value='${user.email}'/>"
@@ -99,7 +113,7 @@
                                                 type="button">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-light p-2 d-flex align-items-center justify-content-center border-0 text-danger rounded-3 js-delete-user"
+                                            <button class="btn btn-sm btn-light border-0 text-danger js-delete-user"
                                                 data-user-id="${user.userId}"
                                                 data-full-name="<c:out value='${user.fullName}'/>"
                                                 type="button">
@@ -113,14 +127,12 @@
                     </table>
                 </div>
 
-                <div class="px-4 py-3 border-top border-outline-variant bg-surface d-flex justify-content-between align-items-center">
-                    <p class="m-0 fw-medium text-on-surface-variant" style="font-size: 12px;">Showing ${totalUsers} users</p>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-danger btn-sm px-3 py-1 rounded-pill" id="deleteSelectedBtn" style="font-size:13px;">Delete selected</button>
-                        <button class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" style="font-size: 13px;">Previous</button>
-                        <button class="btn btn-primary btn-sm px-3 py-1 rounded-pill fw-medium border-0" style="font-size: 13px;">1</button>
-                        <button class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" style="font-size: 13px;">2</button>
-                        <button class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" style="font-size: 13px;">Next</button>
+                <div class="users-pagination-bar px-3 px-md-4 py-3 border-top border-outline-variant d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                    <p id="usersSummaryText" class="m-0 fw-medium text-on-surface-variant" style="font-size: 12px;">Showing ${totalUsers} users</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <button id="prevPageBtn" class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" type="button">Previous</button>
+                        <span id="pageIndicator" class="small fw-semibold text-on-surface-variant">Page 1</span>
+                        <button id="nextPageBtn" class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" type="button">Next</button>
                     </div>
                 </div>
             </section>
@@ -239,192 +251,390 @@
     </div>
 
     <script>
-        const contextPath = '${pageContext.request.contextPath}';
-        const usersTableBody = document.getElementById('usersTableBody');
-        const usersAlertContainer = document.getElementById('usersAlertContainer');
-        const teacherCountValue = document.getElementById('teacherCountValue');
-        const studentCountValue = document.getElementById('studentCountValue');
-        const pendingCountValue = document.getElementById('pendingCountValue');
-        const usersSummaryText = document.getElementById('usersSummaryText');
+        (() => {
+            const contextPath = '${pageContext.request.contextPath}';
+            const usersTableBody = document.getElementById('usersTableBody');
+            const usersAlertContainer = document.getElementById('usersAlertContainer');
+            const usersSummaryText = document.getElementById('usersSummaryText');
+            const searchInput = document.getElementById('usersSearchInput');
+            const roleFilter = document.getElementById('roleFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const rowsPerPage = document.getElementById('rowsPerPage');
+            const selectAllUsers = document.getElementById('selectAllUsers');
+            const bulkDeleteIconBtn = document.getElementById('bulkDeleteIconBtn');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
 
-        const addUserModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addUserModal'));
-        const editUserModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editUserModal'));
+            const addUserModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addUserModal'));
+            const editUserModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editUserModal'));
 
-        document.getElementById('addUserForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formParams = new URLSearchParams(new FormData(event.target));
-            const payload = await window.postFormData(contextPath + '/AdminUsers', formParams);
-            if (!payload) return;
-            applyPayload(payload);
-            if (payload.success) {
-                event.target.reset();
-                addUserModal.hide();
-            }
-        });
+            const state = {
+                allUsers: [],
+                filteredUsers: [],
+                selectedIds: new Set(),
+                currentPage: 1,
+                pageSize: Number(rowsPerPage.value || 20),
+                query: '',
+                role: 'ALL',
+                status: 'ALL'
+            };
 
-        document.getElementById('editUserForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formParams = new URLSearchParams(new FormData(event.target));
-            const payload = await window.postFormData(contextPath + '/AdminUsers', formParams);
-            if (!payload) return;
-            applyPayload(payload);
-            if (payload.success) {
-                event.target.reset();
-                editUserModal.hide();
-            }
-        });
+            const getInitialsSafe = (value) => {
+                if (window.getInitials) {
+                    return window.getInitials(value || 'U');
+                }
+                if (!value) {
+                    return 'U';
+                }
+                return String(value).trim().charAt(0).toUpperCase() || 'U';
+            };
 
-        usersTableBody.addEventListener('click', async (event) => {
-            const editButton = event.target.closest('.js-edit-user');
-            if (editButton) {
-                document.getElementById('editUserId').value = editButton.dataset.userId;
-                document.getElementById('editFullName').value = editButton.dataset.fullName;
-                document.getElementById('editEmail').value = editButton.dataset.email;
-                document.getElementById('editRole').value = editButton.dataset.role;
-                document.getElementById('editStatus').value = editButton.dataset.status;
-                document.getElementById('editPassword').value = '';
-                editUserModal.show();
-                return;
-            }
+            const escapeHtmlSafe = (value) => {
+                if (window.escapeHtml) {
+                    return window.escapeHtml(value == null ? '' : String(value));
+                }
+                return String(value == null ? '' : value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
 
-            const deleteButton = event.target.closest('.js-delete-user');
-            if (!deleteButton) return;
+            const escapeAttrSafe = (value) => {
+                if (window.escapeAttribute) {
+                    return window.escapeAttribute(value == null ? '' : String(value));
+                }
+                return escapeHtmlSafe(value);
+            };
 
-            const fullName = deleteButton.dataset.fullName;
-            const userId = deleteButton.dataset.userId;
+            function applyFilters() {
+                const query = state.query.toLowerCase();
+                state.filteredUsers = state.allUsers.filter((user) => {
+                    const roleOk = state.role === 'ALL' || user.role === state.role;
+                    const statusOk = state.status === 'ALL' || user.status === state.status;
+                    if (!roleOk || !statusOk) {
+                        return false;
+                    }
 
-            const confirmed = await window.showConfirm('Delete user', 'Delete ' + fullName + '? This action cannot be undone.');
-            if (!confirmed) return;
+                    if (!query) {
+                        return true;
+                    }
 
-            const formData = new URLSearchParams();
-            formData.append('action', 'delete_user');
-            formData.append('userId', userId);
+                    const haystack = [
+                        user.fullName,
+                        user.email,
+                        user.role,
+                        user.status,
+                        String(user.userId)
+                    ].join(' ').toLowerCase();
 
-            const payload = await window.postFormData(contextPath + '/AdminUsers', formData);
-            if (!payload) return;
-            applyPayload(payload);
-        });
-
-        // page-specific submit handlers call window.postFormData (defined in js/main.js)
-
-        function applyPayload(payload) {
-            // Use toast for success/error; also update inline alert container for accessibility
-            window.showToast(payload.success ? 'success' : 'error', payload.message || '');
-            if (!payload.users) return;
-            renderUsers(payload.users);
-            teacherCountValue.textContent = payload.teacherCount;
-            studentCountValue.textContent = payload.studentCount;
-            pendingCountValue.textContent = payload.pendingCount;
-            usersSummaryText.textContent = 'Showing ' + payload.totalUsers + ' users';
-        }
-
-        function renderUsers(users) {
-            usersTableBody.innerHTML = users.map((user) => {
-                const initials = getInitials(user.fullName);
-                const roleClass = user.role === 'TEACHER' ? 'bg-primary-container text-primary' : 'bg-surface-container-highest text-on-surface-variant';
-                const statusColor = user.status === 'ACTIVE' ? '#198754' : (user.status === 'PENDING' ? '#f59e0b' : '#dc3545');
-                return '<tr class="transition">'
-                    + '<td class="px-4 py-3">'
-                    + '<div class="d-flex align-items-center gap-3">'
-                    + '<div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 36px; height: 36px; font-size: 12px;">' + escapeHtml(initials) + '</div>'
-                    + '<div>'
-                    + '<p class="m-0 fw-semibold text-on-surface" style="font-size: 14px;">' + escapeHtml(user.fullName) + '</p>'
-                    + '<p class="m-0 text-on-surface-variant" style="font-size: 12px;">' + escapeHtml(user.email) + '</p>'
-                    + '</div>'
-                    + '</div>'
-                    + '</td>'
-                    + '<td class="px-4 py-3 small text-on-surface-variant" style="font-family: monospace;">#EDU-' + user.userId + '</td>'
-                    + '<td class="px-4 py-3"><span class="badge fw-bold text-uppercase px-2 py-1 rounded-pill ' + roleClass + '" style="font-size: 10px;">' + escapeHtml(user.role) + '</span></td>'
-                    + '<td class="px-4 py-3"><div class="d-flex align-items-center gap-2"><span class="status-dot" style="background-color: ' + statusColor + ';"></span><span class="fw-medium text-on-surface" style="font-size: 13px;">' + escapeHtml(user.status) + '</span></div></td>'
-                    + '<td class="px-4 py-3 text-end">'
-                    + '<div class="d-flex justify-content-end gap-2">'
-                    + '<button class="btn btn-sm btn-light p-2 d-flex align-items-center justify-content-center border-0 text-on-surface-variant rounded-3 js-edit-user"'
-                    + ' data-user-id="' + user.userId + '"'
-                    + ' data-full-name="' + escapeAttribute(user.fullName) + '"'
-                    + ' data-email="' + escapeAttribute(user.email) + '"'
-                    + ' data-role="' + escapeAttribute(user.role) + '"'
-                    + ' data-status="' + escapeAttribute(user.status) + '"'
-                    + ' type="button">'
-                    + '<i class="fa-solid fa-pen"></i>'
-                    + '</button>'
-                    + '<button class="btn btn-sm btn-light p-2 d-flex align-items-center justify-content-center border-0 text-danger rounded-3 js-delete-user"'
-                    + ' data-user-id="' + user.userId + '"'
-                    + ' data-full-name="' + escapeAttribute(user.fullName) + '"'
-                    + ' type="button">'
-                    + '<i class="fa-solid fa-trash"></i>'
-                    + '</button>'
-                    + '</div>'
-                    + '</td>'
-                    + '</tr>';
-            }).join('');
-        }
-
-
-
-</script>
-
-    <script>
-        // Bulk-select and bulk-delete handlers + AJAX fallback
-        (function () {
-            const selectAll = document.getElementById('selectAllUsers');
-            const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-            function getSelectedIds() {
-                return Array.from(document.querySelectorAll('.user-select'))
-                    .filter(ch => ch.checked)
-                    .map(ch => ch.value);
-            }
-
-            if (selectAll) {
-                selectAll.addEventListener('change', (e) => {
-                    const checked = !!e.target.checked;
-                    document.querySelectorAll('.user-select').forEach(ch => ch.checked = checked);
+                    return haystack.includes(query);
                 });
+
+                const totalPages = Math.max(1, Math.ceil(state.filteredUsers.length / state.pageSize));
+                if (state.currentPage > totalPages) {
+                    state.currentPage = totalPages;
+                }
+                if (state.currentPage < 1) {
+                    state.currentPage = 1;
+                }
             }
 
-            if (deleteSelectedBtn) {
-                deleteSelectedBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    const ids = getSelectedIds();
-                    if (ids.length === 0) {
-                        window.showToast('info', 'No users selected.');
+            function getPagedUsers() {
+                const startIndex = (state.currentPage - 1) * state.pageSize;
+                return state.filteredUsers.slice(startIndex, startIndex + state.pageSize);
+            }
+
+            function roleBadgeClass(role) {
+                if (role === 'ADMIN') {
+                    return 'edu-badge-role-admin';
+                }
+                if (role === 'TEACHER') {
+                    return 'edu-badge-role-teacher';
+                }
+                return 'edu-badge-role-student';
+            }
+
+            function statusBadgeClass(status) {
+                if (status === 'ACTIVE') {
+                    return 'edu-badge-status-active';
+                }
+                if (status === 'PENDING') {
+                    return 'edu-badge-status-pending';
+                }
+                return 'edu-badge-status-inactive';
+            }
+
+            function renderTable() {
+                const pageUsers = getPagedUsers();
+                const startIndex = (state.currentPage - 1) * state.pageSize;
+
+                if (!pageUsers.length) {
+                    usersTableBody.innerHTML = '<tr><td colspan="7" class="py-5 text-center text-on-surface-variant">No users found for current filters.</td></tr>';
+                    selectAllUsers.checked = false;
+                    selectAllUsers.indeterminate = false;
+                    return;
+                }
+
+                usersTableBody.innerHTML = pageUsers.map((user, index) => {
+                    const sn = startIndex + index + 1;
+                    const checked = state.selectedIds.has(String(user.userId)) ? 'checked' : '';
+                    const initials = getInitialsSafe(user.fullName);
+
+                    return '<tr>'
+                        + '<td class="px-3 px-md-4 py-3"><input type="checkbox" class="user-select" value="' + user.userId + '" ' + checked + '></td>'
+                        + '<td class="px-3 px-md-4 py-3 text-on-surface-variant">' + sn + '</td>'
+                        + '<td class="px-3 px-md-4 py-3"><div class="d-flex align-items-center gap-3"><div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 34px; height: 34px; font-size: 12px;">' + escapeHtmlSafe(initials) + '</div><span class="fw-semibold text-on-surface">' + escapeHtmlSafe(user.fullName) + '</span></div></td>'
+                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge edu-badge-role ' + roleBadgeClass(user.role) + '">' + escapeHtmlSafe(user.role) + '</span></td>'
+                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge edu-badge-status ' + statusBadgeClass(user.status) + '">' + escapeHtmlSafe(user.status) + '</span></td>'
+                        + '<td class="px-3 px-md-4 py-3 text-on-surface-variant">' + escapeHtmlSafe(user.email) + '</td>'
+                        + '<td class="px-3 px-md-4 py-3 text-end"><div class="d-inline-flex align-items-center gap-2">'
+                        + '<button class="btn btn-sm btn-light border-0 text-on-surface-variant js-edit-user" data-user-id="' + user.userId + '" data-full-name="' + escapeAttrSafe(user.fullName) + '" data-email="' + escapeAttrSafe(user.email) + '" data-role="' + escapeAttrSafe(user.role) + '" data-status="' + escapeAttrSafe(user.status) + '" type="button"><i class="fa-solid fa-pen"></i></button>'
+                        + '<button class="btn btn-sm btn-light border-0 text-danger js-delete-user" data-user-id="' + user.userId + '" data-full-name="' + escapeAttrSafe(user.fullName) + '" type="button"><i class="fa-solid fa-trash"></i></button>'
+                        + '</div></td>'
+                        + '</tr>';
+                }).join('');
+
+                syncSelectAllCheckbox(pageUsers);
+            }
+
+            function syncSelectAllCheckbox(pageUsers) {
+                if (!pageUsers.length) {
+                    selectAllUsers.checked = false;
+                    selectAllUsers.indeterminate = false;
+                    return;
+                }
+
+                const selectedCount = pageUsers.filter((user) => state.selectedIds.has(String(user.userId))).length;
+                selectAllUsers.checked = selectedCount === pageUsers.length;
+                selectAllUsers.indeterminate = selectedCount > 0 && selectedCount < pageUsers.length;
+            }
+
+            function renderPaginationAndSummary() {
+                const total = state.filteredUsers.length;
+                const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+                const start = total === 0 ? 0 : ((state.currentPage - 1) * state.pageSize) + 1;
+                const end = Math.min(total, state.currentPage * state.pageSize);
+
+                usersSummaryText.textContent = total === 0
+                    ? 'Showing 0 users'
+                    : ('Showing ' + start + ' to ' + end + ' of ' + total + ' users');
+
+                pageIndicator.textContent = 'Page ' + state.currentPage + ' of ' + totalPages;
+                prevPageBtn.disabled = state.currentPage <= 1;
+                nextPageBtn.disabled = state.currentPage >= totalPages;
+                bulkDeleteIconBtn.disabled = state.selectedIds.size === 0;
+            }
+
+            function rerender() {
+                applyFilters();
+                renderTable();
+                renderPaginationAndSummary();
+            }
+
+            function setUsers(users, showToastMessage, message) {
+                state.allUsers = (users || []).map((user) => ({
+                    userId: Number(user.userId),
+                    fullName: user.fullName || '',
+                    email: user.email || '',
+                    role: user.role || '',
+                    status: user.status || ''
+                }));
+                state.selectedIds.clear();
+                state.currentPage = 1;
+                rerender();
+
+                if (showToastMessage && window.showToast) {
+                    window.showToast('success', message || 'Users loaded.');
+                }
+            }
+
+            async function fetchUsers(showToastMessage) {
+                try {
+                    const response = await fetch(contextPath + '/AdminUsers?action=data', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to load users data.');
+                    }
+                    const payload = await response.json();
+                    setUsers(payload.users || [], showToastMessage, payload.message || 'Users loaded.');
+                } catch (error) {
+                    showAlert('danger', error.message || 'Failed to load users.');
+                }
+            }
+
+            function showAlert(type, message) {
+                usersAlertContainer.innerHTML = '<div class="alert alert-' + type + ' border-0 rounded-0 m-0" role="alert">'
+                    + escapeHtmlSafe(message)
+                    + '</div>';
+            }
+
+            document.getElementById('addUserForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formParams = new URLSearchParams(new FormData(event.target));
+                const payload = await window.postFormData(contextPath + '/AdminUsers', formParams);
+                if (!payload) {
+                    return;
+                }
+                if (payload.success) {
+                    event.target.reset();
+                    addUserModal.hide();
+                    setUsers(payload.users || [], false);
+                }
+                if (window.showToast) {
+                    window.showToast(payload.success ? 'success' : 'error', payload.message || 'Operation completed.');
+                }
+            });
+
+            document.getElementById('editUserForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formParams = new URLSearchParams(new FormData(event.target));
+                const payload = await window.postFormData(contextPath + '/AdminUsers', formParams);
+                if (!payload) {
+                    return;
+                }
+                if (payload.success) {
+                    event.target.reset();
+                    editUserModal.hide();
+                    setUsers(payload.users || [], false);
+                }
+                if (window.showToast) {
+                    window.showToast(payload.success ? 'success' : 'error', payload.message || 'Operation completed.');
+                }
+            });
+
+            usersTableBody.addEventListener('click', async (event) => {
+                const editButton = event.target.closest('.js-edit-user');
+                if (editButton) {
+                    document.getElementById('editUserId').value = editButton.dataset.userId;
+                    document.getElementById('editFullName').value = editButton.dataset.fullName;
+                    document.getElementById('editEmail').value = editButton.dataset.email;
+                    document.getElementById('editRole').value = editButton.dataset.role;
+                    document.getElementById('editStatus').value = editButton.dataset.status;
+                    document.getElementById('editPassword').value = '';
+                    editUserModal.show();
+                    return;
+                }
+
+                const deleteButton = event.target.closest('.js-delete-user');
+                if (deleteButton) {
+                    const fullName = deleteButton.dataset.fullName;
+                    const userId = deleteButton.dataset.userId;
+                    const confirmed = await window.showConfirm('Delete user', 'Delete ' + fullName + '? This action cannot be undone.');
+                    if (!confirmed) {
                         return;
                     }
-                    const confirmed = await window.showConfirm('Delete users', 'Delete ' + ids.length + ' selected users?');
-                    if (!confirmed) return;
 
                     const formData = new URLSearchParams();
-                    formData.append('action', 'delete_multiple');
-                    formData.append('userIds', ids.join(','));
+                    formData.append('action', 'delete_user');
+                    formData.append('userId', userId);
 
                     const payload = await window.postFormData(contextPath + '/AdminUsers', formData);
-                    if (!payload) return;
-                    applyPayload(payload);
-                });
-            }
-
-            // If server-side rendered table is empty, attempt AJAX fetch fallback to populate users
-            if (usersTableBody && usersTableBody.children.length === 0) {
-                (async function fetchFallback() {
-                    try {
-                        const resp = await fetch(contextPath + '/AdminUsers?action=data', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                        if (!resp.ok) return;
-                        const payload = await resp.json();
-                        if (payload && payload.users) applyPayload(payload);
-                    } catch (e) {
-                        console.warn('Users AJAX fallback failed', e);
+                    if (!payload) {
+                        return;
                     }
-                })();
-            }
+                    if (payload.success) {
+                        setUsers(payload.users || [], false);
+                    }
+                    if (window.showToast) {
+                        window.showToast(payload.success ? 'success' : 'error', payload.message || 'Operation completed.');
+                    }
+                    return;
+                }
+
+                const checkbox = event.target.closest('.user-select');
+                if (checkbox) {
+                    const id = String(checkbox.value);
+                    if (checkbox.checked) {
+                        state.selectedIds.add(id);
+                    } else {
+                        state.selectedIds.delete(id);
+                    }
+                    rerender();
+                }
+            });
+
+            selectAllUsers.addEventListener('change', () => {
+                const pageUsers = getPagedUsers();
+                if (selectAllUsers.checked) {
+                    pageUsers.forEach((user) => state.selectedIds.add(String(user.userId)));
+                } else {
+                    pageUsers.forEach((user) => state.selectedIds.delete(String(user.userId)));
+                }
+                rerender();
+            });
+
+            bulkDeleteIconBtn.addEventListener('click', async () => {
+                const ids = Array.from(state.selectedIds);
+                if (!ids.length) {
+                    if (window.showToast) {
+                        window.showToast('info', 'No users selected.');
+                    }
+                    return;
+                }
+
+                const confirmed = await window.showConfirm('Delete users', 'Delete ' + ids.length + ' selected users?');
+                if (!confirmed) {
+                    return;
+                }
+
+                const formData = new URLSearchParams();
+                formData.append('action', 'delete_multiple');
+                formData.append('userIds', ids.join(','));
+
+                const payload = await window.postFormData(contextPath + '/AdminUsers', formData);
+                if (!payload) {
+                    return;
+                }
+
+                if (payload.success) {
+                    setUsers(payload.users || [], false);
+                }
+                if (window.showToast) {
+                    window.showToast(payload.success ? 'success' : 'error', payload.message || 'Operation completed.');
+                }
+            });
+
+            searchInput.addEventListener('input', () => {
+                state.query = searchInput.value.trim();
+                state.currentPage = 1;
+                rerender();
+            });
+
+            roleFilter.addEventListener('change', () => {
+                state.role = roleFilter.value;
+                state.currentPage = 1;
+                rerender();
+            });
+
+            statusFilter.addEventListener('change', () => {
+                state.status = statusFilter.value;
+                state.currentPage = 1;
+                rerender();
+            });
+
+            rowsPerPage.addEventListener('change', () => {
+                state.pageSize = Number(rowsPerPage.value || 20);
+                state.currentPage = 1;
+                rerender();
+            });
+
+            prevPageBtn.addEventListener('click', () => {
+                state.currentPage = Math.max(1, state.currentPage - 1);
+                rerender();
+            });
+
+            nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.max(1, Math.ceil(state.filteredUsers.length / state.pageSize));
+                state.currentPage = Math.min(totalPages, state.currentPage + 1);
+                rerender();
+            });
+
+            fetchUsers(false);
         })();
-
-        // Page-level alert container is still kept for screen-reader visibility; toasts are primary UX.
-        function showAlert(type, message) {
-            usersAlertContainer.innerHTML = '<div class="alert alert-' + type + ' border-0 rounded-0 m-0" role="alert">'
-                + window.escapeHtml(message)
-                + '</div>';
-        }
-
-        // Use global escapeHtml / escapeAttribute defined in js/main.js
     </script>
 </body>
 </html>

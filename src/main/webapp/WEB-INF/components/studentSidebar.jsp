@@ -28,6 +28,14 @@
             <i class="fa-solid fa-users fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Community</span>
         </a>
+        <a href="<c:url value='/PanelContact'/>" class="sidebar-nav-link ${activeSidebar eq 'contact' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-address-book fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">Contact</span>
+        </a>
+        <a href="<c:url value='/PanelAbout'/>" class="sidebar-nav-link ${activeSidebar eq 'about' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-circle-info fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">About</span>
+        </a>
     </nav>
 
     <div class="mt-auto pt-4 border-top border-outline-variant d-flex flex-column gap-2">

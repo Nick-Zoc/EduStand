@@ -10,10 +10,13 @@ import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
 
 import java.io.IOException;
 
 import com.edustand.model.UserModel;
+import com.edustand.service.RememberMeService;
+import com.edustand.util.CookieUtil;
 
 /**
  * Servlet Filter implementation class filter
@@ -26,14 +29,12 @@ public class filter extends HttpFilter {
 	 */
 	public filter() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * @see Filter#destroy()
 	 */
 	public void destroy() {
-		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -48,6 +49,24 @@ public class filter extends HttpFilter {
 		String path = uri.substring(contextPath.length());
 		HttpSession session = httpRequest.getSession(false);
 		UserModel loggedInUser = session == null ? null : (UserModel) session.getAttribute("loggedInUser");
+
+		// If user is not in session, try to restore from Remember Me token
+		if (loggedInUser == null && !isPublicPath(path)) {
+			Cookie rememberMeCookie = CookieUtil.getCookie(httpRequest, "rememberMeToken");
+			if (rememberMeCookie != null && rememberMeCookie.getValue() != null
+					&& !rememberMeCookie.getValue().isBlank()) {
+				RememberMeService rmService = new RememberMeService();
+				UserModel restoredUser = rmService.validateToken(rememberMeCookie.getValue());
+				if (restoredUser != null) {
+					System.out.println("[DEBUG] Auto-restored user from Remember Me token: " + restoredUser.getEmail());
+					loggedInUser = restoredUser;
+					// Restore session
+					session = httpRequest.getSession();
+					session.setAttribute("loggedInUser", restoredUser);
+					session.setAttribute("userRole", restoredUser.getRole());
+				}
+			}
+		}
 
 		if ("/login".equals(path) && loggedInUser != null) {
 			httpResponse.sendRedirect(contextPath + resolveDashboardByRole(loggedInUser.getRole()));
@@ -118,7 +137,6 @@ public class filter extends HttpFilter {
 	 * @see Filter#init(FilterConfig)
 	 */
 	public void init(FilterConfig fConfig) throws ServletException {
-		// TODO Auto-generated method stub
 	}
 
 }

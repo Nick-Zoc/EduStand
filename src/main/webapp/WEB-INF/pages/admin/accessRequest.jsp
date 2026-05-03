@@ -20,18 +20,20 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 2.5rem;">
-            <section class="position-relative overflow-hidden rounded-4 p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, var(--primary) 0%, rgba(0, 86, 179, 1) 100%);">
-                <div class="position-relative z-1" style="max-width: 650px;">
-                    <h2 class="fs-1 fw-bold mb-3 brand-headline">Access requests</h2>
-                    <p class="fs-5 opacity-75 mb-0" style="line-height: 1.6;">Review new user requests and approve or reject access for the platform.</p>
+        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 1.75rem;">
+            <section class="page-header-sleek p-4 p-md-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">Access Review</div>
+                    <h2 class="fs-2 fw-bold mb-2 brand-headline text-on-surface">Pending requests</h2>
+                    <p class="text-on-surface-variant mb-0" style="max-width: 42rem; line-height: 1.6;">Review new user requests and approve or reject access in a clean, focused workflow.</p>
                 </div>
+                <span class="edu-badge edu-badge-pending" id="pendingSummaryCount">${pendingCount} Pending</span>
             </section>
 
             <section class="card-curator overflow-hidden">
                 <div class="px-4 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-bottom border-outline-variant bg-surface gap-3">
-                    <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">Pending Requests</h2>
-                    <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-semibold" id="pendingSummaryCount">${pendingCount} Pending</span>
+                    <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">Review Queue</h2>
+                    <span class="small text-on-surface-variant">Newest requests appear first</span>
                 </div>
 
                 <div id="requestAlertContainer" aria-live="polite"></div>
@@ -60,8 +62,8 @@
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 small text-on-surface-variant"><c:out value="${user.email}" /></td>
-                                    <td class="px-4 py-3"><span class="badge fw-bold text-uppercase px-2 py-1 rounded-pill bg-primary-container text-primary" style="font-size: 10px;"><c:out value="${user.role}" /></span></td>
-                                    <td class="px-4 py-3"><span class="badge fw-bold text-uppercase px-2 py-1 rounded-pill bg-warning-subtle text-warning" style="font-size: 10px;">PENDING</span></td>
+                                    <td class="px-4 py-3"><span class="edu-badge ${user.role eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'} text-uppercase"><c:out value="${user.role}" /></span></td>
+                                    <td class="px-4 py-3"><span class="edu-badge edu-badge-pending text-uppercase">PENDING</span></td>
                                     <td class="px-4 py-3 text-end">
                                         <div class="d-flex justify-content-end gap-2">
                                             <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-open-review" data-user-id="${user.userId}" data-full-name="<c:out value='${user.fullName}'/>" data-email="<c:out value='${user.email}'/>" data-role="${user.role}" data-reason="<c:out value='${user.requestReason}'/>" type="button"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>
@@ -222,8 +224,8 @@
                         + '</div>'
                         + '</td>'
                         + '<td class="px-4 py-3 small text-on-surface-variant">' + escapeHtml(user.email) + '</td>'
-                        + '<td class="px-4 py-3"><span class="badge fw-bold text-uppercase px-2 py-1 rounded-pill bg-primary-container text-primary" style="font-size: 10px;">' + escapeHtml(user.role) + '</span></td>'
-                        + '<td class="px-4 py-3"><span class="badge fw-bold text-uppercase px-2 py-1 rounded-pill bg-warning-subtle text-warning" style="font-size: 10px;">PENDING</span></td>'
+                        + '<td class="px-4 py-3"><span class="edu-badge ' + (user.role === 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students') + ' text-uppercase fw-bold">' + escapeHtml(user.role) + '</span></td>'
+                        + '<td class="px-4 py-3"><span class="edu-badge edu-badge-pending text-uppercase fw-bold">PENDING</span></td>'
                         + '<td class="px-4 py-3 text-end">'
                         + '<div class="d-flex justify-content-end gap-2">'
                         + '<button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-open-review" data-user-id="' + user.userId + '" data-full-name="' + escapeAttribute(user.fullName) + '" data-email="' + escapeAttribute(user.email) + '" data-role="' + escapeAttribute(user.role) + '" data-reason="' + escapeAttribute(user.requestReason) + '" type="button"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>'
@@ -331,7 +333,7 @@
                                     <div class="fw-bold text-on-surface" id="reviewSummaryName">No request selected</div>
                                     <div class="small text-on-surface-variant" id="reviewSummaryEmail">Choose a pending request to review it</div>
                                 </div>
-                                <span class="badge bg-primary-container text-primary px-3 py-2 rounded-pill fw-semibold" id="reviewSummaryRole">-</span>
+                                <span class="edu-badge edu-badge-teachers" id="reviewSummaryRole">-</span>
                             </div>
                         </div>
 

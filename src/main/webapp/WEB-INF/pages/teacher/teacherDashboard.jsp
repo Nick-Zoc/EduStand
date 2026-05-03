@@ -144,7 +144,7 @@
                                 <h4 class="fs-6 fw-bold text-on-surface mb-1">Molecular Bonding.pdf</h4>
                                 <p class="small text-on-surface-variant mb-3 pb-1" style="font-size: 12px;">Uploaded 2 hours ago • 4.2MB</p>
                                 <div class="d-flex align-items-center justify-content-between mt-auto">
-                                    <span class="badge text-uppercase text-danger bg-danger bg-opacity-10 py-1" style="font-size: 10px; letter-spacing: 0.05em;">New</span>
+                                    <span class="edu-badge edu-badge-pending text-uppercase" style="letter-spacing: 0.05em;">New</span>
                                     <button class="btn btn-sm btn-light rounded-circle"><i class="fa-solid fa-download text-on-surface-variant"></i></button>
                                 </div>
                             </div>
@@ -158,7 +158,7 @@
                                 <h4 class="fs-6 fw-bold text-on-surface mb-1">Organic Chem Intro.pptx</h4>
                                 <p class="small text-on-surface-variant mb-3 pb-1" style="font-size: 12px;">Uploaded Yesterday • 12.8MB</p>
                                 <div class="d-flex align-items-center justify-content-between mt-auto">
-                                    <span class="badge text-uppercase text-secondary bg-secondary bg-opacity-10 py-1" style="font-size: 10px; letter-spacing: 0.05em;">Lecture</span>
+                                    <span class="edu-badge edu-badge-students text-uppercase" style="letter-spacing: 0.05em;">Lecture</span>
                                     <button class="btn btn-sm btn-light rounded-circle"><i class="fa-solid fa-download text-on-surface-variant"></i></button>
                                 </div>
                             </div>

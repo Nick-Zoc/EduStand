@@ -9,21 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">
-    <style>
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .table-index th {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--on-surface-variant);
-            font-weight: 700;
-        }
-    </style>
 </head>
 <c:set var="activeSidebar" value="dashboard" scope="request" />
 <c:set var="searchPlaceholder" value="Search resources, users..." scope="request" />
@@ -34,49 +19,51 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 2.5rem;">
-            <section class="position-relative overflow-hidden rounded-4 p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, var(--primary) 0%, rgba(0, 86, 179, 1) 100%);">
-                <div class="position-relative z-1" style="max-width: 650px;">
-                    <h2 class="fs-1 fw-bold mb-3 brand-headline">Admin dashboard</h2>
-                    <p class="fs-5 opacity-75 mb-0" style="line-height: 1.6;">Monitor users, approve access requests, and keep EduStand operations running smoothly.</p>
+        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 1.75rem;">
+            <section class="page-header-sleek p-4 p-md-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">Admin Dashboard</div>
+                    <h2 class="fs-2 fw-bold mb-2 brand-headline text-on-surface">Welcome back, CENAS Admin</h2>
+                    <p class="text-on-surface-variant mb-0" style="max-width: 42rem; line-height: 1.6;">Monitor access, track platform activity, and manage the system from one clean overview.</p>
                 </div>
+                <a href="<c:url value='/AdminUsers'/>" class="btn btn-primary-edu d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold text-white text-decoration-none">
+                    <i class="fa-solid fa-users"></i>
+                    Manage Users
+                </a>
             </section>
 
-            <section class="row g-4">
-                <div class="col-12 col-md-4">
-                    <div class="card-sleek p-4 h-100 d-flex flex-column justify-content-center">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="p-2 rounded-3 text-primary bg-primary-container d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-                                <i class="fa-solid fa-chalkboard-user fs-4"></i>
-                            </div>
-                            <span class="badge fw-bold text-primary bg-primary-container p-2 rounded-2" style="font-size: 11px;">Teachers</span>
+            <section class="row g-3">
+                <div class="col-12 col-sm-6 col-xl-4">
+                    <div class="card-sleek p-3 h-100 d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; background: var(--primary-container); color: var(--primary);">
+                            <i class="fa-solid fa-chalkboard-user fs-5"></i>
                         </div>
-                        <h3 class="brand-headline fs-2 fw-bold text-on-surface m-0">${teacherCount}</h3>
-                        <p class="small text-on-surface-variant m-0 mt-1">Total active educators</p>
+                        <div class="flex-grow-1">
+                            <div class="small text-uppercase fw-semibold text-on-surface-variant">Teachers</div>
+                            <div class="fs-3 fw-bold lh-1 text-on-surface">${teacherCount}</div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-4">
-                    <div class="card-sleek p-4 h-100 d-flex flex-column justify-content-center">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="p-2 rounded-3 d-flex align-items-center justify-content-center" style="background-color: #e0f2fe; color: #0284c7; width: 44px; height: 44px;">
-                                <i class="fa-solid fa-user-graduate fs-4"></i>
-                            </div>
-                            <span class="badge fw-bold p-2 rounded-2" style="background-color: #e0f2fe; color: #0284c7; font-size: 11px;">Students</span>
+                <div class="col-12 col-sm-6 col-xl-4">
+                    <div class="card-sleek p-3 h-100 d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; background: #e0f2fe; color: #0284c7;">
+                            <i class="fa-solid fa-user-graduate fs-5"></i>
                         </div>
-                        <h3 class="brand-headline fs-2 fw-bold text-on-surface m-0">${studentCount}</h3>
-                        <p class="small text-on-surface-variant m-0 mt-1">Enrolled learners</p>
+                        <div class="flex-grow-1">
+                            <div class="small text-uppercase fw-semibold text-on-surface-variant">Students</div>
+                            <div class="fs-3 fw-bold lh-1 text-on-surface">${studentCount}</div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-4">
-                    <div class="card-sleek p-4 h-100 d-flex flex-column justify-content-center">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="p-2 rounded-3 d-flex align-items-center justify-content-center" style="background-color: #fef3c7; color: #d97706; width: 44px; height: 44px;">
-                                <i class="fa-solid fa-user-clock fs-4"></i>
-                            </div>
-                            <span class="badge fw-bold p-2 rounded-2" style="background-color: #fef3c7; color: #d97706; font-size: 11px;">Pending</span>
+                <div class="col-12 col-sm-6 col-xl-4">
+                    <div class="card-sleek p-3 h-100 d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; background: #fef3c7; color: #d97706;">
+                            <i class="fa-solid fa-user-clock fs-5"></i>
                         </div>
-                        <h3 class="brand-headline fs-2 fw-bold text-on-surface m-0">${pendingCount}</h3>
-                        <p class="small text-on-surface-variant m-0 mt-1">Awaiting profile approval</p>
+                        <div class="flex-grow-1">
+                            <div class="small text-uppercase fw-semibold text-on-surface-variant">Pending</div>
+                            <div class="fs-3 fw-bold lh-1 text-on-surface">${pendingCount}</div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -84,9 +71,9 @@
             <section class="card-curator overflow-hidden">
                 <div class="px-4 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-bottom border-outline-variant bg-surface gap-3">
                     <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">Recent User Activity</h2>
-                    <a href="<c:url value='/AdminUsers'/>" class="btn btn-primary-edu d-flex align-items-center justify-content-center gap-2 px-4 py-2 fw-bold small text-white border-0 shadow-sm" style="font-size: 13px; text-decoration: none;">
-                        <i class="fa-solid fa-users fs-6"></i>
-                        Manage Users
+                    <a href="<c:url value='/AdminUsers'/>" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold text-decoration-none">
+                        <i class="fa-solid fa-users"></i>
+                        Open Users
                     </a>
                 </div>
 

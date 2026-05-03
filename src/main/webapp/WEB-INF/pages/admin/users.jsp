@@ -20,60 +20,26 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 2.5rem;">
-            <section class="position-relative overflow-hidden rounded-4 p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, var(--primary) 0%, rgba(0, 86, 179, 1) 100%);">
-                <div class="position-relative z-1" style="max-width: 650px;">
-                    <h2 class="fs-1 fw-bold mb-3 brand-headline">User management</h2>
-                    <p class="fs-5 opacity-75 mb-0" style="line-height: 1.6;">Review student and teacher accounts, approve access, and keep the platform organised.</p>
+        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 1.75rem;">
+            <section class="page-header-sleek p-4 p-md-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">System Users</div>
+                    <h2 class="fs-2 fw-bold mb-2 brand-headline text-on-surface">Admin Users</h2>
+                    <p class="text-on-surface-variant mb-0" style="max-width: 40rem; line-height: 1.6;">Manage website admins who can log in and control the platform from one clean panel.</p>
                 </div>
-            </section>
-
-            <section class="row g-4">
-                <div class="col-12 col-md-4">
-                    <div class="card-sleek p-4 h-100 d-flex flex-column justify-content-center">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="p-2 rounded-3 text-primary bg-primary-container d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-                                <i class="fa-solid fa-chalkboard-user fs-4"></i>
-                            </div>
-                            <span class="badge fw-bold text-primary bg-primary-container p-2 rounded-2" style="font-size: 11px;">Teachers</span>
-                        </div>
-                        <h3 class="brand-headline fs-2 fw-bold text-on-surface m-0" id="teacherCountValue">${teacherCount}</h3>
-                        <p class="small text-on-surface-variant m-0 mt-1">Total active educators</p>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="card-sleek p-4 h-100 d-flex flex-column justify-content-center">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="p-2 rounded-3 d-flex align-items-center justify-content-center" style="background-color: #e0f2fe; color: #0284c7; width: 44px; height: 44px;">
-                                <i class="fa-solid fa-user-graduate fs-4"></i>
-                            </div>
-                            <span class="badge fw-bold p-2 rounded-2" style="background-color: #e0f2fe; color: #0284c7; font-size: 11px;">Students</span>
-                        </div>
-                        <h3 class="brand-headline fs-2 fw-bold text-on-surface m-0" id="studentCountValue">${studentCount}</h3>
-                        <p class="small text-on-surface-variant m-0 mt-1">Enrolled learners</p>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="card-sleek p-4 h-100 d-flex flex-column justify-content-center">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="p-2 rounded-3 d-flex align-items-center justify-content-center" style="background-color: #fef3c7; color: #d97706; width: 44px; height: 44px;">
-                                <i class="fa-solid fa-user-clock fs-4"></i>
-                            </div>
-                            <span class="badge fw-bold p-2 rounded-2" style="background-color: #fef3c7; color: #d97706; font-size: 11px;">Pending</span>
-                        </div>
-                        <h3 class="brand-headline fs-2 fw-bold text-on-surface m-0" id="pendingCountValue">${pendingCount}</h3>
-                        <p class="small text-on-surface-variant m-0 mt-1">Awaiting profile approval</p>
-                    </div>
-                </div>
+                <button class="btn btn-primary-edu d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2 fw-semibold text-white border-0" type="button" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Add Admin User
+                </button>
             </section>
 
             <section class="card-curator overflow-hidden">
-                <div class="px-4 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-bottom border-outline-variant bg-surface gap-3">
-                    <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">Manage Users</h2>
-                    <button class="btn btn-primary-edu d-flex align-items-center justify-content-center gap-2 px-4 py-2 fw-bold small text-white border-0 shadow-sm" style="font-size: 13px;" type="button" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                        <i class="fa-solid fa-user-plus fs-6"></i>
-                        Add New User
-                    </button>
+                <div class="px-4 pt-4 pb-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                    <div>
+                        <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">User Directory</h2>
+                        <p class="small text-on-surface-variant mb-0 mt-1" id="usersSummaryText">Showing ${totalUsers} users</p>
+                    </div>
+                    <div class="text-end small text-on-surface-variant">Updated live from the database</div>
                 </div>
 
                 <div id="usersAlertContainer">
@@ -85,10 +51,11 @@
                     </c:if>
                 </div>
 
-                <div class="table-responsive">
+                <div class="table-responsive border-top border-outline-variant">
                     <table class="table table-hover align-middle mb-0 m-0 table-index">
                         <thead class="bg-surface">
                             <tr>
+                                <th class="border-0 px-4 py-3"><input type="checkbox" id="selectAllUsers" aria-label="Select all users"></th>
                                 <th class="border-0 px-4 py-3">Name</th>
                                 <th class="border-0 px-4 py-3">User ID</th>
                                 <th class="border-0 px-4 py-3">Role</th>
@@ -100,6 +67,9 @@
                             <c:forEach items="${users}" var="user">
                                 <tr class="transition">
                                     <td class="px-4 py-3">
+                                        <input type="checkbox" class="user-select" value="${user.userId}" aria-label="Select user ${user.fullName}">
+                                    </td>
+                                    <td class="px-4 py-3">
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 36px; height: 36px; font-size: 12px;">${empty user.fullName ? 'U' : fn:toUpperCase(fn:substring(user.fullName, 0, 1))}</div>
                                             <div>
@@ -110,11 +80,11 @@
                                     </td>
                                     <td class="px-4 py-3 small text-on-surface-variant" style="font-family: monospace;">#EDU-${user.userId}</td>
                                     <td class="px-4 py-3">
-                                        <span class="badge fw-bold text-uppercase px-2 py-1 rounded-pill ${user.role eq 'TEACHER' ? 'bg-primary-container text-primary' : 'bg-surface-container-highest text-on-surface-variant'}" style="font-size: 10px;"><c:out value="${user.role}" /></span>
+                                        <span class="edu-badge ${user.role eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'}"><c:out value="${user.role}" /></span>
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="status-dot" style="background-color: ${user.status eq 'ACTIVE' ? '#198754' : user.status eq 'PENDING' ? '#f59e0b' : '#dc3545'};"></span>
+                                            <span class="status-dot ${user.status eq 'ACTIVE' ? 'status-active' : (user.status eq 'PENDING' ? 'status-pending' : 'status-inactive')}"></span>
                                             <span class="fw-medium text-on-surface" style="font-size: 13px;"><c:out value="${user.status}" /></span>
                                         </div>
                                     </td>
@@ -144,8 +114,9 @@
                 </div>
 
                 <div class="px-4 py-3 border-top border-outline-variant bg-surface d-flex justify-content-between align-items-center">
-                    <p class="m-0 fw-medium text-on-surface-variant" style="font-size: 12px;" id="usersSummaryText">Showing ${totalUsers} users</p>
+                    <p class="m-0 fw-medium text-on-surface-variant" style="font-size: 12px;">Showing ${totalUsers} users</p>
                     <div class="d-flex gap-2">
+                        <button class="btn btn-outline-danger btn-sm px-3 py-1 rounded-pill" id="deleteSelectedBtn" style="font-size:13px;">Delete selected</button>
                         <button class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" style="font-size: 13px;">Previous</button>
                         <button class="btn btn-primary btn-sm px-3 py-1 rounded-pill fw-medium border-0" style="font-size: 13px;">1</button>
                         <button class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" style="font-size: 13px;">2</button>
@@ -281,10 +252,9 @@
 
         document.getElementById('addUserForm').addEventListener('submit', async (event) => {
             event.preventDefault();
-            const payload = await submitForm(event.target);
-            if (!payload) {
-                return;
-            }
+            const formParams = new URLSearchParams(new FormData(event.target));
+            const payload = await window.postFormData(contextPath + '/AdminUsers', formParams);
+            if (!payload) return;
             applyPayload(payload);
             if (payload.success) {
                 event.target.reset();
@@ -294,10 +264,9 @@
 
         document.getElementById('editUserForm').addEventListener('submit', async (event) => {
             event.preventDefault();
-            const payload = await submitForm(event.target);
-            if (!payload) {
-                return;
-            }
+            const formParams = new URLSearchParams(new FormData(event.target));
+            const payload = await window.postFormData(contextPath + '/AdminUsers', formParams);
+            if (!payload) return;
             applyPayload(payload);
             if (payload.success) {
                 event.target.reset();
@@ -319,60 +288,29 @@
             }
 
             const deleteButton = event.target.closest('.js-delete-user');
-            if (!deleteButton) {
-                return;
-            }
+            if (!deleteButton) return;
 
             const fullName = deleteButton.dataset.fullName;
             const userId = deleteButton.dataset.userId;
-            if (!confirm('Delete ' + fullName + '? This action cannot be undone.')) {
-                return;
-            }
+
+            const confirmed = await window.showConfirm('Delete user', 'Delete ' + fullName + '? This action cannot be undone.');
+            if (!confirmed) return;
 
             const formData = new URLSearchParams();
             formData.append('action', 'delete_user');
             formData.append('userId', userId);
 
-            const payload = await postFormData(formData);
-            if (!payload) {
-                return;
-            }
+            const payload = await window.postFormData(contextPath + '/AdminUsers', formData);
+            if (!payload) return;
             applyPayload(payload);
         });
 
-        async function submitForm(form) {
-            const formData = new FormData(form);
-            return postFormData(new URLSearchParams(formData));
-        }
-
-        async function postFormData(formData) {
-            try {
-                const response = await fetch(contextPath + '/AdminUsers', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    showAlert('danger', 'Request failed. Please try again.');
-                    return null;
-                }
-
-                return await response.json();
-            } catch (error) {
-                showAlert('danger', 'Network error. Please check your connection and retry.');
-                return null;
-            }
-        }
+        // page-specific submit handlers call window.postFormData (defined in js/main.js)
 
         function applyPayload(payload) {
-            showAlert(payload.success ? 'success' : 'danger', payload.message);
-            if (!payload.users) {
-                return;
-            }
+            // Use toast for success/error; also update inline alert container for accessibility
+            window.showToast(payload.success ? 'success' : 'error', payload.message || '');
+            if (!payload.users) return;
             renderUsers(payload.users);
             teacherCountValue.textContent = payload.teacherCount;
             studentCountValue.textContent = payload.studentCount;
@@ -421,35 +359,72 @@
             }).join('');
         }
 
-        function getInitials(name) {
-            if (!name || !name.trim()) {
-                return 'U';
-            }
-            const parts = name.trim().split(/\s+/);
-            if (parts.length === 1) {
-                return parts[0].charAt(0).toUpperCase();
-            }
-            return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
-        }
 
+
+</script>
+
+    <script>
+        // Bulk-select and bulk-delete handlers + AJAX fallback
+        (function () {
+            const selectAll = document.getElementById('selectAllUsers');
+            const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+            function getSelectedIds() {
+                return Array.from(document.querySelectorAll('.user-select'))
+                    .filter(ch => ch.checked)
+                    .map(ch => ch.value);
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', (e) => {
+                    const checked = !!e.target.checked;
+                    document.querySelectorAll('.user-select').forEach(ch => ch.checked = checked);
+                });
+            }
+
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const ids = getSelectedIds();
+                    if (ids.length === 0) {
+                        window.showToast('info', 'No users selected.');
+                        return;
+                    }
+                    const confirmed = await window.showConfirm('Delete users', 'Delete ' + ids.length + ' selected users?');
+                    if (!confirmed) return;
+
+                    const formData = new URLSearchParams();
+                    formData.append('action', 'delete_multiple');
+                    formData.append('userIds', ids.join(','));
+
+                    const payload = await window.postFormData(contextPath + '/AdminUsers', formData);
+                    if (!payload) return;
+                    applyPayload(payload);
+                });
+            }
+
+            // If server-side rendered table is empty, attempt AJAX fetch fallback to populate users
+            if (usersTableBody && usersTableBody.children.length === 0) {
+                (async function fetchFallback() {
+                    try {
+                        const resp = await fetch(contextPath + '/AdminUsers?action=data', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                        if (!resp.ok) return;
+                        const payload = await resp.json();
+                        if (payload && payload.users) applyPayload(payload);
+                    } catch (e) {
+                        console.warn('Users AJAX fallback failed', e);
+                    }
+                })();
+            }
+        })();
+
+        // Page-level alert container is still kept for screen-reader visibility; toasts are primary UX.
         function showAlert(type, message) {
             usersAlertContainer.innerHTML = '<div class="alert alert-' + type + ' border-0 rounded-0 m-0" role="alert">'
-                + escapeHtml(message)
+                + window.escapeHtml(message)
                 + '</div>';
         }
 
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function escapeAttribute(value) {
-            return escapeHtml(value);
-        }
+        // Use global escapeHtml / escapeAttribute defined in js/main.js
     </script>
 </body>
 </html>

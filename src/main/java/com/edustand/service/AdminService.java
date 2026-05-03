@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.edustand.config.DbConfig;
 import com.edustand.model.UserModel;
@@ -18,8 +16,6 @@ import com.edustand.model.UserModel;
  * such as creating, updating, or deleting users.
  */
 public class AdminService {
-    private static final Map<Integer, String> REQUEST_REASON_BY_USER_ID = new ConcurrentHashMap<>();
-
     /**
      * Inserts a new user into the database.
      * * @param user The UserModel containing the new user's data.
@@ -29,7 +25,7 @@ public class AdminService {
     public boolean addUser(UserModel user) {
         // The SQL INSERT query. We leave user_id and created_at out because
         // MySQL will auto-generate them for us.
-        String query = "INSERT INTO Users (full_name, email, password_hash, role, status) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Users (full_name, email, password_hash, role, status, request_reason) VALUES (?, ?, ?, ?, ?, ?)";
 
         // Try-with-resources safely manages the database connection
         try (Connection conn = DbConfig.getDbConnection();
@@ -44,14 +40,8 @@ public class AdminService {
 
             // executeUpdate() returns the number of rows affected.
             // If it's greater than 0, our user was successfully added!
+            stmt.setString(6, user.getRequestReason());
             int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0 && user.getRequestReason() != null && !user.getRequestReason().isBlank()) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        REQUEST_REASON_BY_USER_ID.put(generatedKeys.getInt(1), user.getRequestReason());
-                    }
-                }
-            }
             return rowsAffected > 0;
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -63,7 +53,7 @@ public class AdminService {
     }
 
     public List<UserModel> getAllUsers() {
-        String query = "SELECT user_id, full_name, email, role, status, created_at FROM Users ORDER BY created_at DESC";
+        String query = "SELECT user_id, full_name, email, role, status, request_reason, created_at FROM Users ORDER BY created_at DESC";
         List<UserModel> users = new ArrayList<>();
 
         try (Connection conn = DbConfig.getDbConnection();
@@ -71,7 +61,7 @@ public class AdminService {
                 ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                users.add(attachRequestReason(mapUser(rs)));
+                users.add(mapUser(rs));
             }
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Database error while fetching users: " + e.getMessage());
@@ -82,7 +72,7 @@ public class AdminService {
     }
 
     public List<UserModel> getPendingUsers() {
-        String query = "SELECT user_id, full_name, email, role, status, created_at FROM Users WHERE status = 'PENDING' ORDER BY created_at DESC";
+        String query = "SELECT user_id, full_name, email, role, status, request_reason, created_at FROM Users WHERE status = 'PENDING' ORDER BY created_at DESC";
         List<UserModel> users = new ArrayList<>();
 
         try (Connection conn = DbConfig.getDbConnection();
@@ -90,7 +80,7 @@ public class AdminService {
                 ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                users.add(attachRequestReason(mapUser(rs)));
+                users.add(mapUser(rs));
             }
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Database error while fetching pending users: " + e.getMessage());
@@ -150,13 +140,13 @@ public class AdminService {
     }
 
     public UserModel findUserById(int userId) {
-        String query = "SELECT user_id, full_name, email, role, status, created_at FROM Users WHERE user_id = ?";
+        String query = "SELECT user_id, full_name, email, role, status, request_reason, created_at FROM Users WHERE user_id = ?";
         try (Connection conn = DbConfig.getDbConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return attachRequestReason(mapUser(rs));
+                    return mapUser(rs);
                 }
             }
         } catch (SQLException | ClassNotFoundException e) {
@@ -167,13 +157,13 @@ public class AdminService {
     }
 
     public UserModel findUserByEmail(String email) {
-        String query = "SELECT user_id, full_name, email, role, status, created_at FROM Users WHERE email = ?";
+        String query = "SELECT user_id, full_name, email, role, status, request_reason, created_at FROM Users WHERE email = ?";
         try (Connection conn = DbConfig.getDbConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return attachRequestReason(mapUser(rs));
+                    return mapUser(rs);
                 }
             }
         } catch (SQLException | ClassNotFoundException e) {
@@ -247,9 +237,6 @@ public class AdminService {
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, userId);
             boolean deleted = stmt.executeUpdate() > 0;
-            if (deleted) {
-                REQUEST_REASON_BY_USER_ID.remove(userId);
-            }
             return deleted;
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Database error while deleting user: " + e.getMessage());
@@ -265,16 +252,12 @@ public class AdminService {
         user.setEmail(rs.getString("email"));
         user.setRole(rs.getString("role"));
         user.setStatus(rs.getString("status"));
-        user.setCreatedAt(rs.getTimestamp("created_at"));
-        return user;
-    }
-
-    private UserModel attachRequestReason(UserModel user) {
-        if (user == null) {
-            return null;
+        try {
+            user.setRequestReason(rs.getString("request_reason"));
+        } catch (Exception e) {
+            // If the column doesn't exist (older DB), leave null
         }
-
-        user.setRequestReason(REQUEST_REASON_BY_USER_ID.get(user.getUserId()));
+        user.setCreatedAt(rs.getTimestamp("created_at"));
         return user;
     }
 }

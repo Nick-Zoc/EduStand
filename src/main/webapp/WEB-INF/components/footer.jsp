@@ -6,3 +6,9 @@
         <a href="#" class="text-decoration-none text-on-surface-variant fw-semibold" style="font-size: 12px;">Support</a>
     </div>
 </footer>
+
+<!-- Shared UI libraries: SweetAlert2 + Toastify + main.js -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>

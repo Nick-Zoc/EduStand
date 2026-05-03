@@ -8,6 +8,10 @@
     <welcome-file>index.xhtml</welcome-file>
     <welcome-file>default.html</welcome-file>
     <welcome-file>default.jsp</welcome-file>
+  <session-config>
+    <!-- Session timeout in minutes. Set to 30 minutes for reasonable inactivity window -->
+    <session-timeout>30</session-timeout>
+  </session-config>
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.xhtml</welcome-file>
   </welcome-file-list>

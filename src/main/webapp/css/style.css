@@ -201,14 +201,56 @@ a.text-primary-link:hover {
     box-shadow: 0 0 0 0.2rem rgba(0, 127, 255, 0.24);
 }
 
+/* EduStand badge utility classes (use instead of inline styles) */
+.edu-badge {
+    font-size: 11px;
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    text-transform: none;
+}
+
+.edu-badge-teachers {
+    background-color: var(--primary-container);
+    color: var(--primary);
+}
+
+.edu-badge-students {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+
+.edu-badge-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+/* Small status dot used in tables */
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.status-active {
+    background-color: #198754;
+}
+
+.status-pending {
+    background-color: #f59e0b;
+}
+
+.status-inactive {
+    background-color: #dc3545;
+}
+
 /* Sleek card styling used on dashboard small grid cards */
 .card-sleek {
     background: #FFFFFF;
-    /* pure white */
-    border: 1px solid #F3F4F6;
-    /* barely visible gray border */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    /* subtle ambient shadow */
+    border: 1px solid var(--outline-variant);
+    box-shadow: none;
     border-radius: 8px;
     transition: all 0.3s ease;
     will-change: transform, box-shadow, border-color;
@@ -216,10 +258,35 @@ a.text-primary-link:hover {
 
 .card-sleek:hover {
     border: 1px solid var(--primary);
-    /* Azure Blue border on hover */
-    box-shadow: 0 6px 16px rgba(0, 127, 255, 0.12);
-    /* soft azure glow */
+    box-shadow: 0 10px 24px rgba(0, 127, 255, 0.08);
     transform: translateY(-3px);
+}
+
+.card-curator {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--roundness);
+    box-shadow: none;
+}
+
+.panel-sleek {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--outline-variant);
+    border-radius: 1rem;
+}
+
+.page-header-sleek {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--outline-variant);
+    border-radius: 1rem;
+}
+
+.table-index th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--on-surface-variant);
+    font-weight: 700;
 }
 
 /* Small card inner layout */

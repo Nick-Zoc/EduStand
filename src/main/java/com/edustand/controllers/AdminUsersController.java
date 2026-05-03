@@ -137,6 +137,28 @@ public class AdminUsersController extends HttpServlet {
             return;
         }
 
+        if ("delete_multiple".equals(action)) {
+            String ids = req.getParameter("userIds");
+            if (ids == null || ids.isBlank()) {
+                respond(req, resp, isAjax, false, "No users selected.", loggedInUser);
+                return;
+            }
+            String[] parts = ids.split(",");
+            int successCount = 0;
+            for (String p : parts) {
+                try {
+                    int uid = Integer.parseInt(p.trim());
+                    if (adminService.deleteUser(uid))
+                        successCount++;
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            boolean ok = successCount > 0;
+            respond(req, resp, isAjax, ok,
+                    ok ? ("Deleted " + successCount + " users.") : "Failed to delete selected users.", loggedInUser);
+            return;
+        }
+
         respond(req, resp, isAjax, false, "Unsupported action.", loggedInUser);
     }
 

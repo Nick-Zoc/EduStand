@@ -251,7 +251,7 @@
                             </div>
                             <div class="col-12">
                                 <label for="editPassword" class="form-label small fw-semibold text-on-surface-variant">Set New Password (Optional)</label>
-                                <input type="password" class="form-control" id="editPassword" name="password" minlength="8" placeholder="Leave blank to keep current password">
+                                <input type="password" class="form-control" id="editPassword" name="password" placeholder="Leave blank to keep current password">
                                 <p class="small text-on-surface-variant mt-2 mb-0">Current password is never displayed.</p>
                             </div>
                         </div>

@@ -84,48 +84,53 @@ public class ClassroomController extends HttpServlet {
             return;
         }
 
-        if (!"TEACHER".equalsIgnoreCase(loggedInUser.getRole())) {
-            writeJsonResponse(resp, false, "Only teachers can access classroom operations");
-            return;
-        }
-
         String pathInfo = req.getPathInfo();
-        String action = null;
+        String action = pathInfo != null && pathInfo.length() > 1 ? pathInfo.substring(1) : "";
 
-        if (pathInfo != null && pathInfo.length() > 1) {
-            action = pathInfo.substring(1);
+        // API Endpoints for real data
+        if ("data/resources".equals(action)) {
+            handleGetResources(req, resp, loggedInUser);
+        } else if ("data/assignments".equals(action)) {
+            handleGetAssignments(req, resp, loggedInUser);
+        } else if (action.startsWith("assignment/") && action.endsWith("submissions")) {
+            handleGetSubmissions(req, resp, loggedInUser);
+        } else {
+            writeJsonResponse(resp, false, "Invalid action");
         }
+    }
 
-        if (action != null && action.startsWith("assignment/")) {
-            String[] parts = action.split("/");
-            if (parts.length >= 3 && "submissions".equals(parts[2])) {
-                handleGetSubmissions(req, resp, loggedInUser);
-            }
-        }
+    private void handleGetResources(HttpServletRequest req, HttpServletResponse resp, UserModel user) throws IOException {
+        com.edustand.service.ResourceService resourceService = new com.edustand.service.ResourceService();
+        String jsonArray = resourceService.getAllResourcesAsJson();
+        resp.setContentType("application/json");
+        resp.getWriter().write("{\"success\":true, \"data\":" + jsonArray + "}");
+    }
+
+    private void handleGetAssignments(HttpServletRequest req, HttpServletResponse resp, UserModel user) throws IOException {
+        com.edustand.service.AssignmentService assignmentService = new com.edustand.service.AssignmentService();
+        String jsonArray = assignmentService.getAllAssignmentsAsJson(user.getUserId());
+        resp.setContentType("application/json");
+        resp.getWriter().write("{\"success\":true, \"data\":" + jsonArray + "}");
     }
 
     private void handleCreateFolder(HttpServletRequest req, HttpServletResponse resp, UserModel loggedInUser)
             throws IOException {
         String folderName = trim(req.getParameter("folderName"));
-
         if (folderName.isEmpty()) {
             writeJsonResponse(resp, false, "Folder name is required");
             return;
         }
-
         try {
-            // Create folder under assets/resources/{teacherId}/{folderName}
             int userId = loggedInUser.getUserId();
             String assetsDir = req.getServletContext().getRealPath("/assets/resources/teacher_" + userId);
             Path folderPath = Paths.get(assetsDir, folderName);
-
             if (!Files.exists(folderPath)) {
                 Files.createDirectories(folderPath);
             }
+            com.edustand.service.ResourceService rs = new com.edustand.service.ResourceService();
+            rs.addResource(userId, folderName, "", "", "FOLDER", "ROOT");
 
-            new ActivityLogService().logActivity(userId, "CLASSROOM_FOLDER_CREATE",
-                    "Created folder: " + folderName);
-
+            new ActivityLogService().logActivity(userId, "CLASSROOM_FOLDER_CREATE", "Created folder: " + folderName);
             writeJsonResponse(resp, true, "Folder created successfully", folderName);
         } catch (Exception e) {
             writeJsonResponse(resp, false, "Failed to create folder: " + e.getMessage());
@@ -172,6 +177,15 @@ public class ClassroomController extends HttpServlet {
             try (InputStream inputStream = filePart.getInputStream()) {
                 Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
             }
+            
+            try {
+                String sourceDir = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/resources/teacher_" + userId + (folderName.isEmpty() ? "" : "/" + folderName);
+                Path sourcePath = Paths.get(sourceDir);
+                if (!Files.exists(sourcePath)) {
+                    Files.createDirectories(sourcePath);
+                }
+                Files.copy(target, sourcePath.resolve(finalFileName), StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {}
 
             new ActivityLogService().logActivity(userId, "CLASSROOM_FILE_UPLOAD",
                     "Uploaded file: " + fileName + " to " + fileDir.toString());
@@ -179,6 +193,12 @@ public class ClassroomController extends HttpServlet {
             // Return relative asset path for client
             String relPath = "assets/resources/teacher_" + userId + (folderName.isEmpty() ? "" : "/" + folderName) + "/"
                     + finalFileName;
+
+            // Add to database
+            com.edustand.service.ResourceService rs = new com.edustand.service.ResourceService();
+            String fileDesc = trim(req.getParameter("fileDescription"));
+            rs.addResource(userId, fileName, fileDesc, relPath, "FILE", folderName.isEmpty() ? "ROOT" : folderName);
+
             writeJsonResponse(resp, true, "File uploaded successfully", relPath);
         } catch (Exception e) {
             writeJsonResponse(resp, false, "Failed to upload file: " + e.getMessage());
@@ -190,31 +210,19 @@ public class ClassroomController extends HttpServlet {
         String assignmentTitle = trim(req.getParameter("assignmentTitle"));
         String openDate = trim(req.getParameter("assignmentOpenDate"));
         String dueDate = trim(req.getParameter("assignmentDueDate"));
-        if (assignmentTitle.isEmpty() || openDate.isEmpty() || dueDate.isEmpty()) {
-            writeJsonResponse(resp, false, "Assignment title, open date, and due date are required");
+        String assignmentDescription = trim(req.getParameter("assignmentDescription"));
+        if (assignmentTitle.isEmpty() || dueDate.isEmpty()) {
+            writeJsonResponse(resp, false, "Assignment title and due date are required");
             return;
         }
-
         try {
-            // Create an assignment folder under assets/assignments/{slug}
-            String safeTitle = assignmentTitle.replaceAll("[^a-zA-Z0-9 _-]", "").replaceAll("\\s+", "_");
-            String slug = "assignment_" + System.currentTimeMillis() + "_" + safeTitle;
-            String assignmentsRoot = req.getServletContext().getRealPath("/assets/assignments");
-            Path assignmentDir = Paths.get(assignmentsRoot, slug);
-            if (!Files.exists(assignmentDir)) {
-                Files.createDirectories(assignmentDir);
-            }
-
-            // Save metadata file (assignment.json)
-            String meta = "{\"title\":\"" + escapeJson(assignmentTitle) + "\",\"openDate\":\"" + escapeJson(openDate)
-                    + "\",\"dueDate\":\"" + escapeJson(dueDate) + "\",\"createdAt\":\"" + System.currentTimeMillis()
-                    + "\",\"createdBy\":\"" + loggedInUser.getUserId() + "\"}";
-            Files.write(assignmentDir.resolve("assignment.json"), meta.getBytes());
-
+            com.edustand.service.AssignmentService as = new com.edustand.service.AssignmentService();
+            as.addAssignment(loggedInUser.getUserId(), assignmentTitle, assignmentDescription, dueDate);
+            
             new ActivityLogService().logActivity(loggedInUser.getUserId(), "CLASSROOM_ASSIGNMENT_CREATE",
-                    "Created assignment: " + assignmentTitle + " (" + slug + ")");
+                    "Created assignment: " + assignmentTitle);
 
-            writeJsonResponse(resp, true, "Assignment created successfully", slug);
+            writeJsonResponse(resp, true, "Assignment created successfully", "success");
         } catch (Exception e) {
             writeJsonResponse(resp, false, "Failed to create assignment: " + e.getMessage());
         }
@@ -223,52 +231,58 @@ public class ClassroomController extends HttpServlet {
     private void handleStudentSubmission(HttpServletRequest req, HttpServletResponse resp, UserModel loggedInUser,
             String action)
             throws IOException, ServletException {
-        // action example: assignment/{slug}/submit
+        // action example: assignment/{id}/submit
         String[] parts = action.split("/");
         if (parts.length < 3) {
             writeJsonResponse(resp, false, "Invalid assignment submission path");
             return;
         }
-        String slug = parts[1];
+        int assignmentId = 0;
+        try {
+            assignmentId = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            writeJsonResponse(resp, false, "Invalid assignment ID");
+            return;
+        }
 
-        String remarks = trim(req.getParameter("remarks"));
         Part filePart = req.getPart("submissionFile");
 
-        if ((filePart == null || filePart.getSize() == 0) && remarks.isEmpty()) {
-            writeJsonResponse(resp, false, "Please attach a file or provide remarks before submitting.");
+        if (filePart == null || filePart.getSize() == 0) {
+            writeJsonResponse(resp, false, "Please attach a file before submitting.");
             return;
         }
 
         try {
             int studentId = loggedInUser.getUserId();
             String assignmentsRoot = req.getServletContext().getRealPath("/assets/assignments");
-            Path submissionDir = Paths.get(assignmentsRoot, slug, "submissions", "student_" + studentId);
+            Path submissionDir = Paths.get(assignmentsRoot, "assignment_" + assignmentId, "submissions", "student_" + studentId);
             if (!Files.exists(submissionDir)) {
                 Files.createDirectories(submissionDir);
             }
 
             String savedFileName = "";
-            if (filePart != null && filePart.getSize() > 0) {
-                String submittedName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String safeName = submittedName.replaceAll("[^a-zA-Z0-9._-]", "_");
-                savedFileName = "submission_" + System.currentTimeMillis() + "_" + safeName;
-                try (InputStream in = filePart.getInputStream()) {
-                    Files.copy(in, submissionDir.resolve(savedFileName), StandardCopyOption.REPLACE_EXISTING);
+            String submittedName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            String safeName = submittedName.replaceAll("[^a-zA-Z0-9._-]", "_");
+            savedFileName = "submission_" + System.currentTimeMillis() + "_" + safeName;
+            try (InputStream in = filePart.getInputStream()) {
+                Files.copy(in, submissionDir.resolve(savedFileName), StandardCopyOption.REPLACE_EXISTING);
+            }
+            
+            try {
+                String sourceDir = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/assignments/assignment_" + assignmentId + "/submissions/student_" + studentId;
+                Path sourcePath = Paths.get(sourceDir);
+                if (!Files.exists(sourcePath)) {
+                    Files.createDirectories(sourcePath);
                 }
-            }
+                Files.copy(submissionDir.resolve(savedFileName), sourcePath.resolve(savedFileName), StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {}
 
-            // Save remarks if present
-            if (!remarks.isEmpty()) {
-                Files.write(submissionDir.resolve("remarks.txt"), remarks.getBytes());
-            }
+            String relPath = "assets/assignments/assignment_" + assignmentId + "/submissions/student_" + studentId + "/" + savedFileName;
+            
+            com.edustand.service.AssignmentService as = new com.edustand.service.AssignmentService();
+            as.submitAssignment(assignmentId, studentId, relPath);
 
-            // Write a small submission metadata file
-            String meta = "{\"studentId\":\"" + studentId + "\",\"file\":\"" + escapeJson(savedFileName)
-                    + "\",\"remarks\":\"" + escapeJson(remarks) + "\",\"submittedAt\":\"" + System.currentTimeMillis()
-                    + "\"}";
-            Files.write(submissionDir.resolve("submission.json"), meta.getBytes());
-
-            new ActivityLogService().logActivity(studentId, "ASSIGNMENT_SUBMIT", "Submitted to " + slug);
+            new ActivityLogService().logActivity(studentId, "ASSIGNMENT_SUBMIT", "Submitted to assignment " + assignmentId);
 
             writeJsonResponse(resp, true, "Submission received successfully", savedFileName);
         } catch (Exception e) {
@@ -281,43 +295,23 @@ public class ClassroomController extends HttpServlet {
         String pathInfo = req.getPathInfo();
         String[] parts = pathInfo.split("/");
 
-        if (parts.length < 2) {
+        if (parts.length < 3) {
             writeJsonResponse(resp, false, "Assignment ID is required");
             return;
         }
-
+        int assignmentId = 0;
         try {
-            // TODO: Fetch submissions from database for this assignment
-            // For now, return sample data
-            List<SubmissionData> submissions = new ArrayList<>();
-            submissions.add(new SubmissionData("John Doe", "SUBMITTED", "2024-01-15 10:30 AM", "submission_1.pdf"));
-            submissions.add(new SubmissionData("Jane Smith", "NOT SUBMITTED", "", ""));
-            submissions.add(new SubmissionData("Bob Johnson", "SUBMITTED", "2024-01-14 02:15 PM", "submission_3.pdf"));
-            submissions
-                    .add(new SubmissionData("Alice Williams", "SUBMITTED", "2024-01-13 09:45 AM", "submission_4.pdf"));
-            submissions.add(new SubmissionData("Charlie Brown", "NOT SUBMITTED", "", ""));
-
-            StringBuilder json = new StringBuilder();
-            json.append("{\"success\":true,\"submissions\":[");
-            for (int i = 0; i < submissions.size(); i++) {
-                if (i > 0)
-                    json.append(",");
-                SubmissionData sub = submissions.get(i);
-                json.append("{");
-                json.append("\"name\":\"").append(escapeJson(sub.name)).append("\",");
-                json.append("\"status\":\"").append(escapeJson(sub.status)).append("\",");
-                json.append("\"submissionDate\":\"").append(escapeJson(sub.submissionDate)).append("\",");
-                json.append("\"fileName\":\"").append(escapeJson(sub.fileName)).append("\"");
-                json.append("}");
-            }
-            json.append("]}");
-
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-            resp.getWriter().write(json.toString());
-        } catch (Exception e) {
-            writeJsonResponse(resp, false, "Failed to fetch submissions: " + e.getMessage());
+            assignmentId = Integer.parseInt(parts[2]);
+        } catch (NumberFormatException e) {
+            writeJsonResponse(resp, false, "Invalid assignment ID");
+            return;
         }
+
+        com.edustand.service.AssignmentService as = new com.edustand.service.AssignmentService();
+        String jsonArray = as.getSubmissionsAsJson(assignmentId);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        resp.getWriter().write("{\"success\":true,\"submissions\":" + jsonArray + "}");
     }
 
     private void writeJsonResponse(HttpServletResponse resp, boolean success, String message) throws IOException {

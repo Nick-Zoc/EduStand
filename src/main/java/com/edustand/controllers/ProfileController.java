@@ -125,16 +125,22 @@ public class ProfileController extends HttpServlet {
     }
 
     private String storeProfilePicture(HttpServletRequest req, int userId, Part part) throws IOException {
-        String submittedName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-        String safeName = submittedName.replaceAll("[^a-zA-Z0-9._-]", "_");
+        String rawName = part.getSubmittedFileName();
+        if (rawName.contains("/")) {
+            rawName = rawName.substring(rawName.lastIndexOf("/") + 1);
+        }
+        if (rawName.contains("\\")) {
+            rawName = rawName.substring(rawName.lastIndexOf("\\") + 1);
+        }
+        
+        String safeName = rawName.replaceAll("[^a-zA-Z0-9._-]", "_");
         String fileName = "profile_" + userId + "_" + Instant.now().toEpochMilli() + "_" + safeName;
 
         // Organize by role: images/profile/{admin|teacher|student}
         UserModel currentProfile = profileService.getProfileById(userId);
         String userRole = currentProfile != null ? currentProfile.getRole().toLowerCase() : "user";
 
-        // Persist profile images under assets so they survive redeploys to the project
-        // layout
+        // Persist profile images under assets so they survive redeploys to the project layout
         String uploadDirectory = req.getServletContext().getRealPath("/assets/profile/" + userRole);
         Path uploadPath = Paths.get(uploadDirectory);
         if (!Files.exists(uploadPath)) {
@@ -144,6 +150,18 @@ public class ProfileController extends HttpServlet {
         Path target = uploadPath.resolve(fileName);
         try (InputStream inputStream = part.getInputStream()) {
             Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+        
+        // Also copy to project source if possible so it persists across Eclipse cleans
+        try {
+            String sourceDir = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/profile/" + userRole;
+            Path sourcePath = Paths.get(sourceDir);
+            if (!Files.exists(sourcePath)) {
+                Files.createDirectories(sourcePath);
+            }
+            Files.copy(target, sourcePath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            // Ignore if source path is not available
         }
 
         return "assets/profile/" + userRole + "/" + fileName;

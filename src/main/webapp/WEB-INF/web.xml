@@ -33,13 +33,11 @@
     <servlet-name>default</servlet-name>
     <url-pattern>/images/*</url-pattern>
   </servlet-mapping>
-  <!-- Explicit mapping for TeacherClassroom controller to ensure route availability -->
-  <servlet>
-    <servlet-name>TeacherClassroom</servlet-name>
-    <servlet-class>com.edustand.controllers.TeacherClassroomController</servlet-class>
-  </servlet>
   <servlet-mapping>
-    <servlet-name>TeacherClassroom</servlet-name>
-    <url-pattern>/TeacherClassroom</url-pattern>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/assets/*</url-pattern>
   </servlet-mapping>
+  <!-- Note: servlet mapping for TeacherClassroom is provided via @WebServlet
+       annotation on the controller class. Removing duplicate XML mapping
+       to avoid startup conflicts. -->
 </web-app>

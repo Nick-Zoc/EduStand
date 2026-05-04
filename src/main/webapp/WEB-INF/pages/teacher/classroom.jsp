@@ -353,6 +353,12 @@
                         <small class="text-on-surface-variant">Supported formats: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, ZIP</small>
                     </div>
                     <div class="mb-3">
+                        <label for="folderName" class="form-label fw-semibold">Upload to Folder (Optional)</label>
+                        <select class="form-select input-ghost rounded-3" id="folderName">
+                            <option value="">Root Directory</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="fileDescription" class="form-label fw-semibold">Description (Optional)</label>
                         <textarea class="form-control input-ghost rounded-3" id="fileDescription" rows="3" placeholder="Add file description..."></textarea>
                     </div>
@@ -528,12 +534,10 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            showToast('Folder created successfully!');
-                            document.getElementById('folderName').value = '';
-                            document.getElementById('folderDescription').value = '';
+                            showToast('Folder created successfully');
                             const modal = bootstrap.Modal.getInstance(document.getElementById('createFolderModal'));
                             modal.hide();
-                            // TODO: Reload folder grid or add new folder to UI
+                            loadResources();
                         } else {
                             showToast(data.message, 'error');
                         }
@@ -560,6 +564,8 @@
 
                     const formData = new FormData();
                     formData.append('fileName', fileName);
+                    const folderNameVal = document.getElementById('folderName') ? document.getElementById('folderName').value : '';
+                    formData.append('folderName', folderNameVal);
                     formData.append('fileDescription', fileDescription);
                     formData.append('fileInput', fileInput.files[0]);
 
@@ -570,13 +576,10 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            showToast('File uploaded successfully!');
-                            document.getElementById('fileName').value = '';
-                            document.getElementById('fileInput').value = '';
-                            document.getElementById('fileDescription').value = '';
+                            showToast('File uploaded successfully');
                             const modal = bootstrap.Modal.getInstance(document.getElementById('uploadFileModal'));
                             modal.hide();
-                            // TODO: Reload file table or add new file to UI
+                            loadResources();
                         } else {
                             showToast(data.message, 'error');
                         }
@@ -615,14 +618,10 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            showToast('Assignment created successfully!');
-                            document.getElementById('assignmentTitle').value = '';
-                            document.getElementById('assignmentOpenDate').value = '';
-                            document.getElementById('assignmentDueDate').value = '';
-                            document.getElementById('assignmentDescription').value = '';
+                            showToast('Assignment created successfully');
                             const modal = bootstrap.Modal.getInstance(document.getElementById('createAssignmentModal'));
                             modal.hide();
-                            // TODO: Reload assignments list or add new assignment to UI
+                            loadAssignments();
                         } else {
                             showToast(data.message, 'error');
                         }
@@ -642,5 +641,184 @@
                     // For now, sample data is hardcoded in the modal
                 });
             });
+        });
+        let allResources = [];
+        
+        window.viewSubmissions = async function(assignmentId) {
+            try {
+                const resp = await fetch('${pageContext.request.contextPath}/classroom/assignment/' + assignmentId + '/submissions');
+                const result = await resp.json();
+                
+                const tableBody = document.querySelector('#viewSubmissionsModal tbody');
+                if (!tableBody) return;
+                
+                let html = '';
+                if (result.submissions && result.submissions.length > 0) {
+                    result.submissions.forEach(s => {
+                        html += `
+                        <tr>
+                            <td class="px-4 py-3"><div class="fw-semibold text-on-surface">\${s.name}</div></td>
+                            <td class="px-4 py-3">
+                                <span class="badge \${(s.status === 'PENDING' || s.status === 'GRADED') ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'} rounded-pill fw-medium">\${s.status}</span>
+                            </td>
+                            <td class="px-4 py-3 small text-on-surface-variant">\${s.submissionDate}</td>
+                            <td class="px-4 py-3 text-end">`;
+                            
+                        if (s.path && s.path !== '') {
+                            html += `<a href="${pageContext.request.contextPath}/\${s.path}" target="_blank" class="btn btn-sm btn-outline-primary">View File</a>`;
+                        }
+                        
+                        html += `</td></tr>`;
+                    });
+                } else {
+                    html = '<tr><td colspan="4" class="text-center py-4 text-on-surface-variant">No submissions yet.</td></tr>';
+                }
+                tableBody.innerHTML = html;
+            } catch (err) { console.error("Error loading submissions", err); }
+        };
+
+        async function loadAssignments() {
+            try {
+                const resp = await fetch('${pageContext.request.contextPath}/classroom/data/assignments');
+                const result = await resp.json();
+                
+                const container = document.getElementById('assignments-content');
+                if (!container) return;
+                
+                let html = '<h5 class="fw-bold mb-3">All Assignments</h5>';
+                
+                if (result.data && result.data.length > 0) {
+                    result.data.forEach(a => {
+                        html += `
+                        <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek p-4 d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <h6 class="fw-bold mb-2">\${a.title}</h6>
+                                <div class="small text-on-surface-variant">Due: \${a.due}</div>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-primary-edu btn-sm" onclick="viewSubmissions('\${a.id}')" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</button>
+                            </div>
+                        </div>`;
+                    });
+                } else {
+                    html += '<p class="text-on-surface-variant">No assignments posted yet.</p>';
+                }
+                
+                // Keep the search and create button at the top
+                const topHtml = `
+                    <div class="d-flex gap-3 mb-4 flex-column flex-md-row">
+                        <div class="flex-grow-1">
+                            <input type="text" class="form-control input-ghost rounded-3" placeholder="Search assignments..." style="min-height: 44px;">
+                        </div>
+                        <button class="btn btn-primary-edu px-4 py-2 rounded-3 fw-semibold" type="button" data-bs-toggle="modal" data-bs-target="#createAssignmentModal">
+                            <i class="fa-solid fa-plus me-2"></i>Create Assignment
+                        </button>
+                    </div>`;
+
+                container.innerHTML = topHtml + html;
+            } catch (err) { console.error("Error loading assignments", err); }
+        }
+
+        async function loadResources() {
+            try {
+                const resp = await fetch('${pageContext.request.contextPath}/classroom/data/resources');
+                const result = await resp.json();
+                allResources = result.data || [];
+                renderFolderGrid();
+            } catch (err) { console.error("Error loading resources", err); }
+        }
+
+        function renderFolderGrid() {
+            const container = document.getElementById('content-content');
+            if (!container) return;
+
+            // Find all unique folders
+            const folders = allResources.filter(r => r.type === 'FOLDER');
+            
+            // Populate folder dropdown in upload modal
+            const folderSelect = document.getElementById('folderName');
+            if (folderSelect) {
+                folderSelect.innerHTML = '<option value="">Root Directory</option>';
+                folders.forEach(f => {
+                    folderSelect.innerHTML += `<option value="\${f.title}">\${f.title}</option>`;
+                });
+            }
+            
+            let html = `
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-outline-variant">
+                <nav aria-label="breadcrumb"><ol class="breadcrumb mb-0"><li class="breadcrumb-item active text-on-surface-variant">Root Directory</li></ol></nav>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm px-3 py-2 rounded-3" type="button" data-bs-toggle="modal" data-bs-target="#createFolderModal">
+                        <i class="fa-solid fa-folder-plus me-2"></i>Create Folder
+                    </button>
+                    <button class="btn btn-primary-edu btn-sm px-3 py-2 rounded-3" type="button" data-bs-toggle="modal" data-bs-target="#uploadFileModal">
+                        <i class="fa-solid fa-arrow-up-from-bracket me-2"></i>Upload File
+                    </button>
+                </div>
+            </div>
+            <div class="row g-3 mb-4" id="folderGrid">`;
+
+            if (folders.length === 0) {
+                html += '<p class="text-on-surface-variant w-100">No folders created yet.</p>';
+            } else {
+                folders.forEach(f => {
+                    const fileCount = allResources.filter(r => r.type === 'FILE' && r.folder === f.title).length;
+                    html += `
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                        <div class="card card-sleek h-100 cursor-pointer" onclick="openFolder('\${f.title}')" style="transition: all 0.3s ease;">
+                            <div class="card-body d-flex flex-column align-items-center text-center">
+                                <i class="fa-solid fa-folder-open fs-1 text-primary mb-3" style="opacity: 0.8;"></i>
+                                <h5 class="card-title fw-bold mb-1">\${f.title}</h5>
+                                <p class="card-text small text-on-surface-variant">\${fileCount} files</p>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            }
+            html += `</div><div id="fileTableContainer"></div>`;
+            container.innerHTML = html;
+        }
+
+        // Must be global so the onclick attribute can find it
+        window.openFolder = function(folderName) {
+            const grid = document.getElementById('folderGrid');
+            const tableContainer = document.getElementById('fileTableContainer');
+            
+            grid.style.display = 'none'; // Hide folders
+            
+            // Get files for this folder
+            const files = allResources.filter(r => r.type === 'FILE' && r.folder === folderName);
+            
+            let html = `
+            <div class="mb-3">
+                <button class="btn btn-sm btn-outline-secondary" onclick="renderFolderGrid()"><i class="fa-solid fa-arrow-left me-2"></i>Back to Folders</button>
+                <h4 class="mt-3">\${folderName}</h4>
+            </div>
+            <div class="table-responsive bg-white rounded-3 border border-outline-variant overflow-hidden">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-surface-container-high">
+                        <tr><th class="px-4 py-3 fw-bold small text-on-surface-variant">Resource Name</th><th class="px-4 py-3 fw-bold small text-on-surface-variant text-end">Action</th></tr>
+                    </thead>
+                    <tbody>`;
+            
+            if (files.length === 0) {
+                html += '<tr><td colspan="2" class="px-4 py-3 text-center text-on-surface-variant">Folder is empty</td></tr>';
+            } else {
+                files.forEach(f => {
+                    html += `
+                    <tr>
+                        <td class="px-4 py-3"><div class="d-flex align-items-center gap-2"><i class="fa-regular fa-file text-primary"></i><span class="fw-semibold text-on-surface">\${f.title}</span></div></td>
+                        <td class="px-4 py-3 text-end"><a href="${pageContext.request.contextPath}/\${f.path}" target="_blank" class="btn btn-sm btn-outline-primary">Download</a></td>
+                    </tr>`;
+                });
+            }
+            html += `</tbody></table></div>`;
+            tableContainer.innerHTML = html;
+        };
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAssignments();
+            loadResources();
         });
     </script>

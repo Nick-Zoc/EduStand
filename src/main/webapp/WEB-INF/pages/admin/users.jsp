@@ -25,7 +25,7 @@
                 <div>
                     <div class="users-kicker small text-uppercase fw-semibold text-primary mb-1" style="letter-spacing: 0.08em;">Manage Users</div>
                     <h2 class="users-title fs-1 fw-bold m-0 brand-headline text-on-surface">All Users</h2>
-                    <p class="users-subtitle text-on-surface-variant mb-0" style="max-width: 46rem; line-height: 1.6;">Review accounts, update roles and status, and remove users from a clean, premium table layout.</p>
+                    <p class="users-subtitle text-on-surface-variant mb-0" style="max-width: 46rem; line-height: 1.6;">Review accounts, update roles and status, and remove users.</p>
                 </div>
                 <button class="btn btn-primary-edu d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold text-white border-0" type="button" data-bs-toggle="modal" data-bs-target="#addUserModal">
                     <i class="fa-solid fa-user-plus"></i>

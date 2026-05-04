@@ -34,7 +34,7 @@ public class ContactRequestService {
     }
 
     public List<ContactRequestModel> getAllRequests() {
-        String query = "SELECT request_id, user_id, full_name, email, subject, message, read_status, request_status, admin_response, email_notified, created_at, updated_at FROM ContactRequests ORDER BY created_at DESC";
+        String query = "SELECT request_id, user_id, full_name, email, subject, message, read_status, request_status, created_at, updated_at FROM ContactRequests ORDER BY created_at DESC";
         List<ContactRequestModel> requests = new ArrayList<>();
 
         try (Connection conn = DbConfig.getDbConnection();
@@ -68,16 +68,13 @@ public class ContactRequestService {
         return 0;
     }
 
-    public boolean updateRequest(int requestId, String readStatus, String requestStatus, String adminResponse,
-            boolean emailNotified) {
-        String query = "UPDATE ContactRequests SET read_status = ?, request_status = ?, admin_response = ?, email_notified = ?, updated_at = CURRENT_TIMESTAMP WHERE request_id = ?";
+    public boolean updateRequest(int requestId, String readStatus, String requestStatus) {
+        String query = "UPDATE ContactRequests SET read_status = ?, request_status = ?, updated_at = CURRENT_TIMESTAMP WHERE request_id = ?";
         try (Connection conn = DbConfig.getDbConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, readStatus);
             stmt.setString(2, requestStatus);
-            stmt.setString(3, adminResponse == null ? "" : adminResponse);
-            stmt.setBoolean(4, emailNotified);
-            stmt.setInt(5, requestId);
+            stmt.setInt(3, requestId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Database error while updating contact request: " + e.getMessage());
@@ -87,7 +84,7 @@ public class ContactRequestService {
     }
 
     public ContactRequestModel findById(int requestId) {
-        String query = "SELECT request_id, user_id, full_name, email, subject, message, read_status, request_status, admin_response, email_notified, created_at, updated_at FROM ContactRequests WHERE request_id = ?";
+        String query = "SELECT request_id, user_id, full_name, email, subject, message, read_status, request_status, created_at, updated_at FROM ContactRequests WHERE request_id = ?";
         try (Connection conn = DbConfig.getDbConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, requestId);
@@ -103,6 +100,19 @@ public class ContactRequestService {
         return null;
     }
 
+    public boolean deleteRequest(int requestId) {
+        String query = "DELETE FROM ContactRequests WHERE request_id = ?";
+        try (Connection conn = DbConfig.getDbConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, requestId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Database error while deleting contact request: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private ContactRequestModel mapRequest(ResultSet rs) throws SQLException {
         ContactRequestModel request = new ContactRequestModel();
         request.setRequestId(rs.getInt("request_id"));
@@ -114,8 +124,6 @@ public class ContactRequestService {
         request.setMessage(rs.getString("message"));
         request.setReadStatus(rs.getString("read_status"));
         request.setRequestStatus(rs.getString("request_status"));
-        request.setAdminResponse(rs.getString("admin_response"));
-        request.setEmailNotified(rs.getBoolean("email_notified"));
         request.setCreatedAt(rs.getTimestamp("created_at"));
         request.setUpdatedAt(rs.getTimestamp("updated_at"));
         return request;

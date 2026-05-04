@@ -46,8 +46,10 @@ public class AdminService {
             return rowsAffected > 0;
 
         } catch (SQLException | ClassNotFoundException e) {
-            if (e instanceof SQLException && e.getMessage() != null
-                    && e.getMessage().toLowerCase().contains("request_reason")) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+
+            // If DB doesn't have request_reason column, retry insert without it
+            if (msg.contains("request_reason")) {
                 try (Connection conn = DbConfig.getDbConnection();
                         PreparedStatement stmt = conn.prepareStatement(queryWithoutReason,
                                 Statement.RETURN_GENERATED_KEYS)) {
@@ -58,11 +60,34 @@ public class AdminService {
                     stmt.setString(5, user.getStatus());
                     return stmt.executeUpdate() > 0;
                 } catch (SQLException | ClassNotFoundException retryError) {
-                    System.err.println("Database error while adding user: " + retryError.getMessage());
+                    System.err.println("Database error while adding user (retry without request_reason): "
+                            + retryError.getMessage());
                     retryError.printStackTrace();
                 }
                 return false;
             }
+
+            // If DB doesn't accept the status value (enum mismatch), retry with a safe
+            // status
+            if (isEnumValueError(e)) {
+                String safeStatus = "INACTIVE"; // fallback to INACTIVE so the account isn't active unexpectedly
+                try (Connection conn = DbConfig.getDbConnection();
+                        PreparedStatement stmt = conn.prepareStatement(queryWithoutReason,
+                                Statement.RETURN_GENERATED_KEYS)) {
+                    stmt.setString(1, user.getFullName());
+                    stmt.setString(2, user.getEmail());
+                    stmt.setString(3, user.getPasswordHash());
+                    stmt.setString(4, user.getRole());
+                    stmt.setString(5, safeStatus);
+                    return stmt.executeUpdate() > 0;
+                } catch (SQLException | ClassNotFoundException retryError) {
+                    System.err.println(
+                            "Database error while adding user (retry with safe status): " + retryError.getMessage());
+                    retryError.printStackTrace();
+                }
+                return false;
+            }
+
             System.err.println("Database error while adding user: " + e.getMessage());
             e.printStackTrace();
         }
@@ -266,6 +291,13 @@ public class AdminService {
         return e.getMessage().toLowerCase().contains("request_reason");
     }
 
+    private boolean isEnumValueError(Exception e) {
+        if (!(e instanceof SQLException) || e.getMessage() == null)
+            return false;
+        String msg = e.getMessage().toLowerCase();
+        return msg.contains("incorrect") && msg.contains("enum");
+    }
+
     public boolean emailExistsForOtherUser(String email, int userId) {
         String query = "SELECT 1 FROM Users WHERE email = ? AND user_id <> ?";
         try (Connection conn = DbConfig.getDbConnection();
@@ -349,6 +381,21 @@ public class AdminService {
             user.setRequestReason(rs.getString("request_reason"));
         } catch (Exception e) {
             // If the column doesn't exist (older DB), leave null
+        }
+        try {
+            user.setPhoneNumber(rs.getString("phone_number"));
+        } catch (Exception e) {
+            // Optional profile field for newer schema versions.
+        }
+        try {
+            user.setAddress(rs.getString("address"));
+        } catch (Exception e) {
+            // Optional profile field for newer schema versions.
+        }
+        try {
+            user.setProfilePicturePath(rs.getString("profile_picture_path"));
+        } catch (Exception e) {
+            // Optional profile field for newer schema versions.
         }
         user.setCreatedAt(rs.getTimestamp("created_at"));
         return user;

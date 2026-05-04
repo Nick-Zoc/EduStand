@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.edustand.model.ContactRequestModel;
 import com.edustand.model.UserModel;
+import com.edustand.service.ActivityLogService;
 import com.edustand.service.ContactRequestService;
 
 import jakarta.servlet.ServletException;
@@ -25,6 +26,33 @@ public class AdminContactRequestsController extends HttpServlet {
         UserModel loggedInUser = session == null ? null : (UserModel) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        if ("get_unread_json".equals(req.getParameter("action"))) {
+            resp.setContentType("application/json");
+            List<ContactRequestModel> requests = contactRequestService.getAllRequests();
+            int unreadCount = contactRequestService.countByReadStatus("UNREAD");
+
+            StringBuilder json = new StringBuilder();
+            json.append("{\"unreadCount\":").append(unreadCount).append(",\"requests\":[");
+
+            for (int i = 0; i < requests.size() && i < 5; i++) {
+                ContactRequestModel req2 = requests.get(i);
+                if (i > 0)
+                    json.append(",");
+                json.append("{")
+                        .append("\"requestId\":").append(req2.getRequestId()).append(",")
+                        .append("\"fullName\":\"").append(escapeJson(req2.getFullName())).append("\",")
+                        .append("\"email\":\"").append(escapeJson(req2.getEmail())).append("\",")
+                        .append("\"subject\":\"").append(escapeJson(req2.getSubject())).append("\",")
+                        .append("\"readStatus\":\"").append(req2.getReadStatus()).append("\",")
+                        .append("\"createdAt\":\"").append(req2.getCreatedAt()).append("\"")
+                        .append("}");
+            }
+
+            json.append("]}");
+            resp.getWriter().write(json.toString());
             return;
         }
 
@@ -59,6 +87,20 @@ public class AdminContactRequestsController extends HttpServlet {
             return;
         }
 
+        if ("delete_request".equals(action)) {
+            boolean deleted = contactRequestService.deleteRequest(requestId);
+            if (!deleted) {
+                writeJson(resp, false, "Failed to delete request.");
+                return;
+            }
+            if (deleted) {
+                new ActivityLogService().logActivity(loggedInUser.getUserId(), "CONTACT_DELETE",
+                        "Deleted contact request (ID: " + requestId + ")");
+            }
+            writeJson(resp, true, "Request deleted.");
+            return;
+        }
+
         ContactRequestModel current = contactRequestService.findById(requestId);
         if (current == null) {
             writeJson(resp, false, "Request not found.");
@@ -67,8 +109,6 @@ public class AdminContactRequestsController extends HttpServlet {
 
         String readStatus = current.getReadStatus();
         String requestStatus = current.getRequestStatus();
-        String adminResponse = trim(req.getParameter("adminResponse"));
-        boolean emailNotified = current.isEmailNotified();
 
         if ("mark_read".equals(action)) {
             readStatus = "READ";
@@ -79,30 +119,26 @@ public class AdminContactRequestsController extends HttpServlet {
         } else if ("mark_fixed".equals(action)) {
             requestStatus = "FIXED";
             readStatus = "READ";
-            emailNotified = true;
-            if (adminResponse.isEmpty()) {
-                adminResponse = "Issue resolved by admin. Follow-up completed.";
-            }
-        } else if ("save_note".equals(action)) {
-            if (adminResponse.isEmpty()) {
-                adminResponse = current.getAdminResponse();
-            }
         } else {
             writeJson(resp, false, "Unsupported action.");
             return;
         }
 
-        boolean updated = contactRequestService.updateRequest(requestId, readStatus, requestStatus, adminResponse,
-                emailNotified);
+        boolean updated = contactRequestService.updateRequest(requestId, readStatus, requestStatus);
         if (!updated) {
             writeJson(resp, false, "Failed to update request.");
             return;
         }
 
-        String message = "Request updated.";
-        if ("mark_fixed".equals(action)) {
-            message = "Request marked as fixed and notification queued to " + current.getEmail() + ".";
+        if (updated && "mark_fixed".equals(action)) {
+            new ActivityLogService().logActivity(loggedInUser.getUserId(), "CONTACT_FIXED",
+                    "Marked contact request " + requestId + " as FIXED");
+        } else if (updated && "mark_read".equals(action)) {
+            new ActivityLogService().logActivity(loggedInUser.getUserId(), "CONTACT_READ",
+                    "Marked contact request " + requestId + " as READ");
         }
+
+        String message = "Request updated.";
         writeJson(resp, true, message);
     }
 
@@ -129,9 +165,7 @@ public class AdminContactRequestsController extends HttpServlet {
             json.append("\"subject\":\"").append(escapeJson(request.getSubject())).append("\",");
             json.append("\"message\":\"").append(escapeJson(request.getMessage())).append("\",");
             json.append("\"readStatus\":\"").append(escapeJson(request.getReadStatus())).append("\",");
-            json.append("\"requestStatus\":\"").append(escapeJson(request.getRequestStatus())).append("\",");
-            json.append("\"adminResponse\":\"").append(escapeJson(request.getAdminResponse())).append("\",");
-            json.append("\"emailNotified\":").append(request.isEmailNotified());
+            json.append("\"requestStatus\":\"").append(escapeJson(request.getRequestStatus())).append("\"");
             json.append("}");
         }
 

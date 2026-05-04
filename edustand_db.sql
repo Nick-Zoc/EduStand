@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS Users (
     role ENUM('ADMIN', 'TEACHER', 'STUDENT') NOT NULL,
     status ENUM('ACTIVE', 'INACTIVE', 'PENDING') DEFAULT 'ACTIVE',
     request_reason TEXT DEFAULT NULL,
+    phone_number VARCHAR(20) DEFAULT NULL,
+    address VARCHAR(255) DEFAULT NULL,
+    profile_picture_path VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -80,11 +83,22 @@ CREATE TABLE IF NOT EXISTS ContactRequests (
     message TEXT NOT NULL,
     read_status ENUM('UNREAD', 'READ') NOT NULL DEFAULT 'UNREAD',
     request_status ENUM('PENDING', 'FIXED') NOT NULL DEFAULT 'PENDING',
-    admin_response TEXT DEFAULT NULL,
-    email_notified TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL,
     INDEX idx_contact_created (created_at),
     INDEX idx_contact_status (read_status, request_status)
+);
+
+-- 7. Activity Logs Table
+CREATE TABLE IF NOT EXISTS ActivityLogs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    INDEX idx_action (action),
+    INDEX idx_created (created_at),
+    INDEX idx_user_created (user_id, created_at)
 );

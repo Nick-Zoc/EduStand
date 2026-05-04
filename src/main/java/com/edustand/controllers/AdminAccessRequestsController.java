@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.edustand.model.UserModel;
+import com.edustand.service.ActivityLogService;
 import com.edustand.service.AdminService;
 
 import jakarta.servlet.ServletException;
@@ -50,7 +51,7 @@ public class AdminAccessRequestsController extends HttpServlet {
 
         String action = req.getParameter("action");
         if ("review_request".equals(action)) {
-            handleReviewRequest(req, resp);
+            handleReviewRequest(req, resp, loggedInUser);
             return;
         }
 
@@ -75,10 +76,18 @@ public class AdminAccessRequestsController extends HttpServlet {
 
         String newStatus = "approve_request".equals(action) ? "ACTIVE" : "INACTIVE";
         boolean ok = adminService.updateUserStatus(userId, newStatus);
+        if (ok) {
+            String actionType = "ACTIVE".equals(newStatus) ? "ACCESS_APPROVE" : "ACCESS_REJECT";
+            String actionDesc = "ACTIVE".equals(newStatus)
+                    ? "Approved access request for " + pendingRequest.getFullName() + " as " + pendingRequest.getRole()
+                    : "Rejected access request for " + pendingRequest.getFullName();
+            new ActivityLogService().logActivity(loggedInUser.getUserId(), actionType, actionDesc);
+        }
         writePendingUsersJson(resp, ok, ok ? "Request updated." : "Failed to update request.");
     }
 
-    private void handleReviewRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void handleReviewRequest(HttpServletRequest req, HttpServletResponse resp, UserModel loggedInUser)
+            throws IOException {
         String idValue = req.getParameter("userId");
         String status = trim(req.getParameter("status"));
         String newPassword = req.getParameter("password");
@@ -127,9 +136,18 @@ public class AdminAccessRequestsController extends HttpServlet {
             String hashedPassword = com.edustand.util.PasswordUtil.hashPassword(newPassword);
             ok = adminService.updateUser(updatedUser, hashedPassword);
             message = "Request approved successfully.";
+            if (ok) {
+                new ActivityLogService().logActivity(loggedInUser.getUserId(), "ACCESS_APPROVE",
+                        "Approved access request for " + pendingRequest.getFullName() + " as "
+                                + pendingRequest.getRole());
+            }
         } else if ("INACTIVE".equals(normalizedStatus)) {
             ok = adminService.updateUserStatus(userId, normalizedStatus);
             message = "Request declined successfully.";
+            if (ok) {
+                new ActivityLogService().logActivity(loggedInUser.getUserId(), "ACCESS_REJECT",
+                        "Rejected access request for " + pendingRequest.getFullName());
+            }
         } else {
             ok = adminService.updateUserStatus(userId, normalizedStatus);
             message = "Request left pending.";

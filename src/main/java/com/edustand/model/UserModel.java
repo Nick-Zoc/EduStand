@@ -20,6 +20,9 @@ public class UserModel {
     private String role; // 'ADMIN', 'TEACHER', 'STUDENT'
     private String status; // 'ACTIVE', 'INACTIVE'
     private String requestReason;
+    private String phoneNumber;
+    private String address;
+    private String profilePicturePath;
     private Timestamp createdAt;
 
     /**
@@ -97,6 +100,30 @@ public class UserModel {
 
     public void setRequestReason(String requestReason) {
         this.requestReason = requestReason;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getProfilePicturePath() {
+        return profilePicturePath;
+    }
+
+    public void setProfilePicturePath(String profilePicturePath) {
+        this.profilePicturePath = profilePicturePath;
     }
 
     public Timestamp getCreatedAt() {

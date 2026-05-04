@@ -820,6 +820,31 @@ a.text-primary-link:hover {
     border: 1px solid #eef2f7;
     border-radius: 12px;
     background: #fff;
+    overflow: hidden;
+}
+
+.notification-title,
+.notification-subject {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.35;
+}
+
+.notification-subject {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.notification-meta {
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.profile-picture-frame {
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.02);
 }
 
 body.sidebar-collapsed .app-sidebar {
@@ -929,4 +954,65 @@ body.sidebar-collapsed .sidebar-nav-link .sidebar-icon {
     color: var(--primary);
     line-height: 1.1;
     margin-bottom: 0.35rem;
+}
+
+/* ========================================
+   PROFESSIONAL TOOLTIP STYLING
+   ======================================== */
+
+.tooltip-inner {
+    background-color: #ffffff;
+    border: 1.5px solid var(--primary);
+    color: var(--on-surface);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 220px;
+}
+
+.tooltip.show {
+    opacity: 1;
+}
+
+.bs-tooltip-top .tooltip-arrow::before,
+.bs-tooltip-bottom .tooltip-arrow::before,
+.bs-tooltip-left .tooltip-arrow::before,
+.bs-tooltip-right .tooltip-arrow::before {
+    border-color: var(--primary);
+}
+
+/* Icon-only button styling with tooltip support */
+.icon-btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--on-surface-variant);
+}
+
+.icon-btn-action:hover {
+    background: var(--surface-container-low);
+    color: var(--primary);
+}
+
+.icon-btn-action.icon-danger:hover {
+    background: rgba(209, 52, 56, 0.1);
+    color: #d13438;
+}
+
+.icon-btn-action.icon-success:hover {
+    background: rgba(16, 124, 16, 0.1);
+    color: #107c10;
+}
+
+.icon-btn-action.icon-warning:hover {
+    background: rgba(217, 119, 6, 0.1);
+    color: #d97706;
 }

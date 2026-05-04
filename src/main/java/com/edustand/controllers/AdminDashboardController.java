@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import com.edustand.model.UserModel;
+import com.edustand.service.ActivityLogService;
 import com.edustand.service.AdminService;
 import com.edustand.service.ContactRequestService;
 
@@ -21,6 +22,7 @@ public class AdminDashboardController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private final AdminService adminService = new AdminService();
     private final ContactRequestService contactRequestService = new ContactRequestService();
+    private final ActivityLogService activityLogService = new ActivityLogService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -46,7 +48,7 @@ public class AdminDashboardController extends HttpServlet {
         req.setAttribute("totalUsers", adminService.countAllUsers());
         req.setAttribute("inactiveCount", adminService.countUsersByStatus("INACTIVE"));
         req.setAttribute("unreadContactCount", contactRequestService.countByReadStatus("UNREAD"));
-        req.setAttribute("recentUsers", adminService.getRecentUsers(10));
+        req.setAttribute("recentLogs", activityLogService.getRecentLogs(10));
 
         req.setAttribute("userName", loggedInUser.getFullName());
         req.setAttribute("userRole", loggedInUser.getRole());

@@ -3,6 +3,7 @@ package com.edustand.controllers;
 import java.io.IOException;
 
 import com.edustand.model.UserModel;
+import com.edustand.service.ActivityLogService;
 import com.edustand.service.RememberMeService;
 import com.edustand.util.CookieUtil;
 import com.edustand.util.SessionUtil;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(asyncSupported = true, urlPatterns = { "/logout" })
 public class LogoutController extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private final ActivityLogService activityLogService = new ActivityLogService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,6 +27,8 @@ public class LogoutController extends HttpServlet {
         UserModel loggedInUser = session == null ? null : (UserModel) session.getAttribute("loggedInUser");
 
         if (loggedInUser != null) {
+            activityLogService.logActivity(loggedInUser.getUserId(), "LOGOUT", "Logged out of the system");
+
             // Invalidate all Remember Me tokens for this user
             RememberMeService rmService = new RememberMeService();
             rmService.invalidateUserTokens(loggedInUser.getUserId());

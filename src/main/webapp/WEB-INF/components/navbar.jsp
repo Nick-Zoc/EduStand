@@ -27,29 +27,10 @@
                     <h6 class="brand-headline fw-bold mb-0">Notifications</h6>
                     <i class="fa-solid fa-gear text-on-surface-variant small"></i>
                 </div>
-                <div class="p-3 d-flex flex-column gap-3">
-                    <div class="notification-item p-2 d-flex gap-2 align-items-start">
-                        <i class="fa-solid fa-phone-slash text-danger mt-1"></i>
-                        <div>
-                            <div class="fw-semibold text-on-surface small">You have missed call(s) from (201) 555-0124.</div>
-                            <div class="text-on-surface-variant" style="font-size: 12px;">Last call at 2:30 PM</div>
-                            <div class="text-on-surface-variant mt-1" style="font-size: 11px;">2 mins ago</div>
-                        </div>
-                    </div>
-                    <div class="notification-item p-2 d-flex gap-2 align-items-start">
-                        <i class="fa-regular fa-file-lines text-primary mt-1"></i>
-                        <div>
-                            <div class="fw-semibold text-on-surface small">300 minutes and 8GB internet on Rs 397 recharge.</div>
-                            <div class="text-on-surface-variant" style="font-size: 12px;">Duration 30 days. Dial *121*1*2# to check.</div>
-                            <div class="text-on-surface-variant mt-1" style="font-size: 11px;">20 mins ago</div>
-                        </div>
-                    </div>
-                    <div class="notification-item p-2 d-flex gap-2 align-items-start">
-                        <i class="fa-solid fa-wifi text-success mt-1"></i>
-                        <div>
-                            <div class="fw-semibold text-on-surface small">You have 5GB mobile data remaining till 05 Aug 2023.</div>
-                            <div class="text-on-surface-variant mt-1" style="font-size: 11px;">1 hr ago</div>
-                        </div>
+                <div id="notificationList" class="p-3 d-flex flex-column gap-3" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; word-break: break-word;">
+                    <div class="text-center text-on-surface-variant py-3">
+                        <i class="fa-regular fa-clock"></i>
+                        <p class="small mt-2 mb-0">Loading notifications...</p>
                     </div>
                 </div>
                 <div class="text-center p-3 border-top border-outline-variant">
@@ -100,3 +81,103 @@
         </div>
     </div>
 </header>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const notificationBadge = document.querySelector('.notification-badge');
+    const notificationTrigger = document.querySelector('.notification-trigger');
+    const notificationList = document.getElementById('notificationList');
+    const contextPath = '${pageContext.request.contextPath}';
+
+    // Load contact requests when notification button is clicked
+    if (notificationTrigger) {
+        notificationTrigger.addEventListener('click', async () => {
+            await loadContactRequests();
+        });
+    }
+
+    async function loadContactRequests() {
+        try {
+            const response = await fetch(contextPath + '/AdminContactRequests?action=get_unread_json', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to load notifications');
+
+            const data = await response.json();
+            displayNotifications(data);
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+            notificationList.innerHTML = `
+                <div class="text-center text-on-surface-variant py-3 text-danger">
+                    <i class="fa-regular fa-triangle-exclamation"></i>
+                    <p class="small mt-2 mb-0">Failed to load notifications</p>
+                </div>
+            `;
+        }
+    }
+
+    function displayNotifications(data) {
+        if (!data.requests || data.requests.length === 0) {
+            notificationList.innerHTML = `
+                <div class="text-center text-on-surface-variant py-3">
+                    <i class="fa-regular fa-inbox"></i>
+                    <p class="small mt-2 mb-0">No new notifications</p>
+                </div>
+            `;
+            if (notificationBadge) notificationBadge.textContent = '';
+            return;
+        }
+
+        // Update badge count
+        if (notificationBadge) {
+            notificationBadge.textContent = data.unreadCount > 0 ? data.unreadCount : '';
+        }
+
+        // Build notification list (use string concatenation to avoid JSP EL parsing)
+        const notificationHTML = data.requests.map(req => {
+            const badgeClass = req.readStatus == 'UNREAD' ? 'pending' : 'active';
+            return ''
+                + '<div class="notification-item p-2 d-flex gap-2 align-items-start border-bottom border-outline-variant">'
+                + '<i class="fa-regular fa-envelope text-primary mt-1" style="min-width: 20px;"></i>'
+                + '<div class="flex-grow-1 min-w-0">'
+                + '<div class="fw-semibold text-on-surface small notification-title">' + escapeHtml(req.fullName) + '</div>'
+                + '<div class="text-on-surface-variant small mt-1 notification-subject">' + escapeHtml(req.subject) + '</div>'
+                + '<div class="d-flex gap-2 mt-2 align-items-center">'
+                + '<span class="edu-badge edu-badge-status edu-badge-status-' + badgeClass + ' text-white" style="font-size: 10px;">' + req.readStatus + '</span>'
+                + '<span class="text-on-surface-variant notification-meta">' + formatTime(req.createdAt) + '</span>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
+        }).join('');
+
+        notificationList.innerHTML = notificationHTML;
+    }
+
+    function formatTime(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+
+        if (diffMins < 1) return 'just now';
+        if (diffMins < 60) return diffMins + 'm ago';
+        if (diffMins < 1440) return Math.floor(diffMins / 60) + 'h ago';
+        return Math.floor(diffMins / 1440) + 'd ago';
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+});
+</script>

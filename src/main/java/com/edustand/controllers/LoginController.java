@@ -10,11 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.edustand.model.UserModel;
+import com.edustand.service.ActivityLogService;
 import com.edustand.service.LoginService;
 import com.edustand.service.RememberMeService;
 import com.edustand.util.CookieUtil;
 import com.edustand.util.SessionUtil;
-import com.edustand.util.RememberMeUtil;
 
 @WebServlet(asyncSupported = true, urlPatterns = { "/login" })
 public class LoginController extends HttpServlet {
@@ -22,6 +22,7 @@ public class LoginController extends HttpServlet {
 
     // Instantiate our service to talk to the database
     private LoginService loginService = new LoginService();
+    private final ActivityLogService activityLogService = new ActivityLogService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -71,6 +72,9 @@ public class LoginController extends HttpServlet {
             }
 
             // 5. Role-based routing: Send them to the correct dashboard
+            activityLogService.logActivity(loggedInUser.getUserId(), "LOGIN",
+                    "Logged in as " + loggedInUser.getRole());
+
             String role = loggedInUser.getRole();
             if (role.equals("ADMIN")) {
                 resp.sendRedirect(req.getContextPath() + "/AdminDashboard");

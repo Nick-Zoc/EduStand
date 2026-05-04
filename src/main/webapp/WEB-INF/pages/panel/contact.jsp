@@ -31,53 +31,61 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 1.5rem;">
-            <section class="row g-3">
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="contact-info-card h-100 p-4 text-center">
-                        <div class="contact-icon-circle mx-auto mb-3"><i class="fa-solid fa-location-dot"></i></div>
-                        <h3 class="fs-5 fw-bold brand-headline m-0">Postal Address</h3>
-                        <p class="text-on-surface-variant mt-2 mb-0">GPO Box - 7548, Kathmandu, Nepal</p>
+        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-primary mb-1" style="letter-spacing: 0.08em;">Get in Touch</div>
+                    <h2 class="fs-1 fw-bold m-0 brand-headline text-on-surface">Contact Us</h2>
+                    <p class="text-on-surface-variant mb-0" style="max-width: 50rem; line-height: 1.6;">Have questions about resources or platform support? Send us a message and our team will follow up.</p>
+                </div>
+            </div>
+
+            <section class="row g-2 mb-3">
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card-sleek contact-info-card h-100 p-3 text-center">
+                        <div class="contact-icon-circle mx-auto mb-2"><i class="fa-solid fa-location-dot"></i></div>
+                        <div class="small fw-semibold brand-headline m-0">Address</div>
+                        <p class="text-on-surface-variant mt-1 mb-0" style="font-size: 13px;">Imadol, Lalitpur</p>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="contact-info-card h-100 p-4 text-center">
-                        <div class="contact-icon-circle mx-auto mb-3"><i class="fa-solid fa-phone"></i></div>
-                        <h3 class="fs-5 fw-bold brand-headline m-0">Call Us</h3>
-                        <p class="text-on-surface-variant mt-2 mb-0">+977 9744455464</p>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card-sleek contact-info-card h-100 p-3 text-center">
+                        <div class="contact-icon-circle mx-auto mb-2"><i class="fa-solid fa-phone"></i></div>
+                        <div class="small fw-semibold brand-headline m-0">Phone</div>
+                        <p class="text-on-surface-variant mt-1 mb-0" style="font-size: 13px;">+977 9765018488</p>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="contact-info-card h-100 p-4 text-center">
-                        <div class="contact-icon-circle mx-auto mb-3"><i class="fa-solid fa-envelope"></i></div>
-                        <h3 class="fs-5 fw-bold brand-headline m-0">Email Us</h3>
-                        <p class="text-on-surface-variant mt-2 mb-0">info@edustand.edu</p>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card-sleek contact-info-card h-100 p-3 text-center">
+                        <div class="contact-icon-circle mx-auto mb-2"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="small fw-semibold brand-headline m-0">Email</div>
+                        <p class="text-on-surface-variant mt-1 mb-0" style="font-size: 13px;">info@nepalsolutionhub.com</p>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="contact-info-card h-100 p-4 text-center">
-                        <div class="contact-icon-circle mx-auto mb-3"><i class="fa-regular fa-clock"></i></div>
-                        <h3 class="fs-5 fw-bold brand-headline m-0">Open Time</h3>
-                        <p class="text-on-surface-variant mt-2 mb-0">Sun - Fri (10 AM - 05 PM)</p>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card-sleek contact-info-card h-100 p-3 text-center">
+                        <div class="contact-icon-circle mx-auto mb-2"><i class="fa-regular fa-clock"></i></div>
+                        <div class="small fw-semibold brand-headline m-0">Hours</div>
+                        <p class="text-on-surface-variant mt-1 mb-0" style="font-size: 13px;">Sun-Fri 10AM-5PM</p>
                     </div>
                 </div>
             </section>
 
-            <section class="contact-main-card p-4 p-lg-4">
-                <div class="row g-4">
+            <section class="contact-main-card p-3 p-md-4">
+                <div class="row g-3">
                     <div class="col-12 col-lg-7">
-                        <h2 class="brand-headline fw-bold mb-2">Contact Us</h2>
-                        <p class="text-on-surface-variant mb-4">Have questions about resources or platform support? Send us a request and our team will follow up.</p>
+                        <h3 class="brand-headline fw-bold mb-2">Send a Message</h3>
+                        <p class="text-on-surface-variant mb-3" style="font-size: 14px;">Tell us about your request. We typically respond within 1-2 working days.</p>
 
                         <c:if test="${not empty success}">
-                            <div class="alert alert-success">${success}</div>
+                            <div class="alert alert-success border-0 rounded-2 mb-3">${success}</div>
                         </c:if>
                         <c:if test="${not empty error}">
-                            <div class="alert alert-danger">${error}</div>
+                            <div class="alert alert-danger border-0 rounded-2 mb-3">${error}</div>
                         </c:if>
 
-                        <form action="${pageContext.request.contextPath}/PanelContact" method="post" class="d-flex flex-column gap-3">
-                            <div class="row g-3">
+                        <form action="${pageContext.request.contextPath}/PanelContact" method="post" class="d-flex flex-column gap-2">
+                            <div class="row g-2">
                                 <div class="col-12 col-md-6">
                                     <input class="form-control" name="fullName" placeholder="Your Name" value="${empty prefillName ? sessionScope.loggedInUser.fullName : prefillName}" required>
                                 </div>
@@ -85,38 +93,38 @@
                                     <input class="form-control" type="email" name="email" placeholder="Your Email" value="${empty prefillEmail ? sessionScope.loggedInUser.email : prefillEmail}" required>
                                 </div>
                             </div>
-                            <input class="form-control" name="subject" placeholder="Your Subject" value="${prefillSubject}" required>
-                            <textarea class="form-control" rows="5" name="message" placeholder="Write your message" required>${prefillMessage}</textarea>
+                            <input class="form-control" name="subject" placeholder="Subject" value="${prefillSubject}" required>
+                            <textarea class="form-control" rows="4" name="message" placeholder="Your message" required>${prefillMessage}</textarea>
                             <div>
-                                <button type="submit" class="btn btn-primary-edu px-4 py-2 fw-semibold text-white">Send Message <i class="fa-regular fa-paper-plane ms-1"></i></button>
+                                <button type="submit" class="btn btn-primary-edu btn-sm px-3 py-2 fw-semibold text-white">Send Message <i class="fa-regular fa-paper-plane ms-1"></i></button>
                             </div>
                         </form>
                     </div>
                     <div class="col-12 col-lg-5">
-                        <div class="contact-gradient-panel h-100 p-4 p-xl-5 text-white">
-                            <h3 class="brand-headline fw-bold mb-3">Collaborate With EduStand</h3>
-                            <p class="mb-4 text-white-50">Tell us about your request, institution, and goals. We typically respond within 1-2 working days.</p>
+                        <div class="contact-gradient-panel h-100 p-3 p-md-4 text-white rounded-3">
+                            <h3 class="brand-headline fw-bold mb-2" style="font-size: 18px;">Why Contact Us</h3>
+                            <p class="mb-3 text-white-50" style="font-size: 14px;">Reach out for partnership, support, or collaboration inquiries.</p>
 
-                            <div class="d-flex flex-column gap-3">
-                                <div class="d-flex gap-3 align-items-start">
-                                    <div class="contact-mini-dot"><i class="fa-solid fa-flask"></i></div>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex gap-2 align-items-start">
+                                    <div class="contact-mini-dot flex-shrink-0"><i class="fa-solid fa-flask" style="font-size: 14px;"></i></div>
                                     <div>
-                                        <div class="fw-bold">Research Collaboration</div>
-                                        <small class="text-white-50">Joint research, mentoring, and network building.</small>
+                                        <div class="fw-bold" style="font-size: 13px;">Research</div>
+                                        <small class="text-white-50">Collaboration and insights</small>
                                     </div>
                                 </div>
-                                <div class="d-flex gap-3 align-items-start">
-                                    <div class="contact-mini-dot"><i class="fa-solid fa-calendar-days"></i></div>
+                                <div class="d-flex gap-2 align-items-start">
+                                    <div class="contact-mini-dot flex-shrink-0"><i class="fa-solid fa-calendar-days" style="font-size: 14px;"></i></div>
                                     <div>
-                                        <div class="fw-bold">Events & Workshops</div>
-                                        <small class="text-white-50">Capacity building, grants, and online activities.</small>
+                                        <div class="fw-bold" style="font-size: 13px;">Events</div>
+                                        <small class="text-white-50">Workshops and activities</small>
                                     </div>
                                 </div>
-                                <div class="d-flex gap-3 align-items-start">
-                                    <div class="contact-mini-dot"><i class="fa-solid fa-graduation-cap"></i></div>
+                                <div class="d-flex gap-2 align-items-start">
+                                    <div class="contact-mini-dot flex-shrink-0"><i class="fa-solid fa-graduation-cap" style="font-size: 14px;"></i></div>
                                     <div>
-                                        <div class="fw-bold">Scholarship Guidance</div>
-                                        <small class="text-white-50">Guidance for opportunities and applications.</small>
+                                        <div class="fw-bold" style="font-size: 13px;">Support</div>
+                                        <small class="text-white-50">Platform assistance</small>
                                     </div>
                                 </div>
                             </div>

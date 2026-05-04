@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.edustand.model.UserModel;
+import com.edustand.service.ActivityLogService;
 import com.edustand.service.AdminService;
 import com.edustand.util.PasswordUtil;
 
@@ -72,6 +73,10 @@ public class AdminUsersController extends HttpServlet {
                     status.isEmpty() ? "ACTIVE" : status.toUpperCase());
 
             boolean isAdded = adminService.addUser(newUser);
+            if (isAdded) {
+                new ActivityLogService().logActivity(loggedInUser.getUserId(), "USER_CREATE",
+                        "Created user account for " + fullName + " as " + role.toUpperCase());
+            }
             respond(req, resp, isAjax, isAdded,
                     isAdded ? "User created successfully." : "Failed to create user.", loggedInUser);
             return;
@@ -116,6 +121,10 @@ public class AdminUsersController extends HttpServlet {
             }
 
             boolean isUpdated = adminService.updateUser(updatedUser, optionalHashedPassword);
+            if (isUpdated) {
+                new ActivityLogService().logActivity(loggedInUser.getUserId(), "USER_UPDATE",
+                        "Updated user " + fullName + " (ID: " + userId + ")");
+            }
             respond(req, resp, isAjax, isUpdated,
                     isUpdated ? "User updated successfully." : "Failed to update user.", loggedInUser);
             return;
@@ -132,6 +141,12 @@ public class AdminUsersController extends HttpServlet {
             }
 
             boolean isDeleted = adminService.deleteUser(userId);
+            if (isDeleted) {
+                UserModel deletedUser = adminService.findUserById(userId);
+                String userName = deletedUser != null ? deletedUser.getFullName() : "User ID: " + userId;
+                new ActivityLogService().logActivity(loggedInUser.getUserId(), "USER_DELETE",
+                        "Deleted user " + userName);
+            }
             respond(req, resp, isAjax, isDeleted,
                     isDeleted ? "User deleted successfully." : "Failed to delete user.", loggedInUser);
             return;

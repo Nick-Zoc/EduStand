@@ -31,65 +31,69 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1200px; gap: 1.5rem;">
-            <section class="about-hero p-4 p-md-5">
-                <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">About Platform</div>
-                <h1 class="brand-headline fw-bold mb-3" style="font-size: clamp(2rem, 4vw, 3rem);">Transform Your Learning Ecosystem</h1>
-                <p class="text-on-surface-variant mb-0" style="max-width: 54rem; font-size: 1.05rem;">EduStand adapts modern platform-thinking inspired by Nepal Solution Hub: designing digital ecosystems, building scalable products, and helping institutions move faster with reliable software.</p>
-            </section>
+        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-3">
+                <div>
+                    <div class="small text-uppercase fw-semibold text-primary mb-1" style="letter-spacing: 0.08em;">About Platform</div>
+                    <h2 class="fs-1 fw-bold m-0 brand-headline text-on-surface">Transform Your Learning Ecosystem</h2>
+                    <p class="text-on-surface-variant mb-0" style="max-width: 54rem; font-size: 1rem;">EduStand is built by <strong class="text-on-surface">Nepal Solution Hub</strong>, designed with modern platform-thinking: creating scalable digital ecosystems, delivering quality software, and helping educational institutions move faster with reliable technology.</p>
+                </div>
+            </div>
 
-            <section class="row g-3">
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="about-stat-card p-4 h-100">
-                        <div class="about-stat-value">120k+</div>
-                        <div class="text-on-surface-variant fw-semibold">Lines of code mindset</div>
+            <section class="users-table-wrap p-3">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="about-stat-card p-3 h-100 bg-surface-container rounded-3">
+                            <div class="about-stat-value">120k+</div>
+                            <div class="text-on-surface-variant fw-semibold">Lines of code mindset</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="about-stat-card p-3 h-100 bg-surface-container rounded-3">
+                            <div class="about-stat-value">100%</div>
+                            <div class="text-on-surface-variant fw-semibold">Commitment to quality</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="about-stat-card p-3 h-100 bg-surface-container rounded-3">
+                            <div class="about-stat-value">6-Step</div>
+                            <div class="text-on-surface-variant fw-semibold">Delivery process</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="about-stat-card p-3 h-100 bg-surface-container rounded-3">
+                            <div class="about-stat-value">24/7</div>
+                            <div class="text-on-surface-variant fw-semibold">Support-first culture</div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="about-stat-card p-4 h-100">
-                        <div class="about-stat-value">100%</div>
-                        <div class="text-on-surface-variant fw-semibold">Commitment to quality</div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="about-stat-card p-4 h-100">
-                        <div class="about-stat-value">6-Step</div>
-                        <div class="text-on-surface-variant fw-semibold">Delivery process</div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="about-stat-card p-4 h-100">
-                        <div class="about-stat-value">24/7</div>
-                        <div class="text-on-surface-variant fw-semibold">Support-first culture</div>
-                    </div>
-                </div>
-            </section>
 
-            <section class="about-content-card p-4 p-md-5">
-                <div class="row g-4">
-                    <div class="col-12 col-lg-6">
-                        <h3 class="brand-headline fw-bold mb-3">Our Service Philosophy</h3>
-                        <ul class="list-unstyled d-flex flex-column gap-3 mb-0">
-                            <li class="d-flex gap-3"><i class="fa-solid fa-code text-primary mt-1"></i><span>Custom software solutions tailored to educational institutions and platform workflows.</span></li>
-                            <li class="d-flex gap-3"><i class="fa-solid fa-globe text-primary mt-1"></i><span>Modern web development with responsive UX and maintainable architecture.</span></li>
-                            <li class="d-flex gap-3"><i class="fa-solid fa-mobile-screen-button text-primary mt-1"></i><span>Mobile-first thinking for students, teachers, and administrators on the go.</span></li>
-                            <li class="d-flex gap-3"><i class="fa-solid fa-shield-halved text-primary mt-1"></i><span>Reliable delivery process: discovery, design, development, testing, launch, support.</span></li>
-                        </ul>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <h3 class="brand-headline fw-bold mb-3">Why This Matters For EduStand</h3>
-                        <div class="d-flex flex-column gap-3">
-                            <div class="about-point p-3 rounded-3">
-                                <div class="fw-bold">Scalable Growth</div>
-                                <small class="text-on-surface-variant">Architecture designed to grow with new modules, users, and academic programs.</small>
-                            </div>
-                            <div class="about-point p-3 rounded-3">
-                                <div class="fw-bold">Enterprise Quality</div>
-                                <small class="text-on-surface-variant">Production-grade patterns, robust data workflows, and structured administration.</small>
-                            </div>
-                            <div class="about-point p-3 rounded-3">
-                                <div class="fw-bold">Digital Economy Ready</div>
-                                <small class="text-on-surface-variant">A platform that helps institutions modernize student services and academic collaboration.</small>
+                <div class="about-content-card p-3 mt-3 bg-white rounded-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-6">
+                            <h3 class="brand-headline fw-bold mb-2">Our Service Philosophy</h3>
+                            <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                                <li class="d-flex gap-3"><i class="fa-solid fa-code text-primary mt-1"></i><span>Custom software solutions tailored to educational institutions and platform workflows.</span></li>
+                                <li class="d-flex gap-3"><i class="fa-solid fa-globe text-primary mt-1"></i><span>Modern web development with responsive UX and maintainable architecture.</span></li>
+                                <li class="d-flex gap-3"><i class="fa-solid fa-mobile-screen-button text-primary mt-1"></i><span>Mobile-first thinking for students, teachers, and administrators on the go.</span></li>
+                                <li class="d-flex gap-3"><i class="fa-solid fa-shield-halved text-primary mt-1"></i><span>Reliable delivery process: discovery, design, development, testing, launch, support.</span></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-lg-6">
+                            <h3 class="brand-headline fw-bold mb-2">Why This Matters For EduStand</h3>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="about-point p-2 rounded-3 bg-surface-container-low">
+                                    <div class="fw-bold">Scalable Growth</div>
+                                    <small class="text-on-surface-variant">Architecture designed to grow with new modules, users, and academic programs.</small>
+                                </div>
+                                <div class="about-point p-2 rounded-3 bg-surface-container-low">
+                                    <div class="fw-bold">Enterprise Quality</div>
+                                    <small class="text-on-surface-variant">Production-grade patterns, robust data workflows, and structured administration.</small>
+                                </div>
+                                <div class="about-point p-2 rounded-3 bg-surface-container-low">
+                                    <div class="fw-bold">Digital Economy Ready</div>
+                                    <small class="text-on-surface-variant">A platform that helps institutions modernize student services and academic collaboration.</small>
+                                </div>
                             </div>
                         </div>
                     </div>

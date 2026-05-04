@@ -9,6 +9,8 @@
     <title>EduStand | Access Requests</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">
 </head>
 <c:set var="activeSidebar" value="accessRequests" scope="request" />
@@ -20,20 +22,33 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 1.75rem;">
-            <section class="page-header-sleek p-4 p-md-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-3">
                 <div>
-                    <div class="small text-uppercase fw-semibold text-primary mb-2" style="letter-spacing: 0.08em;">Manage Requests</div>
-                    <h2 class="fs-1 fw-bold mb-2 brand-headline text-on-surface">Pending Requests</h2>
-                    <p class="text-on-surface-variant mb-0" style="max-width: 42rem; line-height: 1.6;">Review new user requests and approve or reject access in a clean, focused workflow.</p>
+                    <div class="small text-uppercase fw-semibold text-primary mb-1" style="letter-spacing: 0.08em;">Manage Requests</div>
+                    <h2 class="fs-1 fw-bold m-0 brand-headline text-on-surface">Pending Requests</h2>
+                    <p class="text-on-surface-variant mb-0" style="max-width: 50rem; line-height: 1.6;">Review new user requests and approve or reject access.</p>
                 </div>
-                <span class="edu-badge edu-badge-pending" id="pendingSummaryCount">${pendingCount} Pending</span>
-            </section>
+                <span class="edu-badge edu-badge-status edu-badge-status-pending" id="pendingSummaryCount">${pendingCount} Pending</span>
+            </div>
 
             <section class="users-table-wrap">
-                <div class="users-toolbar px-3 px-md-4 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-bottom border-outline-variant bg-surface gap-3">
-                    <h2 class="fs-5 fw-bold brand-headline text-on-surface m-0">Review Queue</h2>
-                    <span class="small text-on-surface-variant">Newest requests appear first</span>
+                <div class="users-toolbar px-3 px-md-4 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-bottom border-outline-variant gap-3">
+                    <div class="d-flex flex-grow-1 gap-2 align-items-center">
+                        <div class="position-relative w-100">
+                            <i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y text-on-surface-variant small" style="left: 0.85rem;"></i>
+                            <input id="accessSearchInput" class="form-control ps-5 users-search-field" type="text" placeholder="Search by name or email" />
+                        </div>
+                        <select id="accessRoleFilter" class="form-select users-select-filter users-compact-filter" aria-label="Filter by role">
+                            <option value="ALL">All roles</option>
+                            <option value="TEACHER">Teacher</option>
+                            <option value="STUDENT">Student</option>
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h3 class="fs-5 fw-bold brand-headline text-on-surface m-0">Review Queue</h3>
+                        <span class="small text-on-surface-variant">Newest requests appear first</span>
+                    </div>
                 </div>
 
                 <div id="requestAlertContainer" aria-live="polite"></div>
@@ -42,6 +57,8 @@
                     <table class="table table-hover align-middle mb-0 table-index users-flat-table">
                         <thead class="bg-surface">
                             <tr>
+                                <th class="px-3 px-md-4 py-3 users-th-checkbox"><input type="checkbox" id="selectAllRequests" aria-label="Select all requests"></th>
+                                <th class="px-3 px-md-4 py-3">SN</th>
                                 <th class="px-3 px-md-4 py-3">APPLICANT</th>
                                 <th class="px-3 px-md-4 py-3">EMAIL</th>
                                 <th class="px-3 px-md-4 py-3">REQUESTED ROLE</th>
@@ -50,31 +67,30 @@
                             </tr>
                         </thead>
                         <tbody id="requestsTableBody">
-                            <c:forEach items="${pendingUsers}" var="user">
+                            <c:forEach items="${pendingUsers}" var="user" varStatus="loop">
                                 <tr>
+                                    <td class="px-3 px-md-4 py-3"><input type="checkbox" class="request-select" value="${user.userId}"></td>
+                                    <td class="px-3 px-md-4 py-3 text-on-surface-variant">${loop.count}</td>
                                     <td class="px-3 px-md-4 py-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 36px; height: 36px; font-size: 12px;">${empty user.fullName ? 'U' : fn:toUpperCase(fn:substring(user.fullName, 0, 1))}</div>
-                                            <div>
-                                                <p class="m-0 fw-semibold text-on-surface" style="font-size: 14px;"><c:out value="${user.fullName}" /></p>
-                                                <p class="m-0 text-on-surface-variant" style="font-size: 12px;">Requested account</p>
-                                            </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 32px; height: 32px; font-size: 11px;">${empty user.fullName ? 'U' : fn:toUpperCase(fn:substring(user.fullName, 0, 1))}</div>
+                                            <span class="fw-semibold text-on-surface"><c:out value="${user.fullName}" /></span>
                                         </div>
                                     </td>
-                                    <td class="px-3 px-md-4 py-3 small text-on-surface-variant"><c:out value="${user.email}" /></td>
-                                    <td class="px-3 px-md-4 py-3"><span class="edu-badge ${user.role eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'} text-uppercase"><c:out value="${user.role}" /></span></td>
+                                    <td class="px-3 px-md-4 py-3 text-on-surface-variant"><c:out value="${user.email}" /></td>
+                                    <td class="px-3 px-md-4 py-3"><span class="edu-badge ${user.role eq 'TEACHER' ? 'edu-badge-role-teacher' : 'edu-badge-role-student'}"><c:out value="${user.role}" /></span></td>
                                     <td class="px-3 px-md-4 py-3"><span class="edu-badge edu-badge-status edu-badge-status-pending">PENDING</span></td>
                                     <td class="px-3 px-md-4 py-3 text-end">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-open-review" data-user-id="${user.userId}" data-full-name="<c:out value='${user.fullName}'/>" data-email="<c:out value='${user.email}'/>" data-role="${user.role}" data-reason="<c:out value='${user.requestReason}'/>" type="button"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>
-                                            <button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-request-action" data-action="reject_request" data-user-id="${user.userId}" type="button"><i class="fa-solid fa-xmark"></i><span>Decline</span></button>
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 px-3 py-2 fw-semibold text-white rounded-3 js-open-review" data-user-id="${user.userId}" data-full-name="<c:out value='${user.fullName}'/>" data-email="<c:out value='${user.email}'/>" data-role="${user.role}" data-reason="<c:out value='${user.requestReason}'/>" type="button" title="Review and approve"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>
+                                            <button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-3 py-2 fw-semibold text-decoration-none js-request-action rounded-3" data-action="reject_request" data-user-id="${user.userId}" type="button" title="Decline request"><i class="fa-solid fa-xmark"></i><span>Decline</span></button>
                                         </div>
                                     </td>
                                 </tr>
                             </c:forEach>
                             <c:if test="${empty pendingUsers}">
                                 <tr>
-                                    <td colspan="5" class="py-5 text-center text-on-surface-variant px-3 px-md-4">
+                                    <td colspan="7" class="py-5 text-center text-on-surface-variant px-3 px-md-4">
                                         <div class="d-flex flex-column align-items-center gap-2">
                                             <i class="fa-regular fa-circle-check fs-3 text-primary"></i>
                                             <strong class="text-on-surface">No pending requests</strong>
@@ -86,6 +102,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="users-pagination-bar px-3 px-md-4 py-3 border-top border-outline-variant d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                    <p id="requestsSummaryText" class="m-0 fw-medium text-on-surface-variant" style="font-size: 12px;">Showing ${fn:length(pendingUsers)} requests</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <button id="prevPageBtn" class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" type="button">Previous</button>
+                        <span id="pageIndicator" class="small fw-semibold text-on-surface-variant">Page 1</span>
+                        <button id="nextPageBtn" class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" type="button">Next</button>
+                    </div>
+                </div>
             </section>
         </div>
 
@@ -93,8 +118,12 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const accessSearchInput = document.getElementById('accessSearchInput');
+            const accessRoleFilter = document.getElementById('accessRoleFilter');
             const contextPath = '${pageContext.request.contextPath}';
             const requestsTableBody = document.getElementById('requestsTableBody');
             const pendingSummaryCount = document.getElementById('pendingSummaryCount');
@@ -114,8 +143,93 @@
             const reviewSummaryName = document.getElementById('reviewSummaryName');
             const reviewSummaryEmail = document.getElementById('reviewSummaryEmail');
             const reviewSummaryRole = document.getElementById('reviewSummaryRole');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
+            const requestsSummaryText = document.getElementById('requestsSummaryText');
+
+            let allRequests = [];
+            const state = {
+                filteredRequests: [],
+                currentPage: 1,
+                pageSize: 20
+            };
 
             if (requestsTableBody) {
+
+            // Client-side simple filtering for displayed rows
+            function filterAccessRows() {
+                const q = (accessSearchInput && accessSearchInput.value || '').toLowerCase();
+                const role = (accessRoleFilter && accessRoleFilter.value) || 'ALL';
+                state.filteredRequests = allRequests.filter((user) => {
+                    const textMatch = [user.fullName, user.email].join(' ').toLowerCase().includes(q);
+                    const roleMatch = (role === 'ALL') || (user.role === role);
+                    return textMatch && roleMatch;
+                });
+                state.currentPage = 1;
+                renderTable();
+            }
+
+            function renderTable() {
+                if (state.filteredRequests.length === 0) {
+                    requestsTableBody.innerHTML = '<tr><td colspan="7" class="py-5 text-center text-on-surface-variant px-3 px-md-4"><div class="d-flex flex-column align-items-center gap-2"><i class="fa-regular fa-circle-check fs-3 text-primary"></i><strong class="text-on-surface">No pending requests</strong><span class="small">New requests will appear here automatically.</span></div></td></tr>';
+                    updatePagination();
+                    return;
+                }
+
+                const start = (state.currentPage - 1) * state.pageSize;
+                const end = start + state.pageSize;
+                const pageRequests = state.filteredRequests.slice(start, end);
+
+                requestsTableBody.innerHTML = pageRequests.map((user, idx) => {
+                    const globalIdx = start + idx + 1;
+                    return '<tr>'
+                        + '<td class="px-3 px-md-4 py-3"><input type="checkbox" class="request-select" value="' + user.userId + '"></td>'
+                        + '<td class="px-3 px-md-4 py-3 text-on-surface-variant">' + globalIdx + '</td>'
+                        + '<td class="px-3 px-md-4 py-3">'
+                        + '<div class="d-flex align-items-center gap-2">'
+                        + '<div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 32px; height: 32px; font-size: 11px;">' + escapeHtml(getInitial(user.fullName)) + '</div>'
+                        + '<span class="fw-semibold text-on-surface">' + escapeHtml(user.fullName) + '</span>'
+                        + '</div>'
+                        + '</td>'
+                        + '<td class="px-3 px-md-4 py-3 text-on-surface-variant">' + escapeHtml(user.email) + '</td>'
+                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge ' + (user.role === 'TEACHER' ? 'edu-badge-role-teacher' : 'edu-badge-role-student') + '">' + escapeHtml(user.role) + '</span></td>'
+                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge edu-badge-status edu-badge-status-pending">PENDING</span></td>'
+                        + '<td class="px-3 px-md-4 py-3 text-end">'
+                        + '<div class="d-inline-flex align-items-center gap-2">'
+                        + '<button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 px-3 py-2 fw-semibold text-white rounded-3 js-open-review" data-user-id="' + user.userId + '" data-full-name="' + escapeAttribute(user.fullName) + '" data-email="' + escapeAttribute(user.email) + '" data-role="' + escapeAttribute(user.role) + '" data-reason="' + escapeAttribute(user.requestReason) + '" type="button"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>'
+                        + '<button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-3 py-2 fw-semibold text-decoration-none js-request-action rounded-3" data-action="reject_request" data-user-id="' + user.userId + '" type="button"><i class="fa-solid fa-xmark"></i><span>Decline</span></button>'
+                        + '</div>'
+                        + '</td>'
+                        + '</tr>';
+                }).join('');
+
+                updatePagination();
+            }
+
+            function updatePagination() {
+                const totalPages = Math.ceil(state.filteredRequests.length / state.pageSize);
+                pageIndicator.textContent = 'Page ' + state.currentPage + ' of ' + (totalPages || 1);
+                requestsSummaryText.textContent = 'Showing ' + state.filteredRequests.length + ' requests';
+                prevPageBtn.disabled = state.currentPage === 1;
+                nextPageBtn.disabled = state.currentPage >= totalPages;
+            }
+
+            if (accessSearchInput) accessSearchInput.addEventListener('input', filterAccessRows);
+            if (accessRoleFilter) accessRoleFilter.addEventListener('change', filterAccessRows);
+            if (prevPageBtn) prevPageBtn.addEventListener('click', () => {
+                if (state.currentPage > 1) {
+                    state.currentPage--;
+                    renderTable();
+                }
+            });
+            if (nextPageBtn) nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(state.filteredRequests.length / state.pageSize);
+                if (state.currentPage < totalPages) {
+                    state.currentPage++;
+                    renderTable();
+                }
+            });
                 requestsTableBody.addEventListener('click', async (event) => {
                     const reviewButton = event.target.closest('.js-open-review');
                     if (reviewButton) {
@@ -207,33 +321,8 @@
             });
 
             function renderRequests(users) {
-                if (!users.length) {
-                    requestsTableBody.innerHTML = '<tr><td colspan="5" class="py-5 px-3 px-md-4 text-center text-on-surface-variant"><div class="d-flex flex-column align-items-center gap-2"><i class="fa-regular fa-circle-check fs-3 text-primary"></i><strong class="text-on-surface">No pending requests</strong><span class="small">New requests will appear here automatically.</span></div></td></tr>';
-                    return;
-                }
-
-                requestsTableBody.innerHTML = users.map((user) => {
-                    return '<tr>'
-                        + '<td class="px-3 px-md-4 py-3">'
-                        + '<div class="d-flex align-items-center gap-3">'
-                        + '<div class="rounded-circle d-flex align-items-center justify-content-center fw-bold bg-surface-container text-on-surface-variant" style="width: 36px; height: 36px; font-size: 12px;">' + escapeHtml(getInitial(user.fullName)) + '</div>'
-                        + '<div>'
-                        + '<p class="m-0 fw-semibold text-on-surface" style="font-size: 14px;">' + escapeHtml(user.fullName) + '</p>'
-                        + '<p class="m-0 text-on-surface-variant" style="font-size: 12px;">Requested account</p>'
-                        + '</div>'
-                        + '</div>'
-                        + '</td>'
-                        + '<td class="px-3 px-md-4 py-3 small text-on-surface-variant">' + escapeHtml(user.email) + '</td>'
-                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge ' + (user.role === 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students') + ' text-uppercase fw-bold">' + escapeHtml(user.role) + '</span></td>'
-                        + '<td class="px-3 px-md-4 py-3"><span class="edu-badge edu-badge-status edu-badge-status-pending">PENDING</span></td>'
-                        + '<td class="px-3 px-md-4 py-3 text-end">'
-                        + '<div class="d-flex justify-content-end gap-2">'
-                        + '<button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-open-review" data-user-id="' + user.userId + '" data-full-name="' + escapeAttribute(user.fullName) + '" data-email="' + escapeAttribute(user.email) + '" data-role="' + escapeAttribute(user.role) + '" data-reason="' + escapeAttribute(user.requestReason) + '" type="button"><i class="fa-solid fa-clipboard-check"></i><span>Review</span></button>'
-                        + '<button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 js-request-action" data-action="reject_request" data-user-id="' + user.userId + '" type="button"><i class="fa-solid fa-xmark"></i><span>Decline</span></button>'
-                        + '</div>'
-                        + '</td>'
-                        + '</tr>';
-                }).join('');
+                allRequests = users || [];
+                filterAccessRows();
             }
 
             function fillReviewModal(dataset) {
@@ -294,9 +383,16 @@
             }
 
             function showAlert(type, message) {
-                requestAlertContainer.innerHTML = '<div class="alert alert-' + type + ' border-0 rounded-0 m-0" role="alert">'
-                    + escapeHtml(message)
-                    + '</div>';
+                const isSuccess = type === 'success';
+                const bgColor = isSuccess ? '#10B981' : '#EF4444';
+                Toastify({
+                    text: message,
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: bgColor,
+                    className: 'rounded-2'
+                }).showToast();
             }
 
             function escapeAttribute(value) {

@@ -28,6 +28,10 @@
             <i class="fa-solid fa-envelope-open-text fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Contact Requests</span>
         </a>
+        <a href="<c:url value='/AdminActivityLogs'/>" class="sidebar-nav-link ${activeSidebar eq 'activityLogs' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-clock-rotate-left fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">Activity Logs</span>
+        </a>
         <a href="<c:url value='/PanelContact'/>" class="sidebar-nav-link ${activeSidebar eq 'contact' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
             <i class="fa-solid fa-address-book fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Contact</span>
@@ -39,6 +43,10 @@
     </nav>
 
     <div class="mt-auto pt-4 border-top border-outline-variant d-flex flex-column gap-2">
+        <a href="<c:url value='/profile'/>" class="sidebar-nav-link ${activeSidebar eq 'profile' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-regular fa-user fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">Profile</span>
+        </a>
         <a href="#" class="sidebar-nav-link ${activeSidebar eq 'settings' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
             <i class="fa-solid fa-gear fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Settings</span>

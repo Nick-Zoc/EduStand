@@ -298,7 +298,21 @@ a.text-primary-link:hover {
 .edu-badge-status-active {
     background: #ecfdf5;
     color: #047857;
-    border-color: #86efac;
+    border-color: #a7f3d0;
+}
+
+/* Notification Badge Styling */
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: #dc2626;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    display: none;
 }
 
 .edu-badge-status-pending {

@@ -89,37 +89,37 @@
                                     <td class="px-3 px-md-4 py-3">
                                         <c:choose>
                                             <c:when test="${log.action eq 'LOGIN'}">
-                                                <span class="badge bg-success bg-opacity-20 text-success fw-semibold"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'LOGOUT'}">
-                                                <span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-status edu-badge-status-inactive" style="font-size: 10px;"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'USER_CREATE'}">
-                                                <span class="badge bg-primary bg-opacity-20 text-primary fw-semibold"><i class="fa-solid fa-plus me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-role-teacher" style="font-size: 10px;"><i class="fa-solid fa-plus me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'USER_UPDATE'}">
-                                                <span class="badge bg-warning bg-opacity-20 text-warning fw-semibold"><i class="fa-solid fa-pen me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-status-pending" style="font-size: 10px;"><i class="fa-solid fa-pen me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'USER_DELETE'}">
-                                                <span class="badge bg-danger bg-opacity-20 text-danger fw-semibold"><i class="fa-solid fa-trash me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-role-admin" style="font-size: 10px;"><i class="fa-solid fa-trash me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'ACCESS_APPROVE'}">
-                                                <span class="badge bg-info bg-opacity-20 text-info fw-semibold"><i class="fa-solid fa-check-circle me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;"><i class="fa-solid fa-check-circle me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'ACCESS_REJECT'}">
-                                                <span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold"><i class="fa-solid fa-circle-xmark me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-role-admin" style="font-size: 10px;"><i class="fa-solid fa-circle-xmark me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'CONTACT_READ'}">
-                                                <span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold"><i class="fa-solid fa-envelope-open me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-role-student" style="font-size: 10px;"><i class="fa-solid fa-envelope-open me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'CONTACT_FIXED'}">
-                                                <span class="badge bg-success bg-opacity-20 text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;"><i class="fa-solid fa-circle-check me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'PROFILE_UPDATE'}">
-                                                <span class="badge bg-primary bg-opacity-20 text-primary fw-semibold"><i class="fa-regular fa-user-pen me-1"></i> ${log.action}</span>
+                                                <span class="edu-badge edu-badge-role-teacher" style="font-size: 10px;"><i class="fa-regular fa-user-pen me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold">${log.action}</span>
+                                                <span class="edu-badge edu-badge-status edu-badge-status-inactive" style="font-size: 10px;">${log.action}</span>
                                             </c:otherwise>
                                         </c:choose>
                                     </td>

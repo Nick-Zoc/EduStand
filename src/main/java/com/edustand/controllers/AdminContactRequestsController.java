@@ -37,7 +37,7 @@ public class AdminContactRequestsController extends HttpServlet {
             StringBuilder json = new StringBuilder();
             json.append("{\"unreadCount\":").append(unreadCount).append(",\"requests\":[");
 
-            for (int i = 0; i < requests.size() && i < 5; i++) {
+            for (int i = 0; i < requests.size(); i++) {
                 ContactRequestModel req2 = requests.get(i);
                 if (i > 0)
                     json.append(",");
@@ -79,6 +79,20 @@ public class AdminContactRequestsController extends HttpServlet {
         }
 
         String action = req.getParameter("action");
+
+        if ("mark_all_read".equals(action)) {
+            boolean updated = contactRequestService.markAllAsRead();
+            if (updated) {
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"success\":true,\"message\":\"All notifications marked as read.\"}");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"success\":false,\"message\":\"Failed to mark all as read.\"}");
+            }
+            return;
+        }
+
         int requestId;
         try {
             requestId = Integer.parseInt(req.getParameter("requestId"));

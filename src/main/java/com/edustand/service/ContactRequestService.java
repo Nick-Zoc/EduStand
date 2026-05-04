@@ -113,6 +113,18 @@ public class ContactRequestService {
         return false;
     }
 
+    public boolean markAllAsRead() {
+        String query = "UPDATE ContactRequests SET read_status = 'READ', updated_at = CURRENT_TIMESTAMP WHERE read_status = 'UNREAD'";
+        try (Connection conn = DbConfig.getDbConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            return stmt.executeUpdate() >= 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Database error while marking all requests as read: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private ContactRequestModel mapRequest(ResultSet rs) throws SQLException {
         ContactRequestModel request = new ContactRequestModel();
         request.setRequestId(rs.getInt("request_id"));

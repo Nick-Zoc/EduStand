@@ -25,7 +25,9 @@
             <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0 border-0 shadow-lg">
                 <div class="p-3 border-bottom border-outline-variant d-flex justify-content-between align-items-center">
                     <h6 class="brand-headline fw-bold mb-0">Notifications</h6>
-                    <i class="fa-solid fa-gear text-on-surface-variant small"></i>
+                    <button id="markAllReadBtn" class="btn btn-sm btn-link p-0 text-on-surface-variant" title="Mark all as read" style="display: none;">
+                        <i class="fa-solid fa-check-double small"></i>
+                    </button>
                 </div>
                 <div id="notificationList" class="p-3 d-flex flex-column gap-3" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; word-break: break-word;">
                     <div class="text-center text-on-surface-variant py-3">
@@ -45,13 +47,41 @@
                     <p class="m-0 fw-bold brand-headline text-on-surface" style="font-size: 14px; line-height: 1;">${resolvedName}</p>
                     <p class="m-0 text-uppercase fw-bold mt-1 text-on-surface-variant" style="font-size: 10px; letter-spacing: 0.05em;">${resolvedRole}</p>
                 </div>
-                <div class="profile-avatar">${resolvedInitials}</div>
+                <c:choose>
+                        <c:when test="${not empty sessionScope.loggedInUser.profilePicturePath}">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.profilePictureCacheBuster}">
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}?v=${sessionScope.profilePictureCacheBuster}" alt="Profile" class="profile-avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                </c:when>
+                                <c:otherwise>
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}" alt="Profile" class="profile-avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                </c:otherwise>
+                            </c:choose>
+                        </c:when>
+                    <c:otherwise>
+                        <div class="profile-avatar">${resolvedInitials}</div>
+                    </c:otherwise>
+                </c:choose>
             </button>
             <div class="dropdown-menu dropdown-menu-end profile-dropdown p-0 border-0 shadow-lg overflow-hidden">
                 <div class="p-3 border-bottom border-outline-variant d-flex align-items-center gap-3">
-                    <div class="profile-avatar-lg d-flex align-items-center justify-content-center fw-bold" style="width: 54px; height: 54px; font-size: 18px; background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: #fff;">
-                        ${resolvedInitials}
-                    </div>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.loggedInUser.profilePicturePath}">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.profilePictureCacheBuster}">
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}?v=${sessionScope.profilePictureCacheBuster}" alt="Profile" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                </c:when>
+                                <c:otherwise>
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}" alt="Profile" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                </c:otherwise>
+                            </c:choose>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="profile-avatar-lg d-flex align-items-center justify-content-center fw-bold" style="width: 54px; height: 54px; font-size: 18px; background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: #fff;">
+                                ${resolvedInitials}
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                     <div class="min-w-0 flex-grow-1">
                         <div class="fw-bold brand-headline text-on-surface text-truncate">${resolvedName}</div>
                         <div class="mt-1">
@@ -65,10 +95,6 @@
                     <a href="${pageContext.request.contextPath}/profile" class="dropdown-item rounded-3 py-2 px-3 d-flex align-items-center gap-3">
                         <i class="fa-regular fa-user text-primary"></i>
                         <span>View Profile</span>
-                    </a>
-                    <a href="${pageContext.request.contextPath}/settings" class="dropdown-item rounded-3 py-2 px-3 d-flex align-items-center gap-3">
-                        <i class="fa-solid fa-gear text-on-surface-variant"></i>
-                        <span>Settings</span>
                     </a>
                 </div>
                 <div class="p-2 border-top border-outline-variant">
@@ -87,12 +113,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationBadge = document.querySelector('.notification-badge');
     const notificationTrigger = document.querySelector('.notification-trigger');
     const notificationList = document.getElementById('notificationList');
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
     const contextPath = '${pageContext.request.contextPath}';
 
     // Load contact requests when notification button is clicked
     if (notificationTrigger) {
         notificationTrigger.addEventListener('click', async () => {
             await loadContactRequests();
+        });
+    }
+
+    // Mark all as read button
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', async () => {
+            await markAllAsRead();
         });
     }
 
@@ -120,26 +154,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function markAllAsRead() {
+        try {
+            const response = await fetch(contextPath + '/AdminContactRequests?action=mark_all_read', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to mark all as read');
+
+            await loadContactRequests();
+        } catch (error) {
+            console.error('Error marking all as read:', error);
+        }
+    }
+
     function displayNotifications(data) {
         if (!data.requests || data.requests.length === 0) {
             notificationList.innerHTML = `
                 <div class="text-center text-on-surface-variant py-3">
                     <i class="fa-regular fa-inbox"></i>
-                    <p class="small mt-2 mb-0">No new notifications</p>
+                    <p class="small mt-2 mb-0">No notifications</p>
                 </div>
             `;
-            if (notificationBadge) notificationBadge.textContent = '';
+            if (notificationBadge) notificationBadge.style.display = 'none';
+            if (markAllReadBtn) markAllReadBtn.style.display = 'none';
             return;
         }
 
-        // Update badge count
-        if (notificationBadge) {
-            notificationBadge.textContent = data.unreadCount > 0 ? data.unreadCount : '';
+        // Show or hide mark all read button based on unread count
+        if (markAllReadBtn) {
+            markAllReadBtn.style.display = data.unreadCount > 0 ? 'block' : 'none';
         }
 
-        // Build notification list (use string concatenation to avoid JSP EL parsing)
+        // Show red dot if there are unread notifications
+        if (notificationBadge) {
+            notificationBadge.style.display = data.unreadCount > 0 ? 'block' : 'none';
+        }
+
+        // Build notification list with professional badge styling
         const notificationHTML = data.requests.map(req => {
-            const badgeClass = req.readStatus == 'UNREAD' ? 'pending' : 'active';
+            let badgeHTML = '';
+            if (req.readStatus === 'UNREAD') {
+                badgeHTML = '<span class="edu-badge" style="font-size: 10px; background: #fff1f2; color: #be123c; border-color: #fda4af; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em;">UNREAD</span>';
+            } else {
+                badgeHTML = '<span class="edu-badge" style="font-size: 10px; background: #ecfdf5; color: #047857; border-color: #a7f3d0; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em;">READ</span>';
+            }
             return ''
                 + '<div class="notification-item p-2 d-flex gap-2 align-items-start border-bottom border-outline-variant">'
                 + '<i class="fa-regular fa-envelope text-primary mt-1" style="min-width: 20px;"></i>'
@@ -147,8 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 + '<div class="fw-semibold text-on-surface small notification-title">' + escapeHtml(req.fullName) + '</div>'
                 + '<div class="text-on-surface-variant small mt-1 notification-subject">' + escapeHtml(req.subject) + '</div>'
                 + '<div class="d-flex gap-2 mt-2 align-items-center">'
-                + '<span class="edu-badge edu-badge-status edu-badge-status-' + badgeClass + ' text-white" style="font-size: 10px;">' + req.readStatus + '</span>'
-                + '<span class="text-on-surface-variant notification-meta">' + formatTime(req.createdAt) + '</span>'
+                + badgeHTML
+                + '<span class="text-on-surface-variant notification-meta" style="font-size: 12px;">' + formatTime(req.createdAt) + '</span>'
                 + '</div>'
                 + '</div>'
                 + '</div>';

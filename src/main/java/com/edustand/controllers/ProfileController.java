@@ -23,7 +23,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 @WebServlet(asyncSupported = true, urlPatterns = { "/profile" })
-@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 8)
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 100, maxRequestSize = 1024 * 1024
+        * 200)
 public class ProfileController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -103,14 +104,15 @@ public class ProfileController extends HttpServlet {
             HttpSession session = req.getSession(false);
             if (session != null) {
                 session.setAttribute("loggedInUser", loggedInUser);
+                // Cache-buster to ensure updated profile images are fetched by client
+                session.setAttribute("profilePictureCacheBuster", System.currentTimeMillis());
             }
             activityLogService.logActivity(loggedInUser.getUserId(), "PROFILE_UPDATE", "Updated profile details");
-            req.setAttribute("success", "Profile updated successfully.");
+            resp.sendRedirect(req.getContextPath() + "/profile?success=Profile updated successfully");
         } else {
             req.setAttribute("error", "Unable to update your profile right now.");
+            doGet(req, resp);
         }
-
-        doGet(req, resp);
     }
 
     private UserModel resolveLoggedInUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -127,7 +129,13 @@ public class ProfileController extends HttpServlet {
         String safeName = submittedName.replaceAll("[^a-zA-Z0-9._-]", "_");
         String fileName = "profile_" + userId + "_" + Instant.now().toEpochMilli() + "_" + safeName;
 
-        String uploadDirectory = req.getServletContext().getRealPath("/images/profile-pics");
+        // Organize by role: images/profile/{admin|teacher|student}
+        UserModel currentProfile = profileService.getProfileById(userId);
+        String userRole = currentProfile != null ? currentProfile.getRole().toLowerCase() : "user";
+
+        // Persist profile images under assets so they survive redeploys to the project
+        // layout
+        String uploadDirectory = req.getServletContext().getRealPath("/assets/profile/" + userRole);
         Path uploadPath = Paths.get(uploadDirectory);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
@@ -138,7 +146,7 @@ public class ProfileController extends HttpServlet {
             Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        return "images/profile-pics/" + fileName;
+        return "assets/profile/" + userRole + "/" + fileName;
     }
 
     private String trim(String value) {

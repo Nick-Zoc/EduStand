@@ -87,8 +87,14 @@ public class LoginController extends HttpServlet {
         } else {
             // FAILURE! Bad email or password.
 
+            // Check if account is inactive to provide better error message
+            boolean isInactive = loginService.isUserInactive(email);
+            String errorMessage = isInactive
+                    ? "Your account is inactive. Please contact an administrator to activate your account."
+                    : "Invalid email or password. Please try again.";
+
             // Send an error message back to the JSP to display to the user
-            req.setAttribute("error", "Invalid email or password. Please try again.");
+            req.setAttribute("error", errorMessage);
 
             // Forward them back to the login page so they can try again
             req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);

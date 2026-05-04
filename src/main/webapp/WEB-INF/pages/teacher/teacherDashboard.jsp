@@ -110,20 +110,13 @@
                     <div class="card-curator p-4 rounded-4 d-flex flex-column h-100">
                         <h3 class="fs-5 fw-bold text-on-surface mb-3 brand-headline">Manage Resources</h3>
                         <div class="d-flex flex-column gap-3 mt-2">
-                            <button class="btn bg-surface-container-low border border-outline-variant rounded-3 p-3 d-flex align-items-center justify-content-between text-start icon-btn transition">
+                            <a href="<c:url value='/TeacherClassroom'/>" class="btn bg-surface-container-low border border-outline-variant rounded-3 p-3 d-flex align-items-center justify-content-between text-start icon-btn transition text-decoration-none">
                                 <div class="d-flex align-items-center gap-3">
-                                    <i class="fa-solid fa-folder-plus text-primary fs-5"></i>
-                                    <span class="small fw-semibold text-on-surface">Create Folder</span>
+                                    <i class="fa-solid fa-folder-open text-primary fs-5"></i>
+                                    <span class="small fw-semibold text-on-surface">Go to Classroom</span>
                                 </div>
                                 <i class="fa-solid fa-chevron-right text-on-surface-variant small"></i>
-                            </button>
-                            <button class="btn bg-surface-container-low border border-outline-variant rounded-3 p-3 d-flex align-items-center justify-content-between text-start icon-btn transition">
-                                <div class="d-flex align-items-center gap-3">
-                                    <i class="fa-solid fa-file-arrow-up text-primary fs-5"></i>
-                                    <span class="small fw-semibold text-on-surface">Add File</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right text-on-surface-variant small"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -132,7 +125,7 @@
                 <div class="col-12 col-md-8">
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <h3 class="fs-5 fw-bold brand-headline m-0">Recent Resources</h3>
-                        <button class="btn btn-link text-primary p-0 text-decoration-none fw-bold small">View All</button>
+                        <a href="<c:url value='/TeacherClassroom'/>" class="btn btn-link text-primary p-0 text-decoration-none fw-bold small">View All</a>
                     </div>
                     
                     <div class="row g-4">
@@ -144,7 +137,7 @@
                                 <h4 class="fs-6 fw-bold text-on-surface mb-1">Molecular Bonding.pdf</h4>
                                 <p class="small text-on-surface-variant mb-3 pb-1" style="font-size: 12px;">Uploaded 2 hours ago • 4.2MB</p>
                                 <div class="d-flex align-items-center justify-content-between mt-auto">
-                                    <span class="edu-badge edu-badge-pending text-uppercase" style="letter-spacing: 0.05em;">New</span>
+                                    <span class="edu-badge" style="background: #dbeafe; color: #0c4a6e; border-color: #0284c7; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;">New</span>
                                     <button class="btn btn-sm btn-light rounded-circle"><i class="fa-solid fa-download text-on-surface-variant"></i></button>
                                 </div>
                             </div>
@@ -158,7 +151,7 @@
                                 <h4 class="fs-6 fw-bold text-on-surface mb-1">Organic Chem Intro.pptx</h4>
                                 <p class="small text-on-surface-variant mb-3 pb-1" style="font-size: 12px;">Uploaded Yesterday • 12.8MB</p>
                                 <div class="d-flex align-items-center justify-content-between mt-auto">
-                                    <span class="edu-badge edu-badge-students text-uppercase" style="letter-spacing: 0.05em;">Lecture</span>
+                                    <span class="edu-badge edu-badge-role-teacher" style="text-transform: uppercase; font-size: 10px;">Lecture</span>
                                     <button class="btn btn-sm btn-light rounded-circle"><i class="fa-solid fa-download text-on-surface-variant"></i></button>
                                 </div>
                             </div>

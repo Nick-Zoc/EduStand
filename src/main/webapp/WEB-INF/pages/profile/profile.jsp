@@ -41,6 +41,9 @@
                 </div>
             </section>
 
+            <c:if test="${not empty param.success}">
+                <div class="alert alert-success border-0 rounded-3 mb-3">${param.success}</div>
+            </c:if>
             <c:if test="${not empty success}">
                 <div class="alert alert-success border-0 rounded-3 mb-3">${success}</div>
             </c:if>
@@ -53,7 +56,21 @@
                     <div class="panel-sleek p-4 h-100">
                         <div class="d-flex flex-column align-items-center text-center gap-3">
                             <div class="profile-picture-frame overflow-hidden rounded-circle border border-outline-variant bg-surface-container d-flex align-items-center justify-content-center" style="width: 132px; height: 132px;">
-                                <img id="profilePreviewImage" src="${pageContext.request.contextPath}/${profileUser.profilePicturePath}" alt="Profile picture" class="w-100 h-100 object-fit-cover ${empty profileUser.profilePicturePath ? 'd-none' : ''}">
+                                <c:choose>
+                                    <c:when test="${not empty profileUser.profilePicturePath}">
+                                        <c:choose>
+                                            <c:when test="${not empty sessionScope.profilePictureCacheBuster}">
+                                                <img id="profilePreviewImage" src="${pageContext.request.contextPath}/${profileUser.profilePicturePath}?v=${sessionScope.profilePictureCacheBuster}" alt="Profile picture" class="w-100 h-100 object-fit-cover">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img id="profilePreviewImage" src="${pageContext.request.contextPath}/${profileUser.profilePicturePath}" alt="Profile picture" class="w-100 h-100 object-fit-cover">
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <img id="profilePreviewImage" src="${pageContext.request.contextPath}/${profileUser.profilePicturePath}" alt="Profile picture" class="w-100 h-100 object-fit-cover d-none">
+                                    </c:otherwise>
+                                </c:choose>
                                 <span id="profilePreviewInitial" class="fs-1 fw-bold text-primary ${empty profileUser.profilePicturePath ? '' : 'd-none'}">${empty profileUser.fullName ? 'U' : fn:toUpperCase(fn:substring(profileUser.fullName, 0, 1))}</span>
                             </div>
                             <div>

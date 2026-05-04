@@ -47,10 +47,6 @@
             <i class="fa-regular fa-user fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Profile</span>
         </a>
-        <a href="#" class="sidebar-nav-link ${activeSidebar eq 'settings' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-            <i class="fa-solid fa-gear fs-6 sidebar-icon"></i>
-            <span class="brand-headline small sidebar-label">Settings</span>
-        </a>
         <a href="<c:url value='/logout'/>" class="sidebar-nav-link d-flex align-items-center gap-3 px-3 py-2 text-decoration-none text-danger">
             <i class="fa-solid fa-right-from-bracket fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Logout</span>

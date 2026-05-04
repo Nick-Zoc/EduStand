@@ -16,17 +16,9 @@
             <i class="fa-solid fa-table-columns fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Dashboard</span>
         </a>
-        <a href="#" class="sidebar-nav-link ${activeSidebar eq 'courses' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-            <i class="fa-solid fa-book-open fs-6 sidebar-icon"></i>
-            <span class="brand-headline small sidebar-label">Courses</span>
-        </a>
-        <a href="#" class="sidebar-nav-link ${activeSidebar eq 'assignments' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-            <i class="fa-solid fa-clipboard-list fs-6 sidebar-icon"></i>
-            <span class="brand-headline small sidebar-label">Assignments</span>
-        </a>
-        <a href="#" class="sidebar-nav-link ${activeSidebar eq 'community' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-            <i class="fa-solid fa-users fs-6 sidebar-icon"></i>
-            <span class="brand-headline small sidebar-label">Community</span>
+        <a href="<c:url value='/StudentClassroom'/>" class="sidebar-nav-link ${activeSidebar eq 'resources' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-folder-tree fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">Classroom</span>
         </a>
         <a href="<c:url value='/PanelContact'/>" class="sidebar-nav-link ${activeSidebar eq 'contact' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
             <i class="fa-solid fa-address-book fs-6 sidebar-icon"></i>
@@ -42,10 +34,6 @@
         <a href="<c:url value='/profile'/>" class="sidebar-nav-link ${activeSidebar eq 'profile' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
             <i class="fa-regular fa-user fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Profile</span>
-        </a>
-        <a href="#" class="sidebar-nav-link ${activeSidebar eq 'settings' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
-            <i class="fa-solid fa-gear fs-6 sidebar-icon"></i>
-            <span class="brand-headline small sidebar-label">Settings</span>
         </a>
         <a href="<c:url value='/logout'/>" class="sidebar-nav-link d-flex align-items-center gap-3 px-3 py-2 text-decoration-none text-danger">
             <i class="fa-solid fa-right-from-bracket fs-6 sidebar-icon"></i>

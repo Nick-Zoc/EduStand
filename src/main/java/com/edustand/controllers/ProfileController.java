@@ -136,12 +136,12 @@ public class ProfileController extends HttpServlet {
         String safeName = rawName.replaceAll("[^a-zA-Z0-9._-]", "_");
         String fileName = "profile_" + userId + "_" + Instant.now().toEpochMilli() + "_" + safeName;
 
-        // Organize by role: images/profile/{admin|teacher|student}
+        // Organize by role: assets/images/profile/{admin|teacher|student}
         UserModel currentProfile = profileService.getProfileById(userId);
         String userRole = currentProfile != null ? currentProfile.getRole().toLowerCase() : "user";
 
         // Persist profile images under assets so they survive redeploys to the project layout
-        String uploadDirectory = req.getServletContext().getRealPath("/assets/profile/" + userRole);
+        String uploadDirectory = req.getServletContext().getRealPath("/assets/images/profile/" + userRole);
         Path uploadPath = Paths.get(uploadDirectory);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
@@ -154,7 +154,7 @@ public class ProfileController extends HttpServlet {
         
         // Also copy to project source if possible so it persists across Eclipse cleans
         try {
-            String sourceDir = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/profile/" + userRole;
+            String sourceDir = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/images/profile/" + userRole;
             Path sourcePath = Paths.get(sourceDir);
             if (!Files.exists(sourcePath)) {
                 Files.createDirectories(sourcePath);
@@ -164,7 +164,7 @@ public class ProfileController extends HttpServlet {
             // Ignore if source path is not available
         }
 
-        return "assets/profile/" + userRole + "/" + fileName;
+        return "assets/images/profile/" + userRole + "/" + fileName;
     }
 
     private String trim(String value) {

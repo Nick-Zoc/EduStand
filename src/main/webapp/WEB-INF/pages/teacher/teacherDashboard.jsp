@@ -6,245 +6,357 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>EduStand | Teacher Dashboard</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Local design tokens & universal styles -->
     <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            width: 256px;
-            height: 100vh;
-            background-color: var(--surface-container-lowest);
-            border-right: 1px solid var(--outline-variant);
-            z-index: 1040;
-        }
-        .main-content {
-            margin-left: 256px;
-            width: calc(100% - 256px);
-        }
-        .nav-link-custom {
-            color: var(--on-surface-variant);
-            font-weight: 500;
-            transition: all 0.3s ease-in-out;
-            border-radius: 0;
-        }
-        .nav-link-custom:hover {
-            color: var(--primary);
-        }
-        .nav-link-custom.active {
-            background-color: var(--primary-container);
-            color: var(--primary);
-            border-right: 4px solid var(--primary);
-            font-weight: 600;
-        }
-        .icon-w { width: 24px; text-align: center; }
-
-        .table-index th {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--on-surface-variant);
-            font-weight: 700;
-        }
-        .offset-card {
-            transition: transform 0.3s;
-        }
-        @media (min-width: 576px) {
-            .offset-card-sm {
-                transform: translateY(1.5rem);
-            }
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                transition: transform 0.3s ease;
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <c:set var="activeSidebar" value="dashboard" scope="request" />
-<c:set var="userName" value="Prof. Miller" scope="request" />
-<c:set var="userRole" value="Teacher" scope="request" />
-<c:set var="userInitials" value="PM" scope="request" />
 <c:set var="searchPlaceholder" value="Search resources..." scope="request" />
 
 <body class="dashboard-shell bg-surface text-on-surface">
 
     <jsp:include page="/WEB-INF/components/teacherSidebar.jsp" />
 
-    <!-- Main Canvas -->
     <main class="app-main d-flex flex-column min-vh-100">
-
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-md-5 mx-auto w-100 d-flex flex-column" style="max-width: 1280px; gap: 2.5rem;">
-            <!-- Hero Section: Editorial Premium Style -->
-            <section class="position-relative overflow-hidden rounded-4 p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, var(--primary) 0%, rgba(0, 86, 179, 1) 100%);">
+        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell d-flex flex-column" style="gap: 2rem;">
+
+            <!-- Hero Banner -->
+            <section class="position-relative overflow-hidden rounded-4 p-4 p-md-5 text-white shadow-sm"
+                     style="background: linear-gradient(135deg, var(--primary) 0%, rgba(0,86,179,1) 100%);">
                 <div class="position-relative z-1" style="max-width: 650px;">
-                    <h2 class="fs-1 fw-bold mb-3 brand-headline">Welcome back, Prof. Miller</h2>
-                    <p class="fs-5 opacity-75 mb-0" style="line-height: 1.6;">Your curriculum overview for Advanced Biochemistry is ready. You have 4 pending resource reviews and 12 new submissions from Semester 2 students.</p>
-                    
-                    <div class="mt-4 pt-2 d-flex gap-3">
-                        <button class="btn bg-white text-primary fw-bold px-4 py-2 shadow-sm border-0 rounded-3" style="font-size: 14px;">View Schedule</button>
-                        <button class="btn border border-white text-white fw-bold px-4 py-2 rounded-3" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); font-size: 14px;">Manage Class</button>
+                    <div class="small fw-semibold text-uppercase opacity-75 mb-2" style="letter-spacing: 0.08em;">
+                        <i class="fa-solid fa-chalkboard-user me-1"></i> Teacher Dashboard
+                    </div>
+                    <h2 class="fs-1 fw-bold mb-3 brand-headline">Welcome back, <c:out value="${userName}" /></h2>
+                    <p class="fs-5 opacity-75 mb-0">Manage your resources, assignments, and track student progress all in one place.</p>
+                    <div class="mt-4 d-flex gap-3 flex-wrap">
+                        <a href="<c:url value='/TeacherClassroom'/>" class="btn bg-white text-primary fw-bold px-4 py-2 shadow-sm border-0 rounded-3" style="font-size:14px;">
+                            <i class="fa-solid fa-folder-open me-2"></i>Open Classroom
+                        </a>
                     </div>
                 </div>
-                <!-- Abstract Decorative Image -->
-                <div class="position-absolute h-100 top-0 end-0" style="width: 33%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius: 50%; right: -5%; filter: blur(30px);"></div>
+                <div class="position-absolute h-100 top-0 end-0" style="width:33%; background:radial-gradient(circle,rgba(255,255,255,0.2) 0%,transparent 70%); right:-5%; filter:blur(30px);"></div>
             </section>
 
-            <!-- Quick Actions & Recent Resources Bento Grid -->
+            <!-- Stats Row -->
+            <section class="row g-3" id="dashboard-stats">
+                <div class="col-6 col-lg-3">
+                    <div class="card-sleek p-3 h-100 d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:42px;height:42px;background:var(--primary-container);color:var(--primary)">
+                            <i class="fa-solid fa-file-alt fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="small text-uppercase fw-semibold text-on-surface-variant">Assignments</div>
+                            <div class="fs-3 fw-bold lh-1 text-on-surface" id="stat-assignments">—</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card-sleek p-3 h-100 d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:42px;height:42px;background:#d1fae5;color:#065f46">
+                            <i class="fa-solid fa-folder-open fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="small text-uppercase fw-semibold text-on-surface-variant">Resources</div>
+                            <div class="fs-3 fw-bold lh-1 text-on-surface" id="stat-resources">—</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card-sleek p-3 h-100 d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:42px;height:42px;background:#fef3c7;color:#d97706">
+                            <i class="fa-solid fa-bullhorn fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="small text-uppercase fw-semibold text-on-surface-variant">Active Notices</div>
+                            <div class="fs-3 fw-bold lh-1 text-on-surface" id="stat-notices">—</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card-sleek p-3 h-100 d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:42px;height:42px;background:#e0e7ff;color:#4338ca">
+                            <i class="fa-solid fa-pen-to-square fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="small text-uppercase fw-semibold text-on-surface-variant">Go To</div>
+                            <a href="<c:url value='/TeacherClassroom'/>" class="small fw-semibold text-primary text-decoration-none">Classroom →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Resources & Content Overview -->
             <section class="row g-4">
-                <!-- Manage Resources Area -->
-                <div class="col-12 col-md-4">
-                    <div class="card-curator p-4 rounded-4 d-flex flex-column h-100">
-                        <h3 class="fs-5 fw-bold text-on-surface mb-3 brand-headline">Manage Resources</h3>
-                        <div class="d-flex flex-column gap-3 mt-2">
-                            <a href="<c:url value='/TeacherClassroom'/>" class="btn bg-surface-container-low border border-outline-variant rounded-3 p-3 d-flex align-items-center justify-content-between text-start icon-btn transition text-decoration-none">
-                                <div class="d-flex align-items-center gap-3">
-                                    <i class="fa-solid fa-folder-open text-primary fs-5"></i>
-                                    <span class="small fw-semibold text-on-surface">Go to Classroom</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right text-on-surface-variant small"></i>
-                            </a>
+                <div class="col-12 col-lg-8">
+                    <div class="card-sleek overflow-hidden h-100 d-flex flex-column">
+                        <div class="px-4 py-3 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
+                            <h3 class="fs-6 fw-bold text-on-surface m-0 brand-headline">
+                                <i class="fa-solid fa-folder-open text-primary me-2"></i>Recent Resources
+                            </h3>
+                            <a href="<c:url value='/TeacherClassroom'/>" class="btn btn-sm btn-outline-primary rounded-pill px-3">Manage Files</a>
+                        </div>
+                        <div class="p-4 flex-grow-1" id="dash-resources">
+                            <div class="text-center text-on-surface-variant py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="card-sleek-no-hover p-4 h-100 d-flex flex-column align-items-center justify-content-center">
+                        <div class="small fw-semibold text-uppercase text-on-surface-variant mb-3 w-100 text-center" style="letter-spacing:0.06em;">Content Distribution</div>
+                        <canvas id="teacherContentChart" style="max-height: 200px; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Two-column: Assignments + Notices -->
+            <section class="row g-4 mt-2">
+                <!-- Recent Assignments -->
+                <div class="col-12 col-lg-6">
+                    <div class="card-sleek h-100 overflow-hidden d-flex flex-column">
+                        <div class="px-4 py-3 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
+                            <h3 class="fs-6 fw-bold text-on-surface m-0 brand-headline">
+                                <i class="fa-solid fa-file-alt text-primary me-2"></i>Recent Assignments
+                            </h3>
+                            <a href="<c:url value='/TeacherClassroom'/>" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
+                        </div>
+                        <div class="p-3 flex-grow-1" id="dash-assignments">
+                            <div class="text-center text-on-surface-variant py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Resources Grid -->
-                <div class="col-12 col-md-8">
-                    <div class="d-flex justify-content-between align-items-end mb-4">
-                        <h3 class="fs-5 fw-bold brand-headline m-0">Recent Resources</h3>
-                        <a href="<c:url value='/TeacherClassroom'/>" class="btn btn-link text-primary p-0 text-decoration-none fw-bold small">View All</a>
-                    </div>
-                    
-                    <div class="row g-4">
-                        <div class="col-12 col-sm-6">
-                            <div class="card-sleek p-4 h-100 offset-card d-flex flex-column">
-                                <div class="d-flex align-items-center justify-content-center rounded-3 mb-3" style="width: 44px; height: 44px; background: var(--primary-container); color: var(--primary);">
-                                    <i class="fa-solid fa-file-pdf fs-4"></i>
-                                </div>
-                                <h4 class="fs-6 fw-bold text-on-surface mb-1">Molecular Bonding.pdf</h4>
-                                <p class="small text-on-surface-variant mb-3 pb-1" style="font-size: 12px;">Uploaded 2 hours ago • 4.2MB</p>
-                                <div class="d-flex align-items-center justify-content-between mt-auto">
-                                    <span class="edu-badge" style="background: #dbeafe; color: #0c4a6e; border-color: #0284c7; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;">New</span>
-                                    <button class="btn btn-sm btn-light rounded-circle"><i class="fa-solid fa-download text-on-surface-variant"></i></button>
-                                </div>
-                            </div>
+                <!-- Notice Board -->
+                <div class="col-12 col-lg-6">
+                    <div class="card-sleek h-100 overflow-hidden d-flex flex-column">
+                        <div class="px-4 py-3 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
+                            <h3 class="fs-6 fw-bold text-on-surface m-0 brand-headline">
+                                <i class="fa-solid fa-bullhorn text-warning me-2"></i>Notice Board
+                            </h3>
+                            <button class="btn btn-sm btn-primary-edu rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createNoticeModal">
+                                <i class="fa-solid fa-plus me-1"></i>Post Notice
+                            </button>
                         </div>
-
-                        <div class="col-12 col-sm-6">
-                            <div class="card-sleek p-4 h-100 offset-card offset-card-sm d-flex flex-column">
-                                <div class="d-flex align-items-center justify-content-center rounded-3 mb-3" style="width: 44px; height: 44px; background: rgba(108, 117, 125, 0.1); color: #6c757d;">
-                                    <i class="fa-solid fa-file-powerpoint fs-4"></i>
-                                </div>
-                                <h4 class="fs-6 fw-bold text-on-surface mb-1">Organic Chem Intro.pptx</h4>
-                                <p class="small text-on-surface-variant mb-3 pb-1" style="font-size: 12px;">Uploaded Yesterday • 12.8MB</p>
-                                <div class="d-flex align-items-center justify-content-between mt-auto">
-                                    <span class="edu-badge edu-badge-role-teacher" style="text-transform: uppercase; font-size: 10px;">Lecture</span>
-                                    <button class="btn btn-sm btn-light rounded-circle"><i class="fa-solid fa-download text-on-surface-variant"></i></button>
-                                </div>
-                            </div>
+                        <div class="p-3 flex-grow-1" id="dash-notices">
+                            <div class="text-center text-on-surface-variant py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Resource Index Table -->
-            <section class="mt-4 pt-2">
-                <div class="card-curator overflow-hidden">
-                    <div class="p-4 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
-                        <h3 class="fs-5 fw-bold text-on-surface m-0 brand-headline">Resource Index</h3>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-light d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="fa-solid fa-filter text-on-surface-variant"></i></button>
-                            <button class="btn btn-light d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="fa-solid fa-ellipsis-vertical text-on-surface-variant"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover table-index m-0 align-middle">
-                            <thead class="bg-surface">
-                                <tr>
-                                    <th class="ps-4 py-3 border-bottom-0">Name</th>
-                                    <th class="py-3 border-bottom-0">Type</th>
-                                    <th class="py-3 border-bottom-0">Last Modified</th>
-                                    <th class="py-3 border-bottom-0">Size</th>
-                                    <th class="pe-4 py-3 text-end border-bottom-0">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="border-top-0">
-                                <tr>
-                                    <td class="ps-4 py-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <i class="fa-solid fa-folder text-primary fs-5"></i>
-                                            <span class="small fw-semibold text-on-surface brand-headline">Biochem Unit 01</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-3 small fw-medium text-on-surface-variant">Directory</td>
-                                    <td class="py-3 small text-on-surface-variant">Oct 12, 2025</td>
-                                    <td class="py-3 small text-on-surface-variant">—</td>
-                                    <td class="pe-4 py-3 text-end">
-                                        <button class="btn btn-sm btn-link text-on-surface-variant p-0 me-2"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-on-surface-variant p-0"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-4 py-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <i class="fa-solid fa-file-pdf text-danger fs-5"></i>
-                                            <span class="small fw-semibold text-on-surface brand-headline">Lab Safety Protocol</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-3 small fw-medium text-on-surface-variant">PDF Document</td>
-                                    <td class="py-3 small text-on-surface-variant">Oct 10, 2025</td>
-                                    <td class="py-3 small text-on-surface-variant">1.2 MB</td>
-                                    <td class="pe-4 py-3 text-end">
-                                        <button class="btn btn-sm btn-link text-on-surface-variant p-0 me-2"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-on-surface-variant p-0"><i class="fa-solid fa-download"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-4 py-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <i class="fa-solid fa-file-excel text-success fs-5"></i>
-                                            <span class="small fw-semibold text-on-surface brand-headline">Student Grades Q3</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-3 small fw-medium text-on-surface-variant">Spreadsheet</td>
-                                    <td class="py-3 small text-on-surface-variant">Oct 08, 2025</td>
-                                    <td class="py-3 small text-on-surface-variant">854 KB</td>
-                                    <td class="pe-4 py-3 text-end">
-                                        <button class="btn btn-sm btn-link text-on-surface-variant p-0 me-2"><i class="fa-solid fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-on-surface-variant p-0"><i class="fa-solid fa-download"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="p-3 d-flex justify-content-between align-items-center small bg-surface border-top border-outline-variant">
-                        <span class="fw-semibold text-on-surface-variant">Showing 3 of 248 items</span>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Previous</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Next</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
 
         <jsp:include page="/WEB-INF/components/footer.jsp" />
     </main>
 
+    <!-- Create Notice Modal -->
+    <div class="modal fade" id="createNoticeModal" tabindex="-1" aria-labelledby="createNoticeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 1rem;">
+                <div class="modal-header border-bottom border-outline-variant px-4 py-3">
+                    <h5 class="modal-title fw-bold brand-headline" id="createNoticeModalLabel">
+                        <i class="fa-solid fa-bullhorn text-warning me-2"></i>Post a Notice
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="createNoticeForm" enctype="multipart/form-data">
+                    <div class="modal-body px-4 py-3">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-on-surface-variant text-uppercase" style="letter-spacing:0.05em;">Title</label>
+                            <input type="text" class="form-control input-ghost" name="noticeTitle" placeholder="Notice title..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-on-surface-variant text-uppercase" style="letter-spacing:0.05em;">Message</label>
+                            <textarea class="form-control input-ghost" name="noticeBody" rows="4" placeholder="Write your announcement here..." required></textarea>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small text-on-surface-variant text-uppercase" style="letter-spacing:0.05em;">Active From</label>
+                                <input type="date" class="form-control input-ghost" name="noticeStartDate" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small text-on-surface-variant text-uppercase" style="letter-spacing:0.05em;">Active Until</label>
+                                <input type="date" class="form-control input-ghost" name="noticeEndDate" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-on-surface-variant text-uppercase" style="letter-spacing:0.05em;">Attachment (Optional)</label>
+                            <input type="file" class="form-control input-ghost" name="noticeAttachment" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.zip">
+                            <div class="form-text text-on-surface-variant">PDF, Word, PowerPoint, images, ZIP — max 50MB</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top border-outline-variant px-4 py-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary-edu rounded-pill px-5 fw-semibold">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Post Notice
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+    // Embedded JSON from server
+    const assignmentsData = ${not empty assignmentsJson ? assignmentsJson : '[]'};
+    const resourcesData   = ${not empty resourcesJson   ? resourcesJson   : '[]'};
+    const noticesData     = ${not empty noticesJson     ? noticesJson     : '[]'};
+
+    function showToast(msg, type) {
+        const cls = type === 'error' ? 'bg-danger' : 'bg-success';
+        const div = document.createElement('div');
+        div.className = 'position-fixed bottom-0 end-0 p-3';
+        div.style.zIndex = '9999';
+        div.innerHTML = `<div class="toast align-items-center text-white \${cls} border-0 show" role="alert">
+            <div class="d-flex"><div class="toast-body fw-semibold">\${msg}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.position-fixed').remove()"></button></div></div>`;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    }
+
+    function getFileIcon(type) {
+        if (!type) return 'fa-file';
+        const t = type.toLowerCase();
+        if (t.includes('pdf')) return 'fa-file-pdf';
+        if (t.includes('word') || t.includes('doc')) return 'fa-file-word';
+        if (t.includes('ppt') || t.includes('powerpoint')) return 'fa-file-powerpoint';
+        if (t.includes('xls') || t.includes('excel') || t.includes('spreadsheet')) return 'fa-file-excel';
+        if (t.includes('image') || t.includes('png') || t.includes('jpg')) return 'fa-file-image';
+        if (t.includes('zip') || t.includes('archive')) return 'fa-file-zipper';
+        if (t === 'folder') return 'fa-folder';
+        return 'fa-file';
+    }
+
+    // ---- Assignments ----
+    function renderAssignments() {
+        const el = document.getElementById('dash-assignments');
+        document.getElementById('stat-assignments').textContent = assignmentsData.length;
+        if (!assignmentsData.length) {
+            el.innerHTML = '<p class="text-on-surface-variant small text-center py-3">No assignments yet. <a href="${pageContext.request.contextPath}/TeacherClassroom">Create one →</a></p>';
+            return;
+        }
+        const recent = assignmentsData.slice(0, 4);
+        el.innerHTML = recent.map(a => `
+            <div class="d-flex align-items-start justify-content-between gap-2 py-2 border-bottom border-outline-variant">
+                <div>
+                    <div class="fw-semibold text-on-surface small">\${a.title}</div>
+                    <div class="small text-on-surface-variant">Due: \${a.due}</div>
+                </div>
+                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium flex-shrink-0">Open</span>
+            </div>`).join('') +
+            (assignmentsData.length > 4 ? `<div class="text-center pt-2"><a href="${pageContext.request.contextPath}/TeacherClassroom" class="small text-primary fw-semibold">+\${assignmentsData.length - 4} more →</a></div>` : '');
+    }
+
+    // ---- Resources ----
+    function renderResources() {
+        const el = document.getElementById('dash-resources');
+        const files = resourcesData.filter(r => r.type !== 'FOLDER').slice(0, 6);
+        document.getElementById('stat-resources').textContent = resourcesData.length;
+        if (!files.length) {
+            el.innerHTML = '<p class="text-on-surface-variant small text-center py-3">No files uploaded yet. <a href="${pageContext.request.contextPath}/TeacherClassroom">Upload one →</a></p>';
+            return;
+        }
+        el.innerHTML = `<div class="row g-3">\${files.map(r => `
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card-sleek p-3 text-center h-100 d-flex flex-column align-items-center">
+                    <div class="bg-primary-container rounded-3 d-flex align-items-center justify-content-center mb-2" style="width:44px;height:44px;color:var(--primary)">
+                        <i class="fa-solid \${getFileIcon(r.type)} fs-4"></i>
+                    </div>
+                    <span class="text-on-surface fw-semibold text-truncate w-100 mb-2" style="font-size:11px;" title="\${r.title}">\${r.title}</span>
+                    <a href="${pageContext.request.contextPath}/\${r.path}" target="_blank" class="btn btn-primary-edu rounded-circle mt-auto d-flex align-items-center justify-content-center" style="width:30px;height:30px;padding:0;">
+                        <i class="fa-solid fa-download" style="font-size:11px;"></i>
+                    </a>
+                </div>
+            </div>`).join('')}</div>`;
+    }
+
+    // ---- Notices ----
+    function renderNotices() {
+        const el = document.getElementById('dash-notices');
+        document.getElementById('stat-notices').textContent = noticesData.length;
+        if (!noticesData.length) {
+            el.innerHTML = '<p class="text-on-surface-variant small text-center py-3">No active notices. Post one to inform students.</p>';
+            return;
+        }
+        el.innerHTML = noticesData.slice(0, 4).map(n => {
+            const attach = n.attachmentPath ? `
+                <a href="${pageContext.request.contextPath}/\${n.attachmentPath}" target="_blank"
+                   class="d-inline-flex align-items-center gap-2 mt-2 py-1 px-3 rounded-3 border border-outline-variant small fw-semibold text-on-surface text-decoration-none" style="background:var(--surface-container);">
+                    <i class="fa-solid fa-paperclip text-primary"></i> \${n.attachmentName || 'Attachment'}
+                </a>` : '';
+            return `<div class="py-3 border-bottom border-outline-variant">
+                <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+                    <span class="fw-semibold text-on-surface small">\${n.title}</span>
+                    <span class="small text-on-surface-variant flex-shrink-0">\${n.startDate}</span>
+                </div>
+                <p class="small text-on-surface-variant mb-1 line-clamp-2">\${n.body.substring(0, 120)}\${n.body.length > 120 ? '…' : ''}</p>
+                <div class="small text-on-surface-variant">— \${n.author}</div>
+                \${attach}
+            </div>`;
+        }).join('');
+    }
+
+    // ---- Notice Form Submit ----
+    document.getElementById('createNoticeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        try {
+            const resp = await fetch('${pageContext.request.contextPath}/notice/create', { method: 'POST', body: formData });
+            const result = await resp.json();
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('createNoticeModal')).hide();
+                showToast('Notice posted successfully!');
+                this.reset();
+                // Reload notices from server
+                const r2 = await fetch('${pageContext.request.contextPath}/notice/recent');
+                const j2 = await r2.json();
+                if (j2.success) {
+                    noticesData.length = 0;
+                    j2.data.forEach(n => noticesData.push(n));
+                    renderNotices();
+                    document.getElementById('stat-notices').textContent = noticesData.length;
+                }
+            } else {
+                showToast(result.message || 'Failed to post notice.', 'error');
+            }
+        } catch (err) { console.error(err); showToast('Error posting notice.', 'error'); }
+    });
+
+    // Init
+    renderAssignments();
+    renderResources();
+    renderNotices();
+
+    // Chart
+    setTimeout(() => {
+        const ctx = document.getElementById('teacherContentChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Assignments', 'Resources', 'Notices'],
+                    datasets: [{
+                        data: [assignmentsData.length, resourcesData.length, noticesData.length],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    cutout: '70%'
+                }
+            });
+        }
+    }, 500);
+    </script>
 </body>
 </html>

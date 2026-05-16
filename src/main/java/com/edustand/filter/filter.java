@@ -99,6 +99,7 @@ public class filter extends HttpFilter {
 		return path.startsWith("/css/")
 				|| path.startsWith("/js/")
 				|| path.startsWith("/images/")
+				|| path.startsWith("/assets/")
 				|| path.startsWith("/favicon")
 				|| path.equals("/")
 				|| path.equals("/login")

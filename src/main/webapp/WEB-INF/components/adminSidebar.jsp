@@ -32,6 +32,10 @@
             <i class="fa-solid fa-clock-rotate-left fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Activity Logs</span>
         </a>
+        <a href="<c:url value='/AdminNotices'/>" class="sidebar-nav-link ${activeSidebar eq 'notices' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
+            <i class="fa-solid fa-bullhorn fs-6 sidebar-icon"></i>
+            <span class="brand-headline small sidebar-label">Notices</span>
+        </a>
         <a href="<c:url value='/PanelContact'/>" class="sidebar-nav-link ${activeSidebar eq 'contact' ? 'active' : ''} d-flex align-items-center gap-3 px-3 py-2 text-decoration-none">
             <i class="fa-solid fa-address-book fs-6 sidebar-icon"></i>
             <span class="brand-headline small sidebar-label">Contact</span>

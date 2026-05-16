@@ -20,8 +20,7 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell">
-        <div class="p-4 mx-auto w-100 d-flex flex-column" style="gap: 2.5rem;">
+        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell d-flex flex-column" style="gap: 1.5rem;">
             <!-- Page Header -->
             <section class="page-header-sleek px-4 py-4 mb-4">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
@@ -416,6 +415,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="m-0 fw-semibold text-on-surface">Submissions Overview</h6>
+                        <select id="submissionFilter" class="form-select form-select-sm w-auto" onchange="renderSubmissions()">
+                            <option value="ALL">All</option>
+                            <option value="UNSUBMITTED">Unsubmitted</option>
+                            <option value="PENDING">Pending (Needs Grading)</option>
+                            <option value="GRADED">Graded</option>
+                        </select>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-surface-container-high">
@@ -644,37 +652,104 @@
         });
         let allResources = [];
         
+        let currentSubmissions = [];
+
         window.viewSubmissions = async function(assignmentId) {
             try {
                 const resp = await fetch('${pageContext.request.contextPath}/classroom/assignment/' + assignmentId + '/submissions');
                 const result = await resp.json();
                 
                 const tableBody = document.querySelector('#viewSubmissionsModal tbody');
+                const thead = document.querySelector('#viewSubmissionsModal thead tr');
                 if (!tableBody) return;
-                
-                let html = '';
-                if (result.submissions && result.submissions.length > 0) {
-                    result.submissions.forEach(s => {
-                        html += `
-                        <tr>
-                            <td class="px-4 py-3"><div class="fw-semibold text-on-surface">\${s.name}</div></td>
-                            <td class="px-4 py-3">
-                                <span class="badge \${(s.status === 'PENDING' || s.status === 'GRADED') ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'} rounded-pill fw-medium">\${s.status}</span>
-                            </td>
-                            <td class="px-4 py-3 small text-on-surface-variant">\${s.submissionDate}</td>
-                            <td class="px-4 py-3 text-end">`;
-                            
-                        if (s.path && s.path !== '') {
-                            html += `<a href="${pageContext.request.contextPath}/\${s.path}" target="_blank" class="btn btn-sm btn-outline-primary">View File</a>`;
-                        }
-                        
-                        html += `</td></tr>`;
-                    });
-                } else {
-                    html = '<tr><td colspan="4" class="text-center py-4 text-on-surface-variant">No submissions yet.</td></tr>';
+
+                // Update table headers to include Score and Grade columns
+                if (thead) {
+                    thead.innerHTML = `
+                        <th class="px-4 py-3">Student</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Submitted</th>
+                        <th class="px-4 py-3">Score</th>
+                        <th class="px-4 py-3 text-end">Actions</th>`;
                 }
-                tableBody.innerHTML = html;
+                
+                currentSubmissions = result.submissions || [];
+                renderSubmissions();
             } catch (err) { console.error("Error loading submissions", err); }
+        };
+
+        window.renderSubmissions = function() {
+            const tableBody = document.querySelector('#viewSubmissionsModal tbody');
+            if (!tableBody) return;
+            const filterValue = document.getElementById('submissionFilter') ? document.getElementById('submissionFilter').value : 'ALL';
+            
+            let filtered = currentSubmissions;
+            if (filterValue !== 'ALL') {
+                filtered = currentSubmissions.filter(s => s.status === filterValue);
+            }
+
+            let html = '';
+            if (filtered && filtered.length > 0) {
+                filtered.forEach(s => {
+                    const statusClass = (s.status === 'PENDING' || s.status === 'GRADED')
+                        ? 'bg-success-subtle text-success border border-success-subtle'
+                        : 'bg-secondary-subtle text-secondary border border-secondary-subtle';
+                    const scoreDisplay = s.score !== null && s.score !== undefined
+                        ? `<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-bold">\${s.score}/100</span>`
+                        : `<span class="text-on-surface-variant small">—</span>`;
+                    const fileBtn = (s.path && s.path !== '')
+                        ? `<a href="${pageContext.request.contextPath}/\${s.path}" target="_blank" class="btn btn-sm btn-outline-primary me-1"><i class="fa-solid fa-eye me-1"></i>View</a>`
+                        : '';
+                    
+                    html += `
+                    <tr>
+                        <td class="px-4 py-3"><div class="fw-semibold text-on-surface">\${s.name}</div></td>
+                        <td class="px-4 py-3">
+                            <span class="badge \${statusClass} rounded-pill fw-medium">\${s.status}</span>
+                        </td>
+                        <td class="px-4 py-3 small text-on-surface-variant">\${s.submissionDate ? s.submissionDate.substring(0,10) : '—'}</td>
+                        <td class="px-4 py-3">\${scoreDisplay}</td>
+                        <td class="px-4 py-3 text-end d-flex align-items-center justify-content-end gap-1 flex-wrap">
+                            \${fileBtn}
+                            <div class="input-group input-group-sm" style="width: 130px;">
+                                <input type="number" class="form-control form-control-sm rounded-start" placeholder="Score /100" min="0" max="100" step="0.5" id="score-\${s.submissionId}">
+                                <button class="btn btn-sm btn-success" onclick="gradeSubmission(\${s.submissionId})" title="Submit Grade">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html = '<tr><td colspan="5" class="text-center py-4 text-on-surface-variant">No submissions match your filter.</td></tr>';
+            }
+            tableBody.innerHTML = html;
+        };
+
+        window.gradeSubmission = async function(submissionId) {
+            const scoreInput = document.getElementById('score-' + submissionId);
+            const score = scoreInput ? scoreInput.value : '';
+            if (!score || isNaN(parseFloat(score))) {
+                showToast('Please enter a valid score.', 'error');
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('score', score);
+                const resp = await fetch('${pageContext.request.contextPath}/classroom/submission/' + submissionId + '/grade', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await resp.json();
+                if (result.success) {
+                    showToast('Grade saved successfully!');
+                    // Refresh the submissions table for the currently open modal
+                    const activeBtn = document.querySelector('[data-active-assignment-id]');
+                    if (activeBtn) viewSubmissions(activeBtn.dataset.activeAssignmentId);
+                } else {
+                    showToast(result.message || 'Failed to save grade.', 'error');
+                }
+            } catch (err) { console.error("Grade error", err); showToast('Error saving grade.', 'error'); }
         };
 
         async function loadAssignments() {
@@ -694,9 +769,10 @@
                             <div>
                                 <h6 class="fw-bold mb-2">\${a.title}</h6>
                                 <div class="small text-on-surface-variant">Due: \${a.due}</div>
+                                <div class="small text-on-surface-variant mt-1">\${a.desc || ''}</div>
                             </div>
                             <div class="text-end">
-                                <button class="btn btn-primary-edu btn-sm" onclick="viewSubmissions('\${a.id}')" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</button>
+                                <button class="btn btn-primary-edu btn-sm" onclick="this.setAttribute('data-active-assignment-id','\${a.id}'); document.querySelectorAll('[data-active-assignment-id]').forEach(el => { if(el !== this) el.removeAttribute('data-active-assignment-id'); }); viewSubmissions('\${a.id}');" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</button>
                             </div>
                         </div>`;
                     });

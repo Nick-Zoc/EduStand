@@ -29,7 +29,12 @@
                     <h2 class="fs-1 fw-bold m-0 brand-headline text-on-surface">Activity Logs</h2>
                     <p class="text-on-surface-variant mb-0" style="max-width: 50rem; line-height: 1.6;">Monitor backend user actions securely.</p>
                 </div>
-                <span class="edu-badge edu-badge-status edu-badge-status-active" id="totalLogsBadge">${totalLogs} Total</span>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="<c:url value='/AdminExport?type=logs'/>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold border-outline-variant bg-surface transition-all hover-lift" title="Export Logs CSV">
+                        <i class="fa-solid fa-file-csv text-success"></i> Export CSV
+                    </a>
+                    <span class="edu-badge edu-badge-status edu-badge-status-active" id="totalLogsBadge">${totalLogs} Total</span>
+                </div>
             </div>
 
             <section class="users-table-wrap">
@@ -89,37 +94,37 @@
                                     <td class="px-3 px-md-4 py-3">
                                         <c:choose>
                                             <c:when test="${log.action eq 'LOGIN'}">
-                                                <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fw-medium"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'LOGOUT'}">
-                                                <span class="edu-badge edu-badge-status edu-badge-status-inactive" style="font-size: 10px;"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'USER_CREATE'}">
-                                                <span class="edu-badge edu-badge-role-teacher" style="font-size: 10px;"><i class="fa-solid fa-plus me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-medium"><i class="fa-solid fa-plus me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'USER_UPDATE'}">
-                                                <span class="edu-badge edu-badge-status-pending" style="font-size: 10px;"><i class="fa-solid fa-pen me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill fw-medium"><i class="fa-solid fa-pen me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'USER_DELETE'}">
-                                                <span class="edu-badge edu-badge-role-admin" style="font-size: 10px;"><i class="fa-solid fa-trash me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill fw-medium"><i class="fa-solid fa-trash me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'ACCESS_APPROVE'}">
-                                                <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;"><i class="fa-solid fa-check-circle me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill fw-medium"><i class="fa-solid fa-check-circle me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'ACCESS_REJECT'}">
-                                                <span class="edu-badge edu-badge-role-admin" style="font-size: 10px;"><i class="fa-solid fa-circle-xmark me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium"><i class="fa-solid fa-circle-xmark me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'CONTACT_READ'}">
-                                                <span class="edu-badge edu-badge-role-student" style="font-size: 10px;"><i class="fa-solid fa-envelope-open me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium"><i class="fa-solid fa-envelope-open me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'CONTACT_FIXED'}">
-                                                <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;"><i class="fa-solid fa-circle-check me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fw-medium"><i class="fa-solid fa-circle-check me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:when test="${log.action eq 'PROFILE_UPDATE'}">
-                                                <span class="edu-badge edu-badge-role-teacher" style="font-size: 10px;"><i class="fa-regular fa-user-pen me-1"></i> ${log.action}</span>
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-medium"><i class="fa-regular fa-user-pen me-1"></i> ${log.action}</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <span class="edu-badge edu-badge-status edu-badge-status-inactive" style="font-size: 10px;">${log.action}</span>
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium">${log.action}</span>
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
@@ -206,17 +211,17 @@
                                   + ' ' + date.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
                     
                     let badge = '';
-                    if (item.action === 'LOGIN') badge = '<span class="badge bg-success bg-opacity-20 text-success fw-semibold"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'LOGOUT') badge = '<span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'USER_CREATE') badge = '<span class="badge bg-primary bg-opacity-20 text-primary fw-semibold"><i class="fa-solid fa-plus me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'USER_UPDATE') badge = '<span class="badge bg-warning bg-opacity-20 text-warning fw-semibold"><i class="fa-solid fa-pen me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'USER_DELETE') badge = '<span class="badge bg-danger bg-opacity-20 text-danger fw-semibold"><i class="fa-solid fa-trash me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'ACCESS_APPROVE') badge = '<span class="badge bg-info bg-opacity-20 text-info fw-semibold"><i class="fa-solid fa-check-circle me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'ACCESS_REJECT') badge = '<span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold"><i class="fa-solid fa-circle-xmark me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'CONTACT_READ') badge = '<span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold"><i class="fa-solid fa-envelope-open me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'CONTACT_FIXED') badge = '<span class="badge bg-success bg-opacity-20 text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else if (item.action === 'PROFILE_UPDATE') badge = '<span class="badge bg-primary bg-opacity-20 text-primary fw-semibold"><i class="fa-regular fa-user-pen me-1"></i> ' + escapeHtml(item.action) + '</span>';
-                    else badge = '<span class="badge bg-secondary bg-opacity-20 text-secondary fw-semibold">' + escapeHtml(item.action) + '</span>';
+                    if (item.action === 'LOGIN') badge = '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fw-medium"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'LOGOUT') badge = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'USER_CREATE') badge = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-medium"><i class="fa-solid fa-plus me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'USER_UPDATE') badge = '<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill fw-medium"><i class="fa-solid fa-pen me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'USER_DELETE') badge = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill fw-medium"><i class="fa-solid fa-trash me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'ACCESS_APPROVE') badge = '<span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill fw-medium"><i class="fa-solid fa-check-circle me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'ACCESS_REJECT') badge = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium"><i class="fa-solid fa-circle-xmark me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'CONTACT_READ') badge = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium"><i class="fa-solid fa-envelope-open me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'CONTACT_FIXED') badge = '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fw-medium"><i class="fa-solid fa-circle-check me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else if (item.action === 'PROFILE_UPDATE') badge = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-medium"><i class="fa-regular fa-user-pen me-1"></i> ' + escapeHtml(item.action) + '</span>';
+                    else badge = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium">' + escapeHtml(item.action) + '</span>';
 
                     return '<tr>'
                         + '<td class="px-3 px-md-4 py-3 text-on-surface-variant">' + globalIdx + '</td>'

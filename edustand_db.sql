@@ -10,7 +10,10 @@ CREATE TABLE IF NOT EXISTS Users (
     phone_number VARCHAR(20) DEFAULT NULL,
     address VARCHAR(255) DEFAULT NULL,
     profile_picture_path VARCHAR(255) DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL,
+    FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE SET NULL
 );
 
 -- 2. Resources Table
@@ -85,7 +88,9 @@ CREATE TABLE IF NOT EXISTS ContactRequests (
     request_status ENUM('PENDING', 'FIXED') NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by INT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (updated_by) REFERENCES Users(user_id) ON DELETE SET NULL,
     INDEX idx_contact_created (created_at),
     INDEX idx_contact_status (read_status, request_status)
 );
@@ -102,3 +107,25 @@ CREATE TABLE IF NOT EXISTS ActivityLogs (
     INDEX idx_created (created_at),
     INDEX idx_user_created (user_id, created_at)
 );
+
+-- 8. Notices / Announcements Table
+CREATE TABLE IF NOT EXISTS Notices (
+    notice_id INT AUTO_INCREMENT PRIMARY KEY,
+    author_id INT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    body TEXT NOT NULL,
+    attachment_path VARCHAR(255) DEFAULT NULL,
+    attachment_name VARCHAR(200) DEFAULT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_edited_by INT NULL,
+    FOREIGN KEY (author_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (last_edited_by) REFERENCES Users(user_id) ON DELETE SET NULL,
+    INDEX idx_notice_dates (start_date, end_date),
+    INDEX idx_notice_author (author_id)
+);
+
+-- Ensure Submissions score column exists (already in schema; safe to run if missing)
+ALTER TABLE Submissions MODIFY COLUMN score DECIMAL(5,2) DEFAULT NULL;

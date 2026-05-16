@@ -66,6 +66,9 @@ public class RememberMeService {
                     user.setEmail(rs.getString("email"));
                     user.setRole(rs.getString("role"));
                     user.setStatus(rs.getString("status"));
+                    try { user.setProfilePicturePath(rs.getString("profile_picture_path")); } catch (Exception ignored) {}
+                    try { user.setPhoneNumber(rs.getString("phone_number")); } catch (Exception ignored) {}
+                    try { user.setAddress(rs.getString("address")); } catch (Exception ignored) {}
                     System.out.println("[DEBUG] Remember-me token validated for user_id=" + user.getUserId());
                     return user;
                 }

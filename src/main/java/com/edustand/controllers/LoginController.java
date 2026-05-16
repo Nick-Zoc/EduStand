@@ -37,67 +37,72 @@ public class LoginController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 1. Grab the data the user typed into the HTML form
         String email = req.getParameter("email");
-        if (email == null || email.isBlank()) {
-            email = req.getParameter("username");
-        }
+        if (email == null || email.isBlank()) email = req.getParameter("username");
         String password = req.getParameter("password");
         String rememberMe = req.getParameter("rememberMe");
-        if (rememberMe == null) {
-            rememberMe = req.getParameter("remember");
-        }
+        if (rememberMe == null) rememberMe = req.getParameter("remember");
 
-        // 2. Ask the LoginService to verify the credentials
-        UserModel loggedInUser = loginService.authenticateUser(email, password);
+        // Use the new structured authenticate() method
+        LoginService.AuthResult result = loginService.authenticate(email, password);
 
-        if (loggedInUser != null) {
-            // SUCCESS! The credentials are valid.
+        switch (result.status) {
+            case SUCCESS:
+                UserModel loggedInUser = result.user;
 
-            // 3. Create a Session and store the user's data in it
-            SessionUtil.setAttribute(req, "loggedInUser", loggedInUser);
-            SessionUtil.setAttribute(req, "userRole", loggedInUser.getRole());
+                SessionUtil.setAttribute(req, "loggedInUser", loggedInUser);
+                SessionUtil.setAttribute(req, "userRole", loggedInUser.getRole());
 
-            // 4. Handle "Remember Me" (Token valid for 30 days)
-            if (isRememberMeSelected(rememberMe)) {
-                RememberMeService rmService = new RememberMeService();
-                String token = rmService.createToken(loggedInUser.getUserId());
-                if (token != null) {
-                    CookieUtil.addCookie(resp, "rememberMeToken", token, 60 * 60 * 24 * 30);
+                if (isRememberMeSelected(rememberMe)) {
+                    RememberMeService rmService = new RememberMeService();
+                    String token = rmService.createToken(loggedInUser.getUserId());
+                    if (token != null) CookieUtil.addCookie(resp, "rememberMeToken", token, 60 * 60 * 24 * 30);
+                    CookieUtil.addCookie(resp, "rememberedEmail", email, 60 * 60 * 24 * 30);
+                } else {
+                    CookieUtil.deleteCookie(resp, "rememberedEmail");
+                    CookieUtil.deleteCookie(resp, "rememberMeToken");
                 }
-                CookieUtil.addCookie(resp, "rememberedEmail", email, 60 * 60 * 24 * 30);
-            } else {
-                CookieUtil.deleteCookie(resp, "rememberedEmail");
-                CookieUtil.deleteCookie(resp, "rememberMeToken");
-            }
 
-            // 5. Role-based routing: Send them to the correct dashboard
-            activityLogService.logActivity(loggedInUser.getUserId(), "LOGIN",
-                    "Logged in as " + loggedInUser.getRole());
+                activityLogService.logActivity(loggedInUser.getUserId(), "LOGIN",
+                        "Logged in as " + loggedInUser.getRole());
 
-            String role = loggedInUser.getRole();
-            if (role.equals("ADMIN")) {
-                resp.sendRedirect(req.getContextPath() + "/AdminDashboard");
-            } else if (role.equals("TEACHER")) {
-                resp.sendRedirect(req.getContextPath() + "/TeacherDashboard");
-            } else {
-                resp.sendRedirect(req.getContextPath() + "/StudentDashboard");
-            }
+                String role = loggedInUser.getRole();
+                if ("ADMIN".equals(role)) {
+                    resp.sendRedirect(req.getContextPath() + "/AdminDashboard");
+                } else if ("TEACHER".equals(role)) {
+                    resp.sendRedirect(req.getContextPath() + "/TeacherDashboard");
+                } else {
+                    resp.sendRedirect(req.getContextPath() + "/StudentDashboard");
+                }
+                break;
 
-        } else {
-            // FAILURE! Bad email or password.
+            case ACCOUNT_LOCKED:
+                String unlockTime = result.lockedUntil != null
+                        ? new java.text.SimpleDateFormat("HH:mm").format(result.lockedUntil)
+                        : "soon";
+                req.setAttribute("error",
+                        "Your account has been temporarily locked after 5 failed attempts. Please try again after " + unlockTime + ".");
+                req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);
+                break;
 
-            // Check if account is inactive to provide better error message
-            boolean isInactive = loginService.isUserInactive(email);
-            String errorMessage = isInactive
-                    ? "Your account is inactive. Please contact an administrator to activate your account."
-                    : "Invalid email or password. Please try again.";
+            case WRONG_PASSWORD:
+                String attemptsMsg = result.remainingAttempts > 0
+                        ? " You have " + result.remainingAttempts + " attempt(s) remaining before your account is locked."
+                        : " Your account has been locked for 30 minutes.";
+                req.setAttribute("error", "Invalid email or password." + attemptsMsg);
+                req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);
+                break;
 
-            // Send an error message back to the JSP to display to the user
-            req.setAttribute("error", errorMessage);
+            case ACCOUNT_INACTIVE:
+                req.setAttribute("error", "Your account is inactive. Please contact an administrator to activate your account.");
+                req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);
+                break;
 
-            // Forward them back to the login page so they can try again
-            req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);
+            case USER_NOT_FOUND:
+            default:
+                req.setAttribute("error", "Invalid email or password. Please try again.");
+                req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);
+                break;
         }
     }
 

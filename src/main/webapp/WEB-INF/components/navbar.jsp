@@ -51,10 +51,10 @@
                         <c:when test="${not empty sessionScope.loggedInUser.profilePicturePath}">
                             <c:choose>
                                 <c:when test="${not empty sessionScope.profilePictureCacheBuster}">
-                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}?v=${sessionScope.profilePictureCacheBuster}" alt="Profile" class="profile-avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}?v=${sessionScope.profilePictureCacheBuster}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${resolvedName}&background=e0f2fe&color=0284c7&size=128';" alt="Profile" class="profile-avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
                                 </c:when>
                                 <c:otherwise>
-                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}" alt="Profile" class="profile-avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${resolvedName}&background=e0f2fe&color=0284c7&size=128';" alt="Profile" class="profile-avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
                                 </c:otherwise>
                             </c:choose>
                         </c:when>
@@ -69,10 +69,10 @@
                         <c:when test="${not empty sessionScope.loggedInUser.profilePicturePath}">
                             <c:choose>
                                 <c:when test="${not empty sessionScope.profilePictureCacheBuster}">
-                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}?v=${sessionScope.profilePictureCacheBuster}" alt="Profile" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}?v=${sessionScope.profilePictureCacheBuster}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${resolvedName}&background=e0f2fe&color=0284c7&size=128';" alt="Profile" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
                                 </c:when>
                                 <c:otherwise>
-                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}" alt="Profile" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePicturePath}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${resolvedName}&background=e0f2fe&color=0284c7&size=128';" alt="Profile" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--outline-variant);">
                                 </c:otherwise>
                             </c:choose>
                         </c:when>
@@ -116,33 +116,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const markAllReadBtn = document.getElementById('markAllReadBtn');
     const contextPath = '${pageContext.request.contextPath}';
 
-    // Load contact requests when notification button is clicked
     if (notificationTrigger) {
         notificationTrigger.addEventListener('click', async () => {
-            await loadContactRequests();
+            await loadNotifications();
         });
     }
 
-    // Mark all as read button
     if (markAllReadBtn) {
         markAllReadBtn.addEventListener('click', async () => {
-            await markAllAsRead();
+            try {
+                await fetch(contextPath + '/notifications?action=mark_all_read', {
+                    method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                await loadNotifications();
+            } catch (e) { console.error('Mark-all-read failed:', e); }
         });
     }
 
-    async function loadContactRequests() {
+    async function loadNotifications() {
         try {
-            const response = await fetch(contextPath + '/AdminContactRequests?action=get_unread_json', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+            const response = await fetch(contextPath + '/notifications?action=get_json', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-
-            if (!response.ok) throw new Error('Failed to load notifications');
-
+            if (!response.ok) throw new Error('HTTP ' + response.status);
             const data = await response.json();
-            displayNotifications(data);
+            if (data.notices) {
+                // Teacher / Student: show notices
+                displayNotices(data.notices);
+            } else {
+                // Admin: show contact requests
+                displayContactRequests(data);
+            }
         } catch (error) {
             console.error('Error loading notifications:', error);
             notificationList.innerHTML = `
@@ -154,77 +158,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function markAllAsRead() {
-        try {
-            const response = await fetch(contextPath + '/AdminContactRequests?action=mark_all_read', {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
-            if (!response.ok) throw new Error('Failed to mark all as read');
-
-            await loadContactRequests();
-        } catch (error) {
-            console.error('Error marking all as read:', error);
-        }
-    }
-
-    function displayNotifications(data) {
+    function displayContactRequests(data) {
         if (!data.requests || data.requests.length === 0) {
-            notificationList.innerHTML = `
-                <div class="text-center text-on-surface-variant py-3">
-                    <i class="fa-regular fa-inbox"></i>
-                    <p class="small mt-2 mb-0">No notifications</p>
-                </div>
-            `;
+            notificationList.innerHTML = '<div class="text-center text-on-surface-variant py-3"><i class="fa-regular fa-inbox"></i><p class="small mt-2 mb-0">No notifications</p></div>';
             if (notificationBadge) notificationBadge.style.display = 'none';
             if (markAllReadBtn) markAllReadBtn.style.display = 'none';
             return;
         }
+        if (markAllReadBtn) markAllReadBtn.style.display = data.unreadCount > 0 ? 'block' : 'none';
+        if (notificationBadge) notificationBadge.style.display = data.unreadCount > 0 ? 'block' : 'none';
 
-        // Show or hide mark all read button based on unread count
-        if (markAllReadBtn) {
-            markAllReadBtn.style.display = data.unreadCount > 0 ? 'block' : 'none';
-        }
-
-        // Show red dot if there are unread notifications
-        if (notificationBadge) {
-            notificationBadge.style.display = data.unreadCount > 0 ? 'block' : 'none';
-        }
-
-        // Build notification list with professional badge styling
-        const notificationHTML = data.requests.map(req => {
-            let badgeHTML = '';
-            if (req.readStatus === 'UNREAD') {
-                badgeHTML = '<span class="edu-badge" style="font-size: 10px; background: #fff1f2; color: #be123c; border-color: #fda4af; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em;">UNREAD</span>';
-            } else {
-                badgeHTML = '<span class="edu-badge" style="font-size: 10px; background: #ecfdf5; color: #047857; border-color: #a7f3d0; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em;">READ</span>';
-            }
-            return ''
-                + '<div class="notification-item p-2 d-flex gap-2 align-items-start border-bottom border-outline-variant">'
-                + '<i class="fa-regular fa-envelope text-primary mt-1" style="min-width: 20px;"></i>'
-                + '<div class="flex-grow-1 min-w-0">'
-                + '<div class="fw-semibold text-on-surface small notification-title">' + escapeHtml(req.fullName) + '</div>'
-                + '<div class="text-on-surface-variant small mt-1 notification-subject">' + escapeHtml(req.subject) + '</div>'
-                + '<div class="d-flex gap-2 mt-2 align-items-center">'
-                + badgeHTML
-                + '<span class="text-on-surface-variant notification-meta" style="font-size: 12px;">' + formatTime(req.createdAt) + '</span>'
-                + '</div>'
-                + '</div>'
-                + '</div>';
+        notificationList.innerHTML = data.requests.map(req => {
+            const badge = req.readStatus === 'UNREAD'
+                ? '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill fw-medium" style="font-size:10px;padding:0.32rem 0.72rem;">UNREAD</span>'
+                : '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fw-medium" style="font-size:10px;padding:0.32rem 0.72rem;">READ</span>';
+            return `<div class="notification-item p-2 d-flex gap-2 align-items-start">
+                <i class="fa-regular fa-envelope text-primary mt-1" style="min-width:20px;"></i>
+                <div class="flex-grow-1 min-w-0">
+                    <div class="fw-semibold text-on-surface small">${escapeHtml(req.fullName)}</div>
+                    <div class="text-on-surface-variant small mt-1">${escapeHtml(req.subject)}</div>
+                    <div class="d-flex gap-2 mt-2 align-items-center">${badge}<span class="text-on-surface-variant" style="font-size:12px;">${formatTime(req.createdAt)}</span></div>
+                </div></div>`;
         }).join('');
+    }
 
-        notificationList.innerHTML = notificationHTML;
+    function displayNotices(notices) {
+        if (!notices || notices.length === 0) {
+            notificationList.innerHTML = '<div class="text-center text-on-surface-variant py-3"><i class="fa-solid fa-bullhorn"></i><p class="small mt-2 mb-0">No active notices</p></div>';
+            if (notificationBadge) notificationBadge.style.display = 'none';
+            if (markAllReadBtn) markAllReadBtn.style.display = 'none';
+            return;
+        }
+        if (notificationBadge) notificationBadge.style.display = 'block';
+        if (markAllReadBtn) markAllReadBtn.style.display = 'none';
+
+        notificationList.innerHTML = notices.map(n => {
+            const preview = n.body ? (n.body.length > 80 ? n.body.substring(0,80)+'…' : n.body) : '';
+            return `<div class="notification-item p-2 d-flex gap-2 align-items-start">
+                <i class="fa-solid fa-bullhorn text-warning mt-1" style="min-width:20px;"></i>
+                <div class="flex-grow-1 min-w-0">
+                    <div class="fw-semibold text-on-surface small">${escapeHtml(n.title)}</div>
+                    <div class="text-on-surface-variant small mt-1">${escapeHtml(preview)}</div>
+                    <div class="mt-2"><span class="text-on-surface-variant" style="font-size:11px;">By ${escapeHtml(n.author)} · ${n.startDate}</span></div>
+                </div></div>`;
+        }).join('');
     }
 
     function formatTime(dateStr) {
+        if (!dateStr) return '';
         const date = new Date(dateStr);
         const now = new Date();
-        const diffMs = now - date;
-        const diffMins = Math.floor(diffMs / 60000);
-
+        const diffMins = Math.floor((now - date) / 60000);
         if (diffMins < 1) return 'just now';
         if (diffMins < 60) return diffMins + 'm ago';
         if (diffMins < 1440) return Math.floor(diffMins / 60) + 'h ago';
@@ -232,14 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
+        if (!text) return '';
+        return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
 });
 </script>

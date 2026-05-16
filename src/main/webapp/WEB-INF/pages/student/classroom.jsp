@@ -19,8 +19,7 @@
     <main class="app-main d-flex flex-column min-vh-100">
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell">
-            <div class="p-4 mx-auto w-100 d-flex flex-column" style="gap: 2.5rem;">
+        <div class="px-3 px-md-4 py-3 w-100 users-flat-shell d-flex flex-column" style="gap: 1.5rem;">
                 <section class="page-header-sleek px-4 py-4 mb-4">
                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
                         <div>
@@ -170,35 +169,73 @@
         });
         let allResources = [];
 
+        let allAssignments = [];
+
         async function loadAssignments() {
             try {
                 const resp = await fetch('${pageContext.request.contextPath}/classroom/data/assignments');
                 const result = await resp.json();
-                
-                const container = document.getElementById('assign-content');
-                if (!container) return;
-                
-                let html = '<h5 class="fw-bold mb-3">All Assignments</h5>';
-                
-                if (result.data && result.data.length > 0) {
-                    result.data.forEach(a => {
-                        html += `
-                        <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek p-4 d-flex justify-content-between align-items-start gap-3">
-                            <div>
-                                <h6 class="fw-bold mb-2">\${a.title}</h6>
-                                <div class="small text-on-surface-variant mb-2">Due: \${a.due}</div>
-                                \${a.status !== 'UNSUBMITTED' ? '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fw-medium"><i class="fa-solid fa-check me-1"></i>Submitted</span>' : '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium">Unsubmitted</span>'}
-                            </div>
-                            <div class="text-end">
-                                <button class="btn \${a.status !== 'UNSUBMITTED' ? 'btn-outline-primary' : 'btn-primary-edu'} btn-sm" data-assignment-slug="\${a.id}" data-bs-toggle="modal" data-bs-target="#studentSubmitModal">\${a.status !== 'UNSUBMITTED' ? 'Resubmit' : 'Submit'}</button>
-                            </div>
-                        </div>`;
-                    });
-                } else {
-                    html += '<p class="text-on-surface-variant">No assignments posted yet.</p>';
-                }
-                container.innerHTML = html;
+                allAssignments = result.data || [];
+                renderAssignments();
             } catch (err) { console.error("Error loading assignments", err); }
+        }
+
+        function renderAssignments() {
+            const container = document.getElementById('assign-content');
+            if (!container) return;
+
+            const searchQuery = (document.getElementById('assignSearch') ? document.getElementById('assignSearch').value.toLowerCase() : '');
+            const filterValue = (document.getElementById('assignFilter') ? document.getElementById('assignFilter').value : 'ALL');
+
+            let html = `
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <h5 class="fw-bold m-0">All Assignments</h5>
+                <div class="d-flex gap-2">
+                    <input type="text" id="assignSearch" class="form-control form-control-sm" placeholder="Search..." value="\${searchQuery}" onkeyup="renderAssignments()">
+                    <select id="assignFilter" class="form-select form-select-sm" onchange="renderAssignments()">
+                        <option value="ALL" \${filterValue === 'ALL' ? 'selected' : ''}>All</option>
+                        <option value="UNSUBMITTED" \${filterValue === 'UNSUBMITTED' ? 'selected' : ''}>Unsubmitted</option>
+                        <option value="SUBMITTED" \${filterValue === 'SUBMITTED' ? 'selected' : ''}>Submitted</option>
+                        <option value="GRADED" \${filterValue === 'GRADED' ? 'selected' : ''}>Graded</option>
+                    </select>
+                </div>
+            </div>`;
+            
+            let filtered = allAssignments.filter(a => {
+                const matchSearch = a.title.toLowerCase().includes(searchQuery);
+                let matchFilter = true;
+                if (filterValue === 'UNSUBMITTED') matchFilter = (a.status === 'UNSUBMITTED');
+                else if (filterValue === 'SUBMITTED') matchFilter = (a.status !== 'UNSUBMITTED');
+                else if (filterValue === 'GRADED') matchFilter = (a.status === 'GRADED');
+                return matchSearch && matchFilter;
+            });
+
+            if (filtered.length > 0) {
+                filtered.forEach(a => {
+                    const isSubmitted = a.status !== 'UNSUBMITTED';
+                    const isGraded = a.status === 'GRADED';
+                    const statusBadge = isGraded
+                        ? `<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-medium"><i class="fa-solid fa-star me-1"></i>Graded: \${a.score}/100</span>`
+                        : isSubmitted
+                            ? `<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fw-medium"><i class="fa-solid fa-check me-1"></i>Submitted</span>`
+                            : `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill fw-medium">Unsubmitted</span>`;
+
+                    html += `
+                    <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek p-4 d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <h6 class="fw-bold mb-2">\${a.title}</h6>
+                            <div class="small text-on-surface-variant mb-2">Due: \${a.due}</div>
+                            \${statusBadge}
+                        </div>
+                        <div class="text-end">
+                            <button class="btn \${isSubmitted ? 'btn-outline-primary' : 'btn-primary-edu'} btn-sm" data-assignment-slug="\${a.id}" data-bs-toggle="modal" data-bs-target="#studentSubmitModal">\${isSubmitted ? 'Resubmit' : 'Submit'}</button>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html += '<p class="text-on-surface-variant">No assignments match your criteria.</p>';
+            }
+            container.innerHTML = html;
         }
 
         async function loadResources() {

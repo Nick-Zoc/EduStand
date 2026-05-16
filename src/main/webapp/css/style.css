@@ -442,6 +442,16 @@ a.text-primary-link:hover {
     transform: translateY(-3px);
 }
 
+/* no hover effect card sleek  */
+
+.card-sleek-no-hover {
+    background: #FFFFFF;
+    border: 1px solid var(--outline-variant);
+    box-shadow: none;
+    border-radius: 8px;
+    will-change: transform, box-shadow, border-color;
+}
+
 .card-curator {
     background: var(--surface-container-lowest);
     border: 1px solid var(--outline-variant);

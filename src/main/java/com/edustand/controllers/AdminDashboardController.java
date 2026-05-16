@@ -14,6 +14,8 @@ import com.edustand.service.ActivityLogService;
 import com.edustand.service.AdminService;
 import com.edustand.service.ContactRequestService;
 
+import com.edustand.service.NoticeService;
+
 /**
  * Handles routing and data processing for the Admin Dashboard.
  */
@@ -23,6 +25,7 @@ public class AdminDashboardController extends HttpServlet {
     private final AdminService adminService = new AdminService();
     private final ContactRequestService contactRequestService = new ContactRequestService();
     private final ActivityLogService activityLogService = new ActivityLogService();
+    private final NoticeService noticeService = new NoticeService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -42,13 +45,22 @@ public class AdminDashboardController extends HttpServlet {
             return;
         }
 
-        req.setAttribute("teacherCount", adminService.countUsersByRole("TEACHER"));
-        req.setAttribute("studentCount", adminService.countUsersByRole("STUDENT"));
+        int teacherCount = adminService.countUsersByRole("TEACHER");
+        int studentCount = adminService.countUsersByRole("STUDENT");
+        int adminCount   = adminService.countUsersByRole("ADMIN");
+
+        req.setAttribute("teacherCount", teacherCount);
+        req.setAttribute("studentCount", studentCount);
         req.setAttribute("pendingCount", adminService.countUsersByStatus("PENDING"));
         req.setAttribute("totalUsers", adminService.countAllUsers());
         req.setAttribute("inactiveCount", adminService.countUsersByStatus("INACTIVE"));
         req.setAttribute("unreadContactCount", contactRequestService.countByReadStatus("UNREAD"));
-        req.setAttribute("recentLogs", activityLogService.getRecentLogs(10));
+        // Show only 5 recent logs — makes room for notices panel side by side
+        req.setAttribute("recentLogs", activityLogService.getRecentLogs(5));
+        // Notices for the notice panel
+        req.setAttribute("noticesJson", noticeService.getRecentNoticesAsJson(5));
+        // Chart data: role distribution as simple JSON for Chart.js
+        req.setAttribute("chartRoleData", "[" + adminCount + "," + teacherCount + "," + studentCount + "]");
 
         req.setAttribute("userName", loggedInUser.getFullName());
         req.setAttribute("userRole", loggedInUser.getRole());

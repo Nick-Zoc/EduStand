@@ -27,10 +27,14 @@
                     <h2 class="users-title fs-1 fw-bold m-0 brand-headline text-on-surface">All Users</h2>
                     <p class="users-subtitle text-on-surface-variant mb-0" style="max-width: 46rem; line-height: 1.6;">Review accounts, update roles and status, and remove users.</p>
                 </div>
-                <button class="btn btn-primary-edu d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold text-white border-0" type="button" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                    <i class="fa-solid fa-user-plus"></i>
-                    Add User
-                </button>
+                <div class="d-flex gap-2">
+                    <a href="<c:url value='/AdminExport?type=users'/>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold border-outline-variant bg-surface transition-all hover-lift" title="Export Users CSV">
+                        <i class="fa-solid fa-file-csv text-success"></i> Export CSV
+                    </a>
+                    <button class="btn btn-primary-edu d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold text-white border-0 shadow-sm hover-lift" type="button" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fa-solid fa-user-plus"></i> Add User
+                    </button>
+                </div>
             </div>
 
             <div id="usersAlertContainer">

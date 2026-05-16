@@ -63,6 +63,12 @@ public class ClassroomController extends HttpServlet {
             return;
         }
 
+        // Grade a submission: POST /classroom/submission/{submissionId}/grade
+        if (action.startsWith("submission/") && action.endsWith("/grade")) {
+            handleGradeSubmission(req, resp, action);
+            return;
+        }
+
         if ("folder/create".equals(action)) {
             handleCreateFolder(req, resp, loggedInUser);
         } else if ("file/upload".equals(action)) {
@@ -108,9 +114,31 @@ public class ClassroomController extends HttpServlet {
 
     private void handleGetAssignments(HttpServletRequest req, HttpServletResponse resp, UserModel user) throws IOException {
         com.edustand.service.AssignmentService assignmentService = new com.edustand.service.AssignmentService();
-        String jsonArray = assignmentService.getAllAssignmentsAsJson(user.getUserId());
+        // Students get their own submission status + scores; teachers get all assignments
+        String jsonArray = "STUDENT".equalsIgnoreCase(user.getRole())
+            ? assignmentService.getStudentAssignmentsAsJson(user.getUserId())
+            : assignmentService.getAllAssignmentsAsJson(user.getUserId());
         resp.setContentType("application/json");
         resp.getWriter().write("{\"success\":true, \"data\":" + jsonArray + "}");
+    }
+
+    private void handleGradeSubmission(HttpServletRequest req, HttpServletResponse resp, String action) throws IOException {
+        // action = "submission/{submissionId}/grade"
+        String[] parts = action.split("/");
+        if (parts.length < 3) { writeJsonResponse(resp, false, "Invalid grade request"); return; }
+        int submissionId;
+        try { submissionId = Integer.parseInt(parts[1]); }
+        catch (NumberFormatException e) { writeJsonResponse(resp, false, "Invalid submission ID"); return; }
+
+        String scoreStr = req.getParameter("score");
+        if (scoreStr == null || scoreStr.isBlank()) { writeJsonResponse(resp, false, "Score is required"); return; }
+        double score;
+        try { score = Double.parseDouble(scoreStr); }
+        catch (NumberFormatException e) { writeJsonResponse(resp, false, "Invalid score value"); return; }
+
+        com.edustand.service.AssignmentService assignmentService = new com.edustand.service.AssignmentService();
+        boolean ok = assignmentService.gradeSubmission(submissionId, score);
+        writeJsonResponse(resp, ok, ok ? "Graded successfully" : "Failed to grade submission");
     }
 
     private void handleCreateFolder(HttpServletRequest req, HttpServletResponse resp, UserModel loggedInUser)

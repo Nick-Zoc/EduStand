@@ -219,5 +219,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!text) return '';
         return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
+
+    // Dismiss sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        const sidebar = document.querySelector('.app-sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle-btn');
+        if (sidebar && sidebar.classList.contains('show')) {
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                sidebar.classList.remove('show');
+            }
+        }
+    });
 });
 </script>

@@ -91,7 +91,7 @@
 
             <!-- Recent Resources & Content Overview -->
             <section class="row g-4">
-                <div class="col-12 col-lg-8">
+                <div class="col-12 col-lg-6">
                     <div class="card-sleek-no-hover overflow-hidden h-100 d-flex flex-column">
                         <div class="px-4 py-3 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
                             <h3 class="fs-6 fw-bold text-on-surface m-0 brand-headline">
@@ -104,10 +104,23 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4">
-                    <div class="card-sleek-no-hover p-4 h-100 d-flex flex-column align-items-center justify-content-center">
-                        <div class="small fw-semibold text-uppercase text-on-surface-variant mb-3 w-100 text-center" style="letter-spacing:0.06em;">Content Overview</div>
-                        <canvas id="teacherContentChart" style="max-height: 200px; width: 100%;"></canvas>
+                <div class="col-12 col-lg-6">
+                    <div class="card-sleek-no-hover p-4 h-100 d-flex flex-column">
+                        <div class="small fw-semibold text-uppercase text-on-surface-variant mb-3 w-100 text-center" style="letter-spacing:0.06em;">Dashboard Analytics</div>
+                        <div class="row g-3 flex-grow-1 align-items-center">
+                            <div class="col-6 text-center">
+                                <div class="small fw-semibold text-on-surface-variant mb-2" style="font-size: 11px;">Distribution (Doughnut)</div>
+                                <div style="height: 160px; position: relative;">
+                                    <canvas id="teacherDoughnutChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div class="small fw-semibold text-on-surface-variant mb-2" style="font-size: 11px;">Overview (Bar)</div>
+                                <div style="height: 160px; position: relative;">
+                                    <canvas id="teacherBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -333,20 +346,49 @@
     renderResources();
     renderNotices();
 
-    // Chart
+    // Charts
     setTimeout(() => {
-        const ctx = document.getElementById('teacherContentChart');
-        if (ctx) {
-            const totalFiles = resourcesData.filter(r => r.type !== 'FOLDER').length;
-            const totalAssignments = assignmentsData.length;
-            new Chart(ctx, {
+        const totalFiles = resourcesData.filter(r => r.type !== 'FOLDER').length;
+        const totalFolders = resourcesData.filter(r => r.type === 'FOLDER').length;
+        const totalAssignments = assignmentsData.length;
+
+        // Doughnut Chart
+        const ctxDoughnut = document.getElementById('teacherDoughnutChart');
+        if (ctxDoughnut) {
+            new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Files', 'Folders', 'Assignments'],
+                    datasets: [{
+                        data: [totalFiles, totalFolders, totalAssignments],
+                        backgroundColor: ['#0ea5e9', '#6366f1', '#f59e0b'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Bar Chart
+        const ctxBar = document.getElementById('teacherBarChart');
+        if (ctxBar) {
+            new Chart(ctxBar, {
                 type: 'bar',
                 data: {
-                    labels: ['Resources (Files)', 'Assignments'],
+                    labels: ['Files', 'Folders', 'Assignments'],
                     datasets: [{
                         label: 'Count',
-                        data: [totalFiles, totalAssignments],
-                        backgroundColor: ['#0ea5e9', '#f59e0b'],
+                        data: [totalFiles, totalFolders, totalAssignments],
+                        backgroundColor: ['#0ea5e9', '#6366f1', '#f59e0b'],
                         borderRadius: 4
                     }]
                 },
@@ -357,8 +399,8 @@
                         legend: { display: false }
                     },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-                        x: { grid: { display: false } }
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 1, font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 9 } } }
                     }
                 }
             });

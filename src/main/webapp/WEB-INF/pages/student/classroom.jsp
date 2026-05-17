@@ -62,23 +62,24 @@
                         </div>
 
                         <div class="tab-pane fade" id="assign-content" role="tabpanel" aria-labelledby="assign-tab">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="fw-semibold">Open Assignments</div>
+                            
+                            <!-- Search and Filter Toolbar -->
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                                <h5 class="fw-bold m-0">All Assignments</h5>
+                                <div class="d-flex gap-2">
+                                    <input type="text" id="assignSearch" class="form-control form-control-sm" placeholder="Search..." oninput="filterAssignments()">
+                                    <select id="assignFilter" class="form-select form-select-sm" onchange="filterAssignments()">
+                                        <option value="ALL">All</option>
+                                        <option value="UNSUBMITTED">Unsubmitted</option>
+                                        <option value="SUBMITTED">Submitted</option>
+                                        <option value="GRADED">Graded</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <!-- Example assignment row -->
-                            <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek">
-                                <div class="p-4 d-flex justify-content-between align-items-start gap-3">
-                                    <div>
-                                        <h6 class="fw-bold mb-2">2nd Milestone</h6>
-                                        <div class="small text-on-surface-variant">Open: May 3, 2026 · Due: May 10, 2026</div>
-                                        <p class="mt-2 text-on-surface-variant">Description: Implement core algorithms and submit source files.</p>
-                                    </div>
-                                    <div class="text-end d-flex flex-column align-items-end gap-2">
-                                        <button class="btn btn-primary-edu btn-sm" data-assignment-slug="assignment_sample_2ndMilestone" data-bs-toggle="modal" data-bs-target="#studentSubmitModal">Submit Assignment</button>
-                                        <a href="#" class="btn btn-sm btn-link">View Details</a>
-                                    </div>
-                                </div>
+                            <!-- Dynamic assignments will be loaded here -->
+                            <div id="assignments-list-container">
+                                <p class="text-on-surface-variant"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading assignments...</p>
                             </div>
                         </div>
 
@@ -181,32 +182,24 @@
         }
 
         function renderAssignments() {
-            const container = document.getElementById('assign-content');
+            const container = document.getElementById('assignments-list-container');
             if (!container) return;
 
-            const searchQuery = (document.getElementById('assignSearch') ? document.getElementById('assignSearch').value.toLowerCase() : '');
+            const searchQuery = (document.getElementById('assignSearch') ? document.getElementById('assignSearch').value.toLowerCase().trim() : '');
             const filterValue = (document.getElementById('assignFilter') ? document.getElementById('assignFilter').value : 'ALL');
 
-            let html = `
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                <h5 class="fw-bold m-0">All Assignments</h5>
-                <div class="d-flex gap-2">
-                    <input type="text" id="assignSearch" class="form-control form-control-sm" placeholder="Search..." value="\${searchQuery}" onkeyup="renderAssignments()">
-                    <select id="assignFilter" class="form-select form-select-sm" onchange="renderAssignments()">
-                        <option value="ALL" \${filterValue === 'ALL' ? 'selected' : ''}>All</option>
-                        <option value="UNSUBMITTED" \${filterValue === 'UNSUBMITTED' ? 'selected' : ''}>Unsubmitted</option>
-                        <option value="SUBMITTED" \${filterValue === 'SUBMITTED' ? 'selected' : ''}>Submitted</option>
-                        <option value="GRADED" \${filterValue === 'GRADED' ? 'selected' : ''}>Graded</option>
-                    </select>
-                </div>
-            </div>`;
+            let html = '';
             
             let filtered = allAssignments.filter(a => {
-                const matchSearch = a.title.toLowerCase().includes(searchQuery);
+                const title = (a.title || '').toLowerCase();
+                const desc = (a.desc || '').toLowerCase();
+                const matchSearch = !searchQuery || title.includes(searchQuery) || desc.includes(searchQuery);
+                
                 let matchFilter = true;
                 if (filterValue === 'UNSUBMITTED') matchFilter = (a.status === 'UNSUBMITTED');
                 else if (filterValue === 'SUBMITTED') matchFilter = (a.status !== 'UNSUBMITTED');
                 else if (filterValue === 'GRADED') matchFilter = (a.status === 'GRADED');
+                
                 return matchSearch && matchFilter;
             });
 
@@ -237,6 +230,10 @@
             }
             container.innerHTML = html;
         }
+
+        window.filterAssignments = function() {
+            renderAssignments();
+        };
 
         async function loadResources() {
             try {

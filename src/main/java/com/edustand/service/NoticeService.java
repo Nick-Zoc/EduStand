@@ -202,16 +202,33 @@ public class NoticeService {
         String editorName = rs.getString("editor_name");
         Timestamp updatedAt = null;
         try { updatedAt = rs.getTimestamp("updated_at"); } catch (Exception ignored) {}
+        Timestamp createdAt = null;
+        try { createdAt = rs.getTimestamp("created_at"); } catch (Exception ignored) {}
+        String startDate = rs.getString("start_date");
+        String endDate = rs.getString("end_date");
+
+        String createdStr = "";
+        if (createdAt != null) {
+            String s = createdAt.toString();
+            createdStr = s.length() >= 19 ? s.substring(0, 19) : s;
+        }
+
+        String updatedStr = "";
+        if (updatedAt != null) {
+            String s = updatedAt.toString();
+            updatedStr = s.length() >= 19 ? s.substring(0, 19) : s;
+        }
+
         return "{"
                 + "\"id\":" + rs.getInt("notice_id") + ","
                 + "\"title\":\"" + escapeJson(rs.getString("title")) + "\","
                 + "\"body\":\"" + escapeJson(rs.getString("body")) + "\","
                 + "\"author\":\"" + escapeJson(rs.getString("author_name")) + "\","
                 + "\"authorId\":" + rs.getInt("author_id") + ","
-                + "\"startDate\":\"" + rs.getString("start_date") + "\","
-                + "\"endDate\":\"" + rs.getString("end_date") + "\","
-                + "\"createdAt\":\"" + rs.getString("created_at") + "\","
-                + "\"updatedAt\":\"" + (updatedAt != null ? updatedAt.toString().substring(0,19) : "") + "\","
+                + "\"startDate\":\"" + (startDate != null ? startDate : "") + "\","
+                + "\"endDate\":\"" + (endDate != null ? endDate : "") + "\","
+                + "\"createdAt\":\"" + createdStr + "\","
+                + "\"updatedAt\":\"" + updatedStr + "\","
                 + "\"lastEditedBy\":\"" + escapeJson(editorName != null ? editorName : "") + "\","
                 + "\"attachmentPath\":\"" + (attachPath != null ? escapeJson(attachPath) : "") + "\","
                 + "\"attachmentName\":\"" + (attachName != null ? escapeJson(attachName) : "") + "\""

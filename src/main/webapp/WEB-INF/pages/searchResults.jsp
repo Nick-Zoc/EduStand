@@ -12,9 +12,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
-<body class="dashboard-body">
+<body class="dashboard-shell bg-surface text-on-surface">
 
-<div class="d-flex w-100 h-100">
     <!-- Sidebar -->
     <c:choose>
         <c:when test="${userRole == 'ADMIN'}">
@@ -29,11 +28,11 @@
     </c:choose>
 
     <!-- Main Content -->
-    <div class="main-content flex-grow-1 d-flex flex-column" style="min-width: 0;">
+    <main class="app-main d-flex flex-column min-vh-100">
         <c:set var="searchPlaceholder" value="Search again..." scope="request" />
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
 
-        <div class="p-4 p-lg-5 w-100" style="max-width: 1400px; margin: 0 auto;">
+        <div class="px-3 px-md-4 py-4 w-100 users-flat-shell flex-grow-1 d-flex flex-column" style="max-width: 1400px; margin: 0 auto;">
             
             <div class="mb-4">
                 <h1 class="h3 brand-headline fw-bold text-on-surface mb-2">Search Results</h1>
@@ -77,8 +76,7 @@
 
         </div>
         <jsp:include page="/WEB-INF/components/footer.jsp" />
-    </div>
-</div>
+    </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

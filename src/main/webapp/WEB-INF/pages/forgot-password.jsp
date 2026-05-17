@@ -12,6 +12,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Local design tokens & universal styles -->
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/style.css'/>">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         .max-w-5xl { max-width: 1024px; }
         .min-vh-60 { min-height: 60vh; }
@@ -34,7 +36,7 @@
                         </div>
                         <span class="brand-headline fs-5 fw-bold text-primary">EduStand</span>
                     </div>
-                    <h1 class="brand-headline fs-4 fw-bold text-on-surface mb-1">Reset your password</h1>
+                    <h1 class="brand-headline fs-4 fw-bold text-on-surface mb-1" id="phaseTitle">Reset your password</h1>
                     <p id="subtext" class="text-on-surface-variant small mb-0">Enter your university email to receive a verification code.</p>
                 </div>
 
@@ -49,7 +51,10 @@
                             </div>
                         </div>
 
-                        <button type="button" id="nextBtn" class="btn btn-primary btn-primary-edu w-100 py-2 mt-2 fw-semibold">Continue</button>
+                        <button type="button" id="nextBtn" class="btn btn-primary btn-primary-edu w-100 py-2 mt-2 fw-semibold">
+                            <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
+                            Continue
+                        </button>
 
                         <div class="text-center mt-1">
                             <a href="<c:url value='/login'/>" class="small fw-semibold text-primary-link forgot-link-inline"><i class="fa-solid fa-arrow-left me-1"></i>Back to Login</a>
@@ -71,13 +76,42 @@
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-primary-edu w-100 py-2 fw-semibold">Verify Code</button>
+                    <button type="button" id="verifyOtpBtn" class="btn btn-primary btn-primary-edu w-100 py-2 fw-semibold">
+                        <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
+                        Verify Code
+                    </button>
 
                     <div class="text-center mt-3">
                         <span class="small text-on-surface-variant">Didn't receive code?</span>
-                        <a href="#" class="small fw-semibold text-primary-link ms-1">Resend</a>
+                        <a href="javascript:void(0)" id="resendOtpLink" class="small fw-semibold text-primary-link ms-1">Resend</a>
                         <br>
                         <a href="javascript:void(0)" id="backToEmailLink" class="small fw-semibold text-primary-link mt-2 d-inline-block forgot-link-inline">Change Email</a>
+                    </div>
+                </div>
+
+                <!-- New Password Phase (Hidden initially) -->
+                <div id="passwordPhase" class="d-none">
+                    <div class="vstack gap-3">
+                        <div class="input-group input-group-float">
+                            <span class="input-group-text input-icon-addon"><i class="fa-solid fa-lock"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="password" id="newPassword" class="form-control input-with-addon" placeholder="New Password" required>
+                                <label for="newPassword">New Password</label>
+                            </div>
+                        </div>
+
+                        <div class="input-group input-group-float">
+                            <span class="input-group-text input-icon-addon"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="password" id="confirmPassword" class="form-control input-with-addon" placeholder="Confirm Password" required>
+                                <label for="confirmPassword">Confirm Password</label>
+                            </div>
+                        </div>
+
+                        <button type="button" id="resetPasswordBtn" class="btn btn-primary btn-primary-edu w-100 py-2 mt-2 fw-semibold">
+                            <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
+                            Reset Password
+                        </button>
                     </div>
                 </div>
 
@@ -140,44 +174,205 @@
 
     <!-- Bootstrap bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- JS Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const emailPhase = document.getElementById('emailPhase');
             const otpPhase = document.getElementById('otpPhase');
+            const passwordPhase = document.getElementById('passwordPhase');
             const nextBtn = document.getElementById('nextBtn');
+            const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+            const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+            const resendOtpLink = document.getElementById('resendOtpLink');
             const backToEmailLink = document.getElementById('backToEmailLink');
             const subtext = document.getElementById('subtext');
+            const phaseTitle = document.getElementById('phaseTitle');
             const emailInput = document.getElementById('recoveryEmail');
 
-            // Handle transition to OTP phase
-            nextBtn.addEventListener('click', function() {
-                // Not adding js validation, just assuming it proceeds
-                emailPhase.classList.add('d-none');
-                otpPhase.classList.remove('d-none');
-                subtext.innerHTML = 'We sent a verification code to <strong>' + (emailInput.value || 'your email') + '</strong>';
+            const CTX = '${pageContext.request.contextPath}';
+
+            function toggleLoading(btn, isLoading) {
+                btn.disabled = isLoading;
+                const spinner = btn.querySelector('.spinner-border');
+                if (spinner) {
+                    if (isLoading) spinner.classList.remove('d-none');
+                    else spinner.classList.add('d-none');
+                }
+            }
+
+            function showToast(msg, type = 'error') {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    icon: type,
+                    title: msg
+                });
+            }
+
+            // Phase 1: Request OTP
+            async function requestOtp() {
+                const email = emailInput.value.trim();
+                if (!email) {
+                    showToast('Please enter your email ID', 'warning');
+                    return;
+                }
+
+                toggleLoading(nextBtn, true);
+
+                try {
+                    const response = await fetch(CTX + '/forgot-password?action=send_otp&email=' + encodeURIComponent(email), {
+                        method: 'POST'
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        emailPhase.classList.add('d-none');
+                        otpPhase.classList.remove('d-none');
+                        phaseTitle.textContent = 'Verify Verification Code';
+                        subtext.innerHTML = 'We sent a verification code to <strong>' + email + '</strong>. (Fallback: check the Tomcat standard log console!)';
+                        
+                        // Focus first OTP digit input
+                        setTimeout(() => {
+                            document.querySelector('.otp-digit').focus();
+                        }, 200);
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error occurred. Please try again.', 'error');
+                    console.error(error);
+                } finally {
+                    toggleLoading(nextBtn, false);
+                }
+            }
+
+            nextBtn.addEventListener('click', requestOtp);
+
+            // Phase 2: Verify OTP
+            async function verifyOtp() {
+                const digits = Array.from(document.querySelectorAll('.otp-digit')).map(i => i.value.trim());
+                const otp = digits.join('');
+
+                if (otp.length !== 6) {
+                    showToast('Please enter all 6 digits of the code', 'warning');
+                    return;
+                }
+
+                toggleLoading(verifyOtpBtn, true);
+
+                try {
+                    const response = await fetch(CTX + '/forgot-password?action=verify_otp&otp=' + encodeURIComponent(otp), {
+                        method: 'POST'
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        otpPhase.classList.add('d-none');
+                        passwordPhase.classList.remove('d-none');
+                        phaseTitle.textContent = 'Set New Password';
+                        subtext.textContent = 'Enter your new secure password of at least 6 characters.';
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error occurred. Please try again.', 'error');
+                } finally {
+                    toggleLoading(verifyOtpBtn, false);
+                }
+            }
+
+            verifyOtpBtn.addEventListener('click', verifyOtp);
+
+            // Phase 3: Reset Password
+            async function resetPassword() {
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (!newPassword || newPassword.length < 6) {
+                    showToast('Password must be at least 6 characters long', 'warning');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    showToast('Passwords do not match', 'warning');
+                    return;
+                }
+
+                toggleLoading(resetPasswordBtn, true);
+
+                try {
+                    const response = await fetch(CTX + '/forgot-password?action=reset_password&password=' + encodeURIComponent(newPassword), {
+                        method: 'POST'
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: result.message,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: true,
+                            confirmButtonText: 'Log In Now'
+                        }).then(() => {
+                            window.location.href = CTX + '/login';
+                        });
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error occurred. Please try again.', 'error');
+                } finally {
+                    toggleLoading(resetPasswordBtn, false);
+                }
+            }
+
+            resetPasswordBtn.addEventListener('click', resetPassword);
+
+            // Resend Link Action
+            resendOtpLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                requestOtp();
             });
 
             // Handle transition back to Email phase
             backToEmailLink.addEventListener('click', function() {
                 otpPhase.classList.add('d-none');
                 emailPhase.classList.remove('d-none');
-                subtext.innerText = 'Enter your email address to receive a verification code.';
+                phaseTitle.textContent = 'Reset your password';
+                subtext.innerText = 'Enter your university email to receive a verification code.';
             });
 
-            // Handle OTP input auto-advance
+            // Handle OTP input auto-advance and backspace handling
             const otpInputs = document.querySelectorAll('.otp-digit');
             otpInputs.forEach((input, index) => {
-                input.addEventListener('keyup', (e) => {
-                    if (e.key >= 0 && e.key <= 9 && input.value.length === 1) {
-                        if (index < otpInputs.length - 1) {
-                            otpInputs[index + 1].focus();
-                        }
-                    } else if (e.key === 'Backspace' && input.value.length === 0) {
-                        if (index > 0) {
-                            otpInputs[index - 1].focus();
-                        }
+                input.addEventListener('input', (e) => {
+                    const val = input.value.replace(/[^0-9]/g, '');
+                    input.value = val;
+                    if (val.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && input.value.length === 0 && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+
+                // Trigger verify on press Enter on last input digit
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && index === otpInputs.length - 1) {
+                        verifyOtp();
                     }
                 });
             });

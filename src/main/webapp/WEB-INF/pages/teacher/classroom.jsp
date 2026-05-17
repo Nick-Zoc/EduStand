@@ -163,136 +163,17 @@
                         <!-- Search and Create -->
                         <div class="d-flex gap-3 mb-4 flex-column flex-md-row">
                             <div class="flex-grow-1">
-                                <input type="text" class="form-control input-ghost rounded-3" placeholder="Search assignments..." style="min-height: 44px;">
+                                <input type="text" id="assignSearchInput" class="form-control input-ghost rounded-3" placeholder="Search assignments..." style="min-height: 44px;" oninput="filterAssignments()">
                             </div>
                             <button class="btn btn-primary-edu px-4 py-2 rounded-3 fw-semibold" type="button" data-bs-toggle="modal" data-bs-target="#createAssignmentModal">
                                 <i class="fa-solid fa-plus me-2"></i>Create Assignment
                             </button>
                         </div>
 
-                        <!-- Open Assignments -->
-                        <div class="mb-4">
-                            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-clock text-warning"></i>
-                                Open Assignments <span class="badge bg-warning text-warning-emphasis">(1)</span>
-                            </h5>
-                            <div class="bg-white rounded-3 border border-outline-variant overflow-hidden">
-                                <div class="p-4 border-bottom border-outline-variant d-flex justify-content-between align-items-start gap-3 card-sleek" style="cursor: pointer; transition: all 0.3s ease;" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">
-                                    <div class="flex-grow-1">
-                                        <h6 class="fw-bold mb-2">2nd Milestone</h6>
-                                        <div class="d-flex gap-4 flex-wrap small text-on-surface-variant">
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Open: <strong>May 3, 2026, 10:54 AM NPT</strong></span>
-                                            </div>
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Due: <strong>May 4, 2026, 6:00 PM NPT</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3 d-flex gap-2">
-                                            <span class="edu-badge" style="background: #fef3c7; color: #92400e; border-color: #fcd34d; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em; font-size: 10px;">PENDING</span>
-                                            <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;">1 Submission</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="#" class="btn btn-sm btn-link text-primary p-0 mb-2" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</a>
-                                        <br>
-                                        <a href="#" class="btn btn-sm btn-link text-on-surface-variant p-0">Edit</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Closed Assignments -->
-                        <div>
-                            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-check-circle text-success"></i>
-                                Closed Assignments <span class="badge bg-success text-success-emphasis">(3)</span>
-                            </h5>
-                            
-                            <!-- Assignment 1 -->
-                            <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek" style="cursor: pointer; transition: all 0.3s ease;" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">
-                                <div class="p-4 border-bottom border-outline-variant d-flex justify-content-between align-items-start gap-3">
-                                    <div class="flex-grow-1">
-                                        <h6 class="fw-bold mb-2">First Milestone DSA Coursework</h6>
-                                        <div class="d-flex gap-4 flex-wrap small text-on-surface-variant">
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Open: <strong>Apr 16, 2026, 11:08 AM NPT</strong></span>
-                                            </div>
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Due: <strong>Apr 17, 2026, 6:00 PM NPT</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3 d-flex gap-2">
-                                            <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;">SUBMITTED</span>
-                                            <span class="edu-badge edu-badge-role-student" style="font-size: 10px;">5/5 Graded</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="#" class="btn btn-sm btn-link text-primary p-0 mb-2" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</a>
-                                        <br>
-                                        <a href="#" class="btn btn-sm btn-link text-on-surface-variant p-0">Edit</a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Assignment 2 -->
-                            <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek" style="cursor: pointer; transition: all 0.3s ease;" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">
-                                <div class="p-4 border-bottom border-outline-variant d-flex justify-content-between align-items-start gap-3">
-                                    <div class="flex-grow-1">
-                                        <h6 class="fw-bold mb-2">Final CourseWork 1 Submission</h6>
-                                        <div class="d-flex gap-4 flex-wrap small text-on-surface-variant">
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Open: <strong>Jan 11, 2026, 3:30 PM NPT</strong></span>
-                                            </div>
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Due: <strong>Jan 16, 2026, 6:00 PM NPT</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3 d-flex gap-2">
-                                            <span class="edu-badge edu-badge-status edu-badge-status-active" style="font-size: 10px;">SUBMITTED</span>
-                                            <span class="edu-badge edu-badge-role-teacher" style="font-size: 10px;">3/5 Graded</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="#" class="btn btn-sm btn-link text-primary p-0 mb-2" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</a>
-                                        <br>
-                                        <a href="#" class="btn btn-sm btn-link text-on-surface-variant p-0">Edit</a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Assignment 3 -->
-                            <div class="bg-white rounded-3 border border-outline-variant overflow-hidden card-sleek" style="cursor: pointer; transition: all 0.3s ease;" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">
-                                <div class="p-4 border-bottom border-outline-variant d-flex justify-content-between align-items-start gap-3">
-                                    <div class="flex-grow-1">
-                                        <h6 class="fw-bold mb-2">Assignment Topic Research</h6>
-                                        <div class="d-flex gap-4 flex-wrap small text-on-surface-variant">
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Open: <strong>Feb 15, 2026, 9:00 AM NPT</strong></span>
-                                            </div>
-                                            <div>
-                                                <i class="fa-regular fa-calendar me-2"></i>
-                                                <span>Due: <strong>Feb 22, 2026, 6:00 PM NPT</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3 d-flex gap-2">
-                                            <span class="edu-badge" style="background: #f3f4f6; color: #6b7280; border-color: #d1d5db; border: 1px solid; border-radius: 999px; padding: 0.32rem 0.72rem; font-weight: 700; letter-spacing: 0.04em; font-size: 10px;">NO SUBMISSIONS</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="#" class="btn btn-sm btn-link text-primary p-0 mb-2" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</a>
-                                        <br>
-                                        <a href="#" class="btn btn-sm btn-link text-on-surface-variant p-0">Edit</a>
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Dynamic assignments will be loaded here -->
+                        <div id="assignments-list-container">
+                            <h5 class="fw-bold mb-3">All Assignments</h5>
+                            <p class="text-on-surface-variant"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading assignments...</p>
                         </div>
                     </div>
 
@@ -651,6 +532,7 @@
             });
         });
         let allResources = [];
+        let allAssignments = [];
         
         let currentSubmissions = [];
 
@@ -750,50 +632,52 @@
                     showToast(result.message || 'Failed to save grade.', 'error');
                 }
             } catch (err) { console.error("Grade error", err); showToast('Error saving grade.', 'error'); }
-        };
-
         async function loadAssignments() {
             try {
                 const resp = await fetch('${pageContext.request.contextPath}/classroom/data/assignments');
                 const result = await resp.json();
-                
-                const container = document.getElementById('assignments-content');
-                if (!container) return;
-                
-                let html = '<h5 class="fw-bold mb-3">All Assignments</h5>';
-                
-                if (result.data && result.data.length > 0) {
-                    result.data.forEach(a => {
-                        html += `
-                        <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek p-4 d-flex justify-content-between align-items-start gap-3">
-                            <div>
-                                <h6 class="fw-bold mb-2">\${a.title}</h6>
-                                <div class="small text-on-surface-variant">Due: \${a.due}</div>
-                                <div class="small text-on-surface-variant mt-1">\${a.desc || ''}</div>
-                            </div>
-                            <div class="text-end">
-                                <button class="btn btn-primary-edu btn-sm" onclick="this.setAttribute('data-active-assignment-id','\${a.id}'); document.querySelectorAll('[data-active-assignment-id]').forEach(el => { if(el !== this) el.removeAttribute('data-active-assignment-id'); }); viewSubmissions('\${a.id}');" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</button>
-                            </div>
-                        </div>`;
-                    });
-                } else {
-                    html += '<p class="text-on-surface-variant">No assignments posted yet.</p>';
-                }
-                
-                // Keep the search and create button at the top
-                const topHtml = `
-                    <div class="d-flex gap-3 mb-4 flex-column flex-md-row">
-                        <div class="flex-grow-1">
-                            <input type="text" class="form-control input-ghost rounded-3" placeholder="Search assignments..." style="min-height: 44px;">
-                        </div>
-                        <button class="btn btn-primary-edu px-4 py-2 rounded-3 fw-semibold" type="button" data-bs-toggle="modal" data-bs-target="#createAssignmentModal">
-                            <i class="fa-solid fa-plus me-2"></i>Create Assignment
-                        </button>
-                    </div>`;
-
-                container.innerHTML = topHtml + html;
+                allAssignments = result.data || [];
+                renderAssignmentsList();
             } catch (err) { console.error("Error loading assignments", err); }
         }
+
+        window.renderAssignmentsList = function() {
+            const listContainer = document.getElementById('assignments-list-container');
+            if (!listContainer) return;
+            
+            const q = document.getElementById('assignSearchInput') ? document.getElementById('assignSearchInput').value.toLowerCase().trim() : '';
+            
+            let html = '<h5 class="fw-bold mb-3">All Assignments</h5>';
+            
+            const filtered = allAssignments.filter(a => {
+                const title = (a.title || '').toLowerCase();
+                const desc = (a.desc || '').toLowerCase();
+                return !q || title.includes(q) || desc.includes(q);
+            });
+            
+            if (filtered.length > 0) {
+                filtered.forEach(a => {
+                    html += `
+                    <div class="bg-white rounded-3 border border-outline-variant overflow-hidden mb-3 card-sleek p-4 d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <h6 class="fw-bold mb-2">\${a.title}</h6>
+                            <div class="small text-on-surface-variant">Due: \${a.due}</div>
+                            <div class="small text-on-surface-variant mt-1">\${a.desc || ''}</div>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-primary-edu btn-sm" onclick="this.setAttribute('data-active-assignment-id','\${a.id}'); document.querySelectorAll('[data-active-assignment-id]').forEach(el => { if(el !== this) el.removeAttribute('data-active-assignment-id'); }); viewSubmissions('\${a.id}');" data-bs-toggle="modal" data-bs-target="#viewSubmissionsModal">View Submissions</button>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html += '<p class="text-on-surface-variant">No assignments found matching search criteria.</p>';
+            }
+            listContainer.innerHTML = html;
+        };
+
+        window.filterAssignments = function() {
+            renderAssignmentsList();
+        };
 
         async function loadResources() {
             try {

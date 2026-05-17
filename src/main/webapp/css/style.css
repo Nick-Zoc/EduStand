@@ -899,9 +899,11 @@ body.sidebar-collapsed .sidebar-nav-link .sidebar-icon {
 
 @media (max-width: 768px) {
     .app-sidebar {
+        display: flex !important;
         transform: translateX(-100%);
         position: fixed;
         width: 256px;
+        z-index: 1050;
     }
 
     .app-sidebar.show {

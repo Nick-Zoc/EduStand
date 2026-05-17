@@ -38,7 +38,7 @@
                     <p class="text-on-surface-variant small mb-0">Please enter your university email and password to continue.</p>
                 </div>
 				<c:if test="${not empty error}">
-				    <div class="alert alert-danger text-center py-2" role="alert">
+				    <div class="alert alert-danger text-center py-2" id="lockoutAlert" data-timestamp="${lockoutUntilTimestamp}" role="alert">
 				        ${error}
 				    </div>
 				</c:if>
@@ -133,5 +133,51 @@
 
     <!-- Bootstrap bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function() {
+        const alertEl = document.getElementById('lockoutAlert');
+        if (!alertEl) return;
+        const tsAttr = alertEl.getAttribute('data-timestamp');
+        if (!tsAttr || tsAttr === '') return;
+        
+        const targetTime = parseInt(tsAttr, 10);
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.querySelector('button[type="submit"]');
+
+        // Disable inputs during lockout
+        if (emailInput) emailInput.disabled = true;
+        if (passwordInput) passwordInput.disabled = true;
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('disabled');
+        }
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = targetTime - now;
+            
+            if (diff <= 0) {
+                alertEl.className = 'alert alert-success text-center py-2';
+                alertEl.innerHTML = '<i class="fa-solid fa-circle-check me-2"></i>Lockout period has expired. You can now try logging in!';
+                if (emailInput) emailInput.disabled = false;
+                if (passwordInput) passwordInput.disabled = false;
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('disabled');
+                }
+                clearInterval(interval);
+                return;
+            }
+            
+            const mins = Math.floor(diff / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+            alertEl.innerHTML = `<i class="fa-solid fa-hourglass-half fa-spin me-2"></i>Your account is temporarily locked. Try again in <strong>\${mins}m \${secs}s</strong>.`;
+        }
+        
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+    })();
+    </script>
 </body>
 </html>

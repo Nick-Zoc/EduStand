@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS Users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by INT NULL,
+    failed_login_attempts INT NOT NULL DEFAULT 0,
+    locked_until TIMESTAMP NULL,
     FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE SET NULL
 );
 
@@ -129,3 +131,14 @@ CREATE TABLE IF NOT EXISTS Notices (
 
 -- Ensure Submissions score column exists (already in schema; safe to run if missing)
 ALTER TABLE Submissions MODIFY COLUMN score DECIMAL(5,2) DEFAULT NULL;
+
+-- 9. Password Reset OTPs Table
+CREATE TABLE IF NOT EXISTS PasswordResetOTPs (
+    otp_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);

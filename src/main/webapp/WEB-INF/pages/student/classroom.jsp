@@ -283,6 +283,45 @@
             }
             html += `</div><div id="fileTableContainer"></div>`;
             container.innerHTML = html;
+
+            // Render root level files below the folders grid for students
+            const rootFiles = allResources.filter(r => r.type === 'FILE' && (r.folder === 'ROOT' || !r.folder || r.folder === ''));
+            const fileTableContainer = document.getElementById('fileTableContainer');
+            if (fileTableContainer && rootFiles.length > 0) {
+                let filesHtml = `
+                <div class="mt-5 mb-4 pb-2 border-bottom border-outline-variant">
+                    <h5 class="fw-bold text-on-surface"><i class="fa-regular fa-file-lines me-2 text-primary"></i>Files in Root Directory</h5>
+                </div>
+                <div class="table-responsive bg-white rounded-3 border border-outline-variant overflow-hidden shadow-sm">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-surface-container-high">
+                            <tr>
+                                <th class="px-4 py-3 fw-bold small text-on-surface-variant">Resource Name</th>
+                                <th class="px-4 py-3 fw-bold small text-on-surface-variant text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                rootFiles.forEach(f => {
+                    filesHtml += `
+                    <tr>
+                        <td class="px-4 py-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-regular fa-file text-primary"></i>
+                                <span class="fw-semibold text-on-surface">\${f.title}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-end">
+                            <a href="${pageContext.request.contextPath}/\${f.path}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="fa-solid fa-download me-1"></i>Download
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+                
+                filesHtml += `</tbody></table></div>`;
+                fileTableContainer.innerHTML = filesHtml;
+            }
         }
 
         // Must be global so the onclick attribute can find it

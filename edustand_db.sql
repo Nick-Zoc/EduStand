@@ -1,4 +1,3 @@
--- 1. Users Table (Core for Milestone 1)
 CREATE TABLE IF NOT EXISTS Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -18,7 +17,6 @@ CREATE TABLE IF NOT EXISTS Users (
     FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE SET NULL
 );
 
--- 2. Resources Table
 CREATE TABLE IF NOT EXISTS Resources (
     resource_id INT AUTO_INCREMENT PRIMARY KEY,
     uploader_id INT NOT NULL,
@@ -31,7 +29,6 @@ CREATE TABLE IF NOT EXISTS Resources (
     FOREIGN KEY (uploader_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- 3. Assignments Table
 CREATE TABLE IF NOT EXISTS Assignments (
     assignment_id INT AUTO_INCREMENT PRIMARY KEY,
     teacher_id INT NOT NULL,
@@ -42,7 +39,6 @@ CREATE TABLE IF NOT EXISTS Assignments (
     FOREIGN KEY (teacher_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- 4. Submissions Table
 CREATE TABLE IF NOT EXISTS Submissions (
     submission_id INT AUTO_INCREMENT PRIMARY KEY,
     assignment_id INT NOT NULL,
@@ -55,7 +51,6 @@ CREATE TABLE IF NOT EXISTS Submissions (
     FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- 5. Resource Downloads (For Analytics)
 CREATE TABLE IF NOT EXISTS Resource_Downloads (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     resource_id INT NOT NULL,
@@ -65,7 +60,6 @@ CREATE TABLE IF NOT EXISTS Resource_Downloads (
     FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
--- Insert a default admin for testing (Password is: admin123)
 INSERT INTO Users (full_name, email, password_hash, role) 
 VALUES ('System Admin', 'admin@edustand.edu', 'admin123', 'ADMIN');
 
@@ -97,7 +91,6 @@ CREATE TABLE IF NOT EXISTS ContactRequests (
     INDEX idx_contact_status (read_status, request_status)
 );
 
--- 7. Activity Logs Table
 CREATE TABLE IF NOT EXISTS ActivityLogs (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -110,7 +103,6 @@ CREATE TABLE IF NOT EXISTS ActivityLogs (
     INDEX idx_user_created (user_id, created_at)
 );
 
--- 8. Notices / Announcements Table
 CREATE TABLE IF NOT EXISTS Notices (
     notice_id INT AUTO_INCREMENT PRIMARY KEY,
     author_id INT NOT NULL,
@@ -129,10 +121,8 @@ CREATE TABLE IF NOT EXISTS Notices (
     INDEX idx_notice_author (author_id)
 );
 
--- Ensure Submissions score column exists (already in schema; safe to run if missing)
 ALTER TABLE Submissions MODIFY COLUMN score DECIMAL(5,2) DEFAULT NULL;
 
--- 9. Password Reset OTPs Table
 CREATE TABLE IF NOT EXISTS PasswordResetOTPs (
     otp_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,

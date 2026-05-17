@@ -151,6 +151,9 @@ public class ClassroomController extends HttpServlet {
         try {
             int userId = loggedInUser.getUserId();
             String assetsDir = req.getServletContext().getRealPath("/assets/resources/teacher_" + userId);
+            if (assetsDir == null) {
+                assetsDir = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/resources/teacher_" + userId;
+            }
             Path folderPath = Paths.get(assetsDir, folderName);
             if (!Files.exists(folderPath)) {
                 Files.createDirectories(folderPath);
@@ -196,6 +199,9 @@ public class ClassroomController extends HttpServlet {
             // Save file to assets/resources/teacher_{id}/{folderName?}
             int userId = loggedInUser.getUserId();
             String baseAssets = req.getServletContext().getRealPath("/assets/resources/teacher_" + userId);
+            if (baseAssets == null) {
+                baseAssets = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/resources/teacher_" + userId;
+            }
             Path fileDir = folderName.isEmpty() ? Paths.get(baseAssets) : Paths.get(baseAssets, folderName);
             if (!Files.exists(fileDir)) {
                 Files.createDirectories(fileDir);
@@ -283,6 +289,9 @@ public class ClassroomController extends HttpServlet {
         try {
             int studentId = loggedInUser.getUserId();
             String assignmentsRoot = req.getServletContext().getRealPath("/assets/assignments");
+            if (assignmentsRoot == null) {
+                assignmentsRoot = "/Users/nick/Dev/College/Year 2/Semester 4/CS5005 Data Structures and Specialist Programming/Coursework/code/src/main/webapp/assets/assignments";
+            }
             Path submissionDir = Paths.get(assignmentsRoot, "assignment_" + assignmentId, "submissions", "student_" + studentId);
             if (!Files.exists(submissionDir)) {
                 Files.createDirectories(submissionDir);

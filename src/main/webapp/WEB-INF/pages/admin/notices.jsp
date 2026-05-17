@@ -166,7 +166,7 @@
         const el = document.createElement('div');
         el.className = 'position-fixed bottom-0 end-0 p-3';
         el.style.zIndex = 9999;
-        el.innerHTML = `<div class="toast align-items-center text-white ${cls} border-0 show"><div class="d-flex"><div class="toast-body fw-semibold">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.position-fixed').remove()"></button></div></div>`;
+        el.innerHTML = `<div class="toast align-items-center text-white \${cls} border-0 show"><div class="d-flex"><div class="toast-body fw-semibold">\${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.position-fixed').remove()"></button></div></div>`;
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
@@ -208,23 +208,23 @@
             const createdDate = n.createdAt ? n.createdAt.substring(0,10) : '—';
             return `<tr>
                 <td class="px-3 py-3">
-                    <div class="fw-semibold text-on-surface" style="max-width:260px;" title="${escHtml(n.title)}">${escHtml(n.title.length > 40 ? n.title.substring(0,40) + '…' : n.title)}</div>
-                    <div class="small text-on-surface-variant mt-1">${escHtml(n.body.length > 60 ? n.body.substring(0,60)+'…' : n.body)}</div>
+                    <div class="fw-semibold text-on-surface" style="max-width:260px;" title="\${escHtml(n.title)}">\${escHtml(n.title.length > 40 ? n.title.substring(0,40) + '…' : n.title)}</div>
+                    <div class="small text-on-surface-variant mt-1">\${escHtml(n.body.length > 60 ? n.body.substring(0,60)+'…' : n.body)}</div>
                 </td>
-                <td class="px-3 py-3">${statusBadge}</td>
-                <td class="px-3 py-3 small text-on-surface-variant">${n.startDate} → ${n.endDate}</td>
-                <td class="px-3 py-3 small fw-semibold text-on-surface">${escHtml(n.author)}</td>
-                <td class="px-3 py-3 small text-on-surface-variant">${editor}</td>
-                <td class="px-3 py-3 small text-on-surface-variant">${createdDate}</td>
+                <td class="px-3 py-3">\${statusBadge}</td>
+                <td class="px-3 py-3 small text-on-surface-variant">\${n.startDate} → \${n.endDate}</td>
+                <td class="px-3 py-3 small fw-semibold text-on-surface">\${escHtml(n.author)}</td>
+                <td class="px-3 py-3 small text-on-surface-variant">\${editor}</td>
+                <td class="px-3 py-3 small text-on-surface-variant">\${createdDate}</td>
                 <td class="px-3 py-3 text-end">
                     <div class="d-flex gap-1 justify-content-end flex-wrap">
-                        <button class="btn btn-sm btn-outline-secondary px-2" title="View full notice" onclick="viewNotice(${n.id})">
+                        <button class="btn btn-sm btn-outline-secondary px-2" title="View full notice" onclick="viewNotice(\${n.id})">
                             <i class="fa-solid fa-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-primary px-2" title="Edit notice" onclick="openEditModal(${n.id})">
+                        <button class="btn btn-sm btn-outline-primary px-2" title="Edit notice" onclick="openEditModal(\${n.id})">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger px-2" title="Delete notice" onclick="deleteNotice(${n.id}, '${escHtml(n.title)}')">
+                        <button class="btn btn-sm btn-outline-danger px-2" title="Delete notice" onclick="deleteNotice(\${n.id}, '\${escHtml(n.title)}')">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -281,7 +281,7 @@
         document.getElementById('viewNoticeEditor').textContent = n.lastEditedBy || '—';
         const attach = document.getElementById('viewNoticeAttachment');
         if (n.attachmentPath) {
-            attach.innerHTML = `<a href="${CTX}/${n.attachmentPath}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-paperclip me-1"></i>${n.attachmentName || 'View Attachment'}</a>`;
+            attach.innerHTML = `<a href="\${CTX}/\${n.attachmentPath}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-paperclip me-1"></i>\${n.attachmentName || 'View Attachment'}</a>`;
         } else {
             attach.innerHTML = '';
         }
@@ -313,7 +313,7 @@
     async function deleteNotice(id, title) {
         const result = await Swal.fire({
             title: 'Delete Notice?',
-            html: `<span class="text-on-surface">This will permanently delete <strong>${escHtml(title)}</strong>.</span>`,
+            html: `<span class="text-on-surface">This will permanently delete <strong>\${escHtml(title)}</strong>.</span>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete',

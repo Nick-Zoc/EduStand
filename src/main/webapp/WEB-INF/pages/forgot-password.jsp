@@ -236,7 +236,7 @@
                         emailPhase.classList.add('d-none');
                         otpPhase.classList.remove('d-none');
                         phaseTitle.textContent = 'Verify Verification Code';
-                        subtext.innerHTML = 'We sent a verification code to <strong>' + email + '</strong>. (Fallback: check the Tomcat standard log console!)';
+                        subtext.innerHTML = 'We sent a verification code to <strong>' + email + '</strong>.';
                         
                         // Focus first OTP digit input
                         setTimeout(() => {

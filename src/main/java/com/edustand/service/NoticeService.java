@@ -49,6 +49,27 @@ public class NoticeService {
         return false;
     }
 
+    /**
+     * Counts notices by status: ACTIVE, UPCOMING, EXPIRED
+     */
+    public int countNoticesByStatus(String status) {
+        String query;
+        if ("ACTIVE".equalsIgnoreCase(status)) {
+            query = "SELECT COUNT(*) FROM Notices WHERE CURDATE() BETWEEN start_date AND end_date";
+        } else if ("UPCOMING".equalsIgnoreCase(status)) {
+            query = "SELECT COUNT(*) FROM Notices WHERE start_date > CURDATE()";
+        } else {
+            query = "SELECT COUNT(*) FROM Notices WHERE end_date < CURDATE()";
+        }
+
+        try (Connection conn = DbConfig.getDbConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
     /** Deletes a notice by ID. */
     public boolean deleteNotice(int noticeId) {
         String query = "DELETE FROM Notices WHERE notice_id=?";

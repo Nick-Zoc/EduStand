@@ -116,7 +116,7 @@
                 </div>
                 <div class="col-12 col-lg-4">
                     <div class="card-sleek-no-hover p-4 h-100 d-flex flex-column align-items-center justify-content-center">
-                        <div class="small fw-semibold text-uppercase text-on-surface-variant mb-3 w-100 text-center" style="letter-spacing:0.06em;">Assignment Status</div>
+                        <div class="small fw-semibold text-uppercase text-on-surface-variant mb-3 w-100 text-center" style="letter-spacing:0.06em;">Content Overview</div>
                         <canvas id="studentStatusChart" style="max-height: 200px; width: 100%;"></canvas>
                     </div>
                 </div>
@@ -278,26 +278,29 @@
     setTimeout(() => {
         const ctx = document.getElementById('studentStatusChart');
         if (ctx) {
+            const totalFiles = resourcesData.filter(r => r.type !== 'FOLDER').length;
+            const totalAssignments = assignmentsData.length;
             new Chart(ctx, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
-                    labels: ['Submitted', 'Graded', 'Pending'],
+                    labels: ['Resources (Files)', 'Assignments'],
                     datasets: [{
-                        data: [
-                            parseInt(document.getElementById('stat-submitted').textContent) || 0,
-                            parseInt(document.getElementById('stat-graded').textContent) || 0,
-                            parseInt(document.getElementById('stat-pending').textContent) || 0
-                        ],
-                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
-                        borderWidth: 0,
-                        hoverOffset: 4
+                        label: 'Count',
+                        data: [totalFiles, totalAssignments],
+                        backgroundColor: ['#0ea5e9', '#f59e0b'],
+                        borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    cutout: '70%'
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
                 }
             });
         }

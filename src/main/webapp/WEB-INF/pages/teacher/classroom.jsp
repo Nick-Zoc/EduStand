@@ -801,6 +801,13 @@
                 const result = await resp.json();
                 allResources = result.data || [];
                 renderFolderGrid();
+                
+                // Deep-link support
+                const urlParams = new URLSearchParams(window.location.search);
+                const folderParam = urlParams.get('folder');
+                if (folderParam) {
+                    openFolder(folderParam);
+                }
             } catch (err) { console.error("Error loading resources", err); }
         }
 
@@ -896,5 +903,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadAssignments();
             loadResources();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam === 'assignments') {
+                const tabEl = document.getElementById('assignments-tab');
+                if (tabEl) {
+                    const tab = new bootstrap.Tab(tabEl);
+                    tab.show();
+                }
+            }
         });
     </script>

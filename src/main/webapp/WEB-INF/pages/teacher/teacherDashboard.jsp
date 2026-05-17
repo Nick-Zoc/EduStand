@@ -92,7 +92,7 @@
             <!-- Recent Resources & Content Overview -->
             <section class="row g-4">
                 <div class="col-12 col-lg-8">
-                    <div class="card-sleek overflow-hidden h-100 d-flex flex-column">
+                    <div class="card-sleek-no-hover overflow-hidden h-100 d-flex flex-column">
                         <div class="px-4 py-3 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
                             <h3 class="fs-6 fw-bold text-on-surface m-0 brand-headline">
                                 <i class="fa-solid fa-folder-open text-primary me-2"></i>Recent Resources
@@ -106,7 +106,7 @@
                 </div>
                 <div class="col-12 col-lg-4">
                     <div class="card-sleek-no-hover p-4 h-100 d-flex flex-column align-items-center justify-content-center">
-                        <div class="small fw-semibold text-uppercase text-on-surface-variant mb-3 w-100 text-center" style="letter-spacing:0.06em;">Content Distribution</div>
+                        <div class="small fw-semibold text-uppercase text-on-surface-variant mb-3 w-100 text-center" style="letter-spacing:0.06em;">Content Overview</div>
                         <canvas id="teacherContentChart" style="max-height: 200px; width: 100%;"></canvas>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
             <section class="row g-4 mt-2">
                 <!-- Recent Assignments -->
                 <div class="col-12 col-lg-6">
-                    <div class="card-sleek h-100 overflow-hidden d-flex flex-column">
+                    <div class="card-sleek-no-hover h-100 overflow-hidden d-flex flex-column">
                         <div class="px-4 py-3 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
                             <h3 class="fs-6 fw-bold text-on-surface m-0 brand-headline">
                                 <i class="fa-solid fa-file-alt text-primary me-2"></i>Recent Assignments
@@ -131,7 +131,7 @@
 
                 <!-- Notice Board -->
                 <div class="col-12 col-lg-6">
-                    <div class="card-sleek h-100 overflow-hidden d-flex flex-column">
+                    <div class="card-sleek-no-hover h-100 overflow-hidden d-flex flex-column">
                         <div class="px-4 py-3 border-bottom border-outline-variant d-flex align-items-center justify-content-between">
                             <h3 class="fs-6 fw-bold text-on-surface m-0 brand-headline">
                                 <i class="fa-solid fa-bullhorn text-warning me-2"></i>Notice Board
@@ -257,7 +257,7 @@
     function renderResources() {
         const el = document.getElementById('dash-resources');
         const files = resourcesData.filter(r => r.type !== 'FOLDER').slice(0, 6);
-        document.getElementById('stat-resources').textContent = resourcesData.length;
+        document.getElementById('stat-resources').textContent = resourcesData.filter(r => r.type !== 'FOLDER').length;
         if (!files.length) {
             el.innerHTML = '<p class="text-on-surface-variant small text-center py-3">No files uploaded yet. <a href="${pageContext.request.contextPath}/TeacherClassroom">Upload one →</a></p>';
             return;
@@ -337,22 +337,29 @@
     setTimeout(() => {
         const ctx = document.getElementById('teacherContentChart');
         if (ctx) {
+            const totalFiles = resourcesData.filter(r => r.type !== 'FOLDER').length;
+            const totalAssignments = assignmentsData.length;
             new Chart(ctx, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
-                    labels: ['Assignments', 'Resources', 'Notices'],
+                    labels: ['Resources (Files)', 'Assignments'],
                     datasets: [{
-                        data: [assignmentsData.length, resourcesData.length, noticesData.length],
-                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
-                        borderWidth: 0,
-                        hoverOffset: 4
+                        label: 'Count',
+                        data: [totalFiles, totalAssignments],
+                        backgroundColor: ['#0ea5e9', '#f59e0b'],
+                        borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    cutout: '70%'
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
                 }
             });
         }

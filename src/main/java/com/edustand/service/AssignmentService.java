@@ -25,6 +25,14 @@ public class AssignmentService {
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
+    public int countAllAssignments() {
+        String query = "SELECT COUNT(*) FROM Assignments";
+        try (Connection conn = DbConfig.getDbConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
     public String getAllAssignmentsAsJson(int studentId) {
         StringBuilder json = new StringBuilder("[");
         String query = "SELECT a.*, (SELECT status FROM Submissions s WHERE s.assignment_id = a.assignment_id AND s.student_id = ?) AS student_status FROM Assignments a ORDER BY a.due_date ASC";

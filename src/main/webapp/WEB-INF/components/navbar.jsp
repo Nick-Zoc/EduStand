@@ -10,10 +10,10 @@
         <button class="btn d-md-none sidebar-toggle-btn p-1" type="button" onclick="document.querySelector('.app-sidebar').classList.toggle('show');">
             <i class="fa-solid fa-bars fs-5"></i>
         </button>
-        <div class="position-relative w-100">
+        <form action="${pageContext.request.contextPath}/search" method="GET" class="position-relative w-100 m-0">
             <i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y text-on-surface-variant small" style="left: 1rem;"></i>
-            <input class="form-control dashboard-search w-100" placeholder="${empty searchPlaceholder ? 'Search resources, users, or pages...' : searchPlaceholder}" type="text"/>
-        </div>
+            <input name="q" class="form-control dashboard-search w-100" placeholder="${empty searchPlaceholder ? 'Search resources, users, or pages...' : searchPlaceholder}" type="text" value="${fn:escapeXml(param.q)}"/>
+        </form>
     </div>
 
     <div class="d-flex align-items-center gap-3 ms-auto">
@@ -85,7 +85,7 @@
                     <div class="min-w-0 flex-grow-1">
                         <div class="fw-bold brand-headline text-on-surface text-truncate">${resolvedName}</div>
                         <div class="mt-1">
-                            <span class="edu-badge ${resolvedRole eq 'ADMIN' ? 'bg-danger' : resolvedRole eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'} text-uppercase text-white">
+                            <span class="edu-badge ${resolvedRole eq 'ADMIN' ? 'bg-danger text-white' : resolvedRole eq 'TEACHER' ? 'edu-badge-teachers' : 'edu-badge-students'} text-uppercase">
                                 ${resolvedRole}
                             </span>
                         </div>
@@ -175,9 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="notification-item p-2 d-flex gap-2 align-items-start">
                 <i class="fa-regular fa-envelope text-primary mt-1" style="min-width:20px;"></i>
                 <div class="flex-grow-1 min-w-0">
-                    <div class="fw-semibold text-on-surface small">${escapeHtml(req.fullName)}</div>
-                    <div class="text-on-surface-variant small mt-1">${escapeHtml(req.subject)}</div>
-                    <div class="d-flex gap-2 mt-2 align-items-center">${badge}<span class="text-on-surface-variant" style="font-size:12px;">${formatTime(req.createdAt)}</span></div>
+                    <div class="fw-semibold text-on-surface small">\${escapeHtml(req.fullName)}</div>
+                    <div class="text-on-surface-variant small mt-1">\${escapeHtml(req.subject)}</div>
+                    <div class="d-flex gap-2 mt-2 align-items-center">\${badge}<span class="text-on-surface-variant" style="font-size:12px;">\${formatTime(req.createdAt)}</span></div>
                 </div></div>`;
         }).join('');
     }
@@ -197,9 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="notification-item p-2 d-flex gap-2 align-items-start">
                 <i class="fa-solid fa-bullhorn text-warning mt-1" style="min-width:20px;"></i>
                 <div class="flex-grow-1 min-w-0">
-                    <div class="fw-semibold text-on-surface small">${escapeHtml(n.title)}</div>
-                    <div class="text-on-surface-variant small mt-1">${escapeHtml(preview)}</div>
-                    <div class="mt-2"><span class="text-on-surface-variant" style="font-size:11px;">By ${escapeHtml(n.author)} · ${n.startDate}</span></div>
+                    <div class="fw-semibold text-on-surface small">\${escapeHtml(n.title)}</div>
+                    <div class="text-on-surface-variant small mt-1">\${escapeHtml(preview)}</div>
+                    <div class="mt-2"><span class="text-on-surface-variant" style="font-size:11px;">By \${escapeHtml(n.author)} · \${n.startDate}</span></div>
                 </div></div>`;
         }).join('');
     }

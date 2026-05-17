@@ -47,7 +47,7 @@ public class AdminDashboardController extends HttpServlet {
 
         int teacherCount = adminService.countUsersByRole("TEACHER");
         int studentCount = adminService.countUsersByRole("STUDENT");
-        int adminCount   = adminService.countUsersByRole("ADMIN");
+        int adminCount = adminService.countUsersByRole("ADMIN");
 
         req.setAttribute("teacherCount", teacherCount);
         req.setAttribute("studentCount", studentCount);
@@ -55,6 +55,16 @@ public class AdminDashboardController extends HttpServlet {
         req.setAttribute("totalUsers", adminService.countAllUsers());
         req.setAttribute("inactiveCount", adminService.countUsersByStatus("INACTIVE"));
         req.setAttribute("unreadContactCount", contactRequestService.countByReadStatus("UNREAD"));
+
+        req.setAttribute("activeNoticesCount", noticeService.countNoticesByStatus("ACTIVE"));
+        req.setAttribute("upcomingNoticesCount", noticeService.countNoticesByStatus("UPCOMING"));
+        req.setAttribute("expiredNoticesCount", noticeService.countNoticesByStatus("EXPIRED"));
+
+        com.edustand.service.ResourceService resourceService = new com.edustand.service.ResourceService();
+        com.edustand.service.AssignmentService assignmentService = new com.edustand.service.AssignmentService();
+        req.setAttribute("filesCount", resourceService.countFilesOnly());
+        req.setAttribute("assignmentsCount", assignmentService.countAllAssignments());
+
         // Show only 5 recent logs — makes room for notices panel side by side
         req.setAttribute("recentLogs", activityLogService.getRecentLogs(5));
         // Notices for the notice panel

@@ -424,11 +424,11 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Notes', 'Books', 'Syllabus', 'Assignments'],
+                labels: ['Resources (Files)', 'Assignments'],
                 datasets: [{
                     label: 'Count',
-                    data: [45, 12, 5, 28],
-                    backgroundColor: ['#6366f1', '#0ea5e9', '#22c55e', '#f59e0b'],
+                    data: [${filesCount}, ${assignmentsCount}],
+                    backgroundColor: ['#0ea5e9', '#f59e0b'],
                     borderRadius: 4
                 }]
             },

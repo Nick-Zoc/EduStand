@@ -19,6 +19,25 @@ public class ResourceService {
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
+    public int countResourcesByCategory(String category) {
+        String query = "SELECT COUNT(*) FROM Resources WHERE category = ?";
+        try (Connection conn = DbConfig.getDbConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, category);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int countFilesOnly() {
+        String query = "SELECT COUNT(*) FROM Resources WHERE file_type <> 'FOLDER'";
+        try (Connection conn = DbConfig.getDbConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
     // Fetches all resources. If we want folder view, we group by 'category' in JS.
     public String getAllResourcesAsJson() {
         StringBuilder json = new StringBuilder("[");

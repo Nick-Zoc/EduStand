@@ -192,7 +192,7 @@
 
     function renderTable(notices) {
         const tbody = document.getElementById('noticesTableBody');
-        document.getElementById('noticeCount').textContent = `Showing ${notices.length} notice${notices.length !== 1 ? 's' : ''}`;
+        document.getElementById('noticeCount').textContent = `Showing \${notices.length} notice\${notices.length !== 1 ? 's' : ''}`;
         if (!notices.length) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-on-surface-variant">No notices found.</td></tr>';
             return;

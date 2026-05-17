@@ -88,7 +88,7 @@ public class LoginController extends HttpServlet {
             case WRONG_PASSWORD:
                 String attemptsMsg = result.remainingAttempts > 0
                         ? " You have " + result.remainingAttempts + " attempt(s) remaining before your account is locked."
-                        : " Your account has been locked for 30 minutes.";
+                        : " Your account has been locked for 10 minutes.";
                 req.setAttribute("error", "Invalid email or password." + attemptsMsg);
                 req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);
                 break;

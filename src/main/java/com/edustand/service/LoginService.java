@@ -22,7 +22,7 @@ public class LoginService {
     private static final int MAX_FAILED_ATTEMPTS = 5;
 
     /** Lock duration in minutes. */
-    private static final int LOCKOUT_MINUTES = 30;
+    private static final int LOCKOUT_MINUTES = 10;
 
     /**
      * Outcome of an authentication attempt. Callers check this to
